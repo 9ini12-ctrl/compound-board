@@ -682,6 +682,72 @@
       box-shadow: 0 0 0 8px rgba(59,130,246,.14);
       transition: box-shadow .25s ease, outline-color .25s ease;
     }
+
+
+    /* Hide sync settings UI (auto-configured) */
+    .syncBlock{display:none !important;}
+    #syncState{display:none !important;}
+
+    /* Card overlay zoom (Jony Ive-ish). Mobile only, desktop unaffected. */
+    .cardOverlay{position:fixed; inset:0; display:none; z-index:120;}
+    .cardOverlay.isOpen{display:block;}
+    .cardOverlayBackdrop{
+      position:absolute; inset:0;
+      background: rgba(10,14,20,.32);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity:0;
+      transition: opacity .22s ease;
+    }
+    .cardOverlay.isOpen .cardOverlayBackdrop{opacity:1;}
+    .cardOverlayShell{
+      position:absolute;
+      left: 12px; right: 12px;
+      top: 64px; bottom: 84px; /* leave space for mobile nav */
+      border-radius: 22px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 28px 80px rgba(16,24,40,.26);
+      overflow:hidden;
+      transform: translateY(16px) scale(.98);
+      opacity:0;
+      transition: transform .26s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
+    }
+    .cardOverlay.isOpen .cardOverlayShell{
+      transform: translateY(0) scale(1);
+      opacity:1;
+    }
+    .cardOverlayTop{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(11,18,32,.08);
+      background: linear-gradient(to bottom, rgba(255,255,255,.96), rgba(255,255,255,.78));
+    }
+    .cardOverlayNav{display:flex; gap:8px;}
+    .cardOverlayBody{
+      height: calc(100% - 52px);
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px;
+    }
+
+    /* FLIP clone that expands from tapped card */
+    .flipClone{
+      position:fixed;
+      z-index:130;
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 20px 60px rgba(16,24,40,.18);
+      transform-origin: top left;
+      will-change: transform, width, height;
+    }
+    .flipFadeIn{opacity:0; transition: opacity .18s ease;}
+    .flipFadeIn.on{opacity:1;}
+    @media (min-width: 641px){
+      .cardOverlay{display:none !important;}
+    }
 </style>
 </head>
 <body>
@@ -890,7 +956,8 @@
                   <option value="rich">غني (تفاصيل أكثر)</option>
                 </select>
               
-            <div class="note" style="margin-top:12px">
+            <div class="syncBlock" aria-hidden="true">
+<div class="note" style="margin-top:12px">
               <b>مزامنة جماعية (تحديث للجميع):</b> ضع رابط ملف JSON عام (GET) ليتم تحميل أحدث البيانات تلقائيًا عند كل المستخدمين.
               يمكنك أيضًا وضع رابط حفظ (POST) إن كان لديك API في منصتك لحفظ البيانات مباشرة.
             </div>
@@ -930,6 +997,7 @@
               <button class="btn" id="btnPublishRemote">نشر التعديل للجميع</button>
               <span class="chip" id="syncState">غير متصل</span>
             </div>
+</div>
 </div>
             </div>
 
@@ -2225,6 +2293,112 @@
         setTimeout(()=>el.classList.remove("pulseFocus"), 900);
       }
     }
+
+
+    
+    // ===== Card overlay zoom (mobile). Presentation only, preserves all existing features. =====
+    const cardOverlay = document.getElementById("cardOverlay");
+    const cardOverlayBackdrop = document.getElementById("cardOverlayBackdrop");
+    const cardOverlayShell = document.getElementById("cardOverlayShell");
+    const cardOverlayBody = document.getElementById("cardOverlayBody");
+    const cardOverlayClose = document.getElementById("cardOverlayClose");
+    const cardOverlayPrev = document.getElementById("cardOverlayPrev");
+    const cardOverlayNext = document.getElementById("cardOverlayNext");
+
+    let overlayOpenId = null;
+
+    function isMobile(){
+      return window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+    }
+
+    function lockScroll(lock){
+      document.documentElement.style.overflow = lock ? "hidden" : "";
+      document.body.style.overflow = lock ? "hidden" : "";
+    }
+
+    function renderOverlayContent(){
+      const vp = document.getElementById("viewPane");
+      if(!vp) return;
+      const clone = vp.cloneNode(true);
+      // Remove controls in the clone to keep it clean
+      clone.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
+      cardOverlayBody.innerHTML = "";
+      const fade = document.createElement("div");
+      fade.className = "flipFadeIn";
+      fade.appendChild(clone);
+      cardOverlayBody.appendChild(fade);
+      requestAnimationFrame(()=>fade.classList.add("on"));
+    }
+
+    function currentIndex(){
+      return cards.findIndex(c=>c.id===overlayOpenId);
+    }
+    function gotoIndex(idx){
+      if(idx<0 || idx>=cards.length) return;
+      const id = cards[idx].id;
+      overlayOpenId = id;
+      selectCard(id);
+      setCardHash(id);
+      focusCardInList(id);
+      renderOverlayContent();
+    }
+
+    function openCardOverlay(fromEl, id){
+      if(!isMobile()) return;
+      overlayOpenId = id;
+
+      const r = fromEl.getBoundingClientRect();
+
+      // Create a lightweight FLIP clone from the tapped card
+      const cloneWrap = document.createElement("div");
+      cloneWrap.className = "flipClone";
+      cloneWrap.style.left = r.left + "px";
+      cloneWrap.style.top = r.top + "px";
+      cloneWrap.style.width = r.width + "px";
+      cloneWrap.style.height = r.height + "px";
+
+      const inner = fromEl.cloneNode(true);
+      inner.classList.remove("pulseFocus");
+      cloneWrap.appendChild(inner);
+      document.body.appendChild(cloneWrap);
+
+      // Open overlay (content prepared from existing viewPane to preserve logic)
+      cardOverlay.classList.add("isOpen");
+      cardOverlay.setAttribute("aria-hidden","false");
+      lockScroll(true);
+      renderOverlayContent();
+
+      // Animate clone into overlay bounds
+      const target = cardOverlayShell.getBoundingClientRect();
+
+      requestAnimationFrame(()=>{
+        cloneWrap.style.transition = "left .34s cubic-bezier(.2,.9,.2,1), top .34s cubic-bezier(.2,.9,.2,1), width .34s cubic-bezier(.2,.9,.2,1), height .34s cubic-bezier(.2,.9,.2,1), border-radius .34s cubic-bezier(.2,.9,.2,1), opacity .18s ease";
+        cloneWrap.style.left = target.left + "px";
+        cloneWrap.style.top = target.top + "px";
+        cloneWrap.style.width = target.width + "px";
+        cloneWrap.style.height = target.height + "px";
+        cloneWrap.style.borderRadius = "22px";
+        inner.style.transition = "opacity .18s ease";
+        inner.style.opacity = "0";
+      });
+
+      setTimeout(()=>{ cloneWrap.remove(); }, 380);
+    }
+
+    function closeCardOverlay(){
+      if(!cardOverlay.classList.contains("isOpen")) return;
+      cardOverlay.classList.remove("isOpen");
+      cardOverlay.setAttribute("aria-hidden","true");
+      lockScroll(false);
+      overlayOpenId = null;
+    }
+
+    cardOverlayBackdrop?.addEventListener("click", closeCardOverlay);
+    cardOverlayClose?.addEventListener("click", closeCardOverlay);
+    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeCardOverlay(); });
+
+    cardOverlayPrev?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>0) gotoIndex(i-1); });
+    cardOverlayNext?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>=0 && i<cards.length-1) gotoIndex(i+1); });
 
 
     // ===== Init =====
