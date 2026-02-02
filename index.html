@@ -748,7 +748,80 @@
     @media (min-width: 641px){
       .cardOverlay{display:none !important;}
     }
+
+
+    /* Admin lock */
+    body.adminLocked .adminOnly{display:none !important;}
+    body.adminLocked #tabManage,
+    body.adminLocked #tabSettings{display:none !important;}
+    body.adminLocked .mNavBtn[data-target="tabManage"],
+    body.adminLocked .mNavBtn[data-target="tabSettings"],
+    body.adminLocked .mNavBtn[data-action="print"],
+    body.adminLocked .mNavBtn[data-action="images"]{display:none !important;}
+    body.adminLocked #btnPrint,
+    body.adminLocked #btnExportZip,
+    body.adminLocked #btnExportImages,
+    body.adminLocked #btnExportHTML,
+    body.adminLocked #btnExportSnippet,
+    body.adminLocked #btnSample,
+    body.adminLocked #btnClear,
+    body.adminLocked #btnFetchRemote,
+    body.adminLocked #btnPublishRemote{display:none !important;}
+
+    /* Lock modal */
+    .adminLockModal{position:fixed; inset:0; display:none; z-index:140;}
+    .adminLockModal.isOpen{display:block;}
+    .adminLockBackdrop{
+      position:absolute; inset:0;
+      background: rgba(10,14,20,.28);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity:0; transition: opacity .18s ease;
+    }
+    .adminLockModal.isOpen .adminLockBackdrop{opacity:1;}
+    .adminLockSheet{
+      position:absolute;
+      left: 12px; right: 12px;
+      bottom: 12px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 28px 80px rgba(16,24,40,.26);
+      padding: 12px;
+      transform: translateY(16px);
+      opacity:0;
+      transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .16s ease;
+    }
+    .adminLockModal.isOpen .adminLockSheet{transform: translateY(0); opacity:1;}
+    .adminLockHandle{width:42px; height:5px; border-radius:999px; background: rgba(11,18,32,.14); margin: 2px auto 10px;}
+    .adminLockTitle{font-weight:1000; font-size:16px; margin-bottom:4px;}
+    .adminLockHint{font-size:12px; color: rgba(11,18,32,.62); margin-bottom:10px; line-height:1.35;}
+    .adminLockRow{display:flex; gap:10px; align-items:center;}
+    #adminPass{flex:1; padding: 12px 12px; border-radius: 16px; border: 1px solid rgba(11,18,32,.14); background: rgba(255,255,255,.85); font-size:16px;}
+    .adminLockRow2{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;}
+
+    /* Overlay handle + phone typography */
+    .cardOverlayHandle{width:44px; height:5px; border-radius:999px; background: rgba(11,18,32,.14); margin: 6px auto 6px;}
+    @media (max-width: 640px){
+      .cardOverlayShell{top: 10px; bottom: 76px; left: 10px; right: 10px;}
+      .cardOverlayBody{padding: 10px;}
+      .cardOverlayTop{padding: 8px 10px;}
+      .cardOverlayTop .btn.small{padding: 8px 10px; border-radius: 14px;}
+      .cardOverlayNav{gap:6px;}
+      .cardOverlayBody .card{padding: 10px !important;}
+      .cardOverlayBody .name{font-size:18px;}
+      .cardOverlayBody .pill{padding: 8px 10px;}
+    }
 </style>
+
+  <!-- PWA / iOS Add to Home Screen -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="بطاقات المجمعات">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png">
 </head>
 <body>
   <header class="top">
@@ -1010,6 +1083,25 @@
       </div>
     </section>
   </main>
+
+
+  <!-- Admin unlock (hidden by default). Triple-tap logo / long-press opens passcode. -->
+  <div id="adminLockModal" class="adminLockModal no-print" aria-hidden="true">
+    <div class="adminLockBackdrop" id="adminLockBackdrop"></div>
+    <div class="adminLockSheet" role="dialog" aria-modal="true" aria-label="رمز الدخول">
+      <div class="adminLockHandle" aria-hidden="true"></div>
+      <div class="adminLockTitle">رمز الدخول</div>
+      <div class="adminLockHint">أدخل الرمز لإظهار الإعدادات والتصدير وتعديل المراحل.</div>
+      <div class="adminLockRow">
+        <input id="adminPass" inputmode="numeric" autocomplete="one-time-code" placeholder="•••" maxlength="6">
+        <button class="btn primary" id="adminUnlockBtn">دخول</button>
+      </div>
+      <div class="adminLockRow2">
+        <button class="btn" id="adminLockBtn">إخفاء الخيارات</button>
+        <span class="chip" id="adminLockState">مخفي</span>
+      </div>
+    </div>
+  </div>
 
   
   <!-- Export overlay -->
@@ -2399,6 +2491,126 @@
 
     cardOverlayPrev?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>0) gotoIndex(i-1); });
     cardOverlayNext?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>=0 && i<cards.length-1) gotoIndex(i+1); });
+
+
+    
+    // ===== PWA: Service Worker (offline shell) =====
+    (function(){
+      try{
+        if("serviceWorker" in navigator){
+          window.addEventListener("load", ()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+        }
+      }catch(e){}
+    })();
+
+
+    
+    // ===== Admin lock logic (keeps all features, hides advanced controls until code) =====
+    const ADMIN_KEY = "compound_admin_unlocked_v1";
+    const adminLockModal = document.getElementById("adminLockModal");
+    const adminLockBackdrop = document.getElementById("adminLockBackdrop");
+    const adminPass = document.getElementById("adminPass");
+    const adminUnlockBtn = document.getElementById("adminUnlockBtn");
+    const adminLockBtn = document.getElementById("adminLockBtn");
+    const adminLockState = document.getElementById("adminLockState");
+
+    function isUnlocked(){
+      try{ return localStorage.getItem(ADMIN_KEY)==="1"; }catch(e){ return false; }
+    }
+    function applyLockState(){
+      const unlocked = isUnlocked();
+      document.body.classList.toggle("adminLocked", !unlocked);
+      if(adminLockState) adminLockState.textContent = unlocked ? "مفعل" : "مخفي";
+    }
+    function openAdminModal(){
+      if(!adminLockModal) return;
+      adminLockModal.classList.add("isOpen");
+      adminLockModal.setAttribute("aria-hidden","false");
+      try{ adminPass.value=""; adminPass.focus(); }catch(e){}
+    }
+    function closeAdminModal(){
+      if(!adminLockModal) return;
+      adminLockModal.classList.remove("isOpen");
+      adminLockModal.setAttribute("aria-hidden","true");
+    }
+    function unlockWith(code){
+      if(String(code||"").trim()==="111"){
+        try{ localStorage.setItem(ADMIN_KEY,"1"); }catch(e){}
+        applyLockState();
+        closeAdminModal();
+        return true;
+      }
+      return false;
+    }
+    function lockNow(){
+      try{ localStorage.removeItem(ADMIN_KEY); }catch(e){}
+      applyLockState();
+      closeAdminModal();
+    }
+
+    adminUnlockBtn?.addEventListener("click", ()=>{ if(!unlockWith(adminPass?.value)) alert("رمز غير صحيح"); });
+    adminPass?.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ if(!unlockWith(adminPass?.value)) alert("رمز غير صحيح"); } });
+    adminLockBtn?.addEventListener("click", lockNow);
+    adminLockBackdrop?.addEventListener("click", closeAdminModal);
+    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeAdminModal(); });
+
+    // Gesture: long-press or triple-tap on header brand to open modal
+    (function(){
+      const brand = document.querySelector(".brand");
+      if(!brand) return;
+      let tapCount=0, tapTimer=null;
+      let pressTimer=null;
+
+      brand.addEventListener("touchstart", ()=>{
+        pressTimer = setTimeout(openAdminModal, 650);
+      }, {passive:true});
+      brand.addEventListener("touchend", ()=>{
+        if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+      });
+
+      brand.addEventListener("click", ()=>{
+        tapCount++;
+        if(tapTimer) clearTimeout(tapTimer);
+        tapTimer = setTimeout(()=>{ tapCount=0; }, 650);
+        if(tapCount>=3){
+          tapCount=0;
+          openAdminModal();
+        }
+      });
+    })();
+
+    // Apply initial lock state
+    applyLockState();
+
+
+    
+    // Swipe down to close (mobile)
+    (function(){
+      const shell = cardOverlayShell;
+      if(!shell) return;
+      let sy=0, cy=0, dragging=false;
+      shell.addEventListener("touchstart", (e)=>{
+        if(!cardOverlay.classList.contains("isOpen")) return;
+        const t = e.touches[0];
+        sy = t.clientY; cy = sy; dragging=true;
+      }, {passive:true});
+      shell.addEventListener("touchmove", (e)=>{
+        if(!dragging) return;
+        const t = e.touches[0];
+        cy = t.clientY;
+        const dy = Math.max(0, cy - sy);
+        shell.style.transform = `translateY(${dy}px) scale(${1 - Math.min(dy/1200, .02)})`;
+        shell.style.transition = "none";
+      }, {passive:true});
+      shell.addEventListener("touchend", ()=>{
+        if(!dragging) return;
+        dragging=false;
+        const dy = Math.max(0, cy - sy);
+        shell.style.transition = "";
+        shell.style.transform = "";
+        if(dy > 120) closeCardOverlay();
+      });
+    })();
 
 
     // ===== Init =====
