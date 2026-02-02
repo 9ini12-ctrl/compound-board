@@ -855,6 +855,117 @@
     @media (max-width:640px){
       .detailBody{padding-bottom: 90px;} /* space for mobile nav */
     }
+
+    /* iPhone-style detail tabs */
+    .detailTop{padding-top: max(10px, env(safe-area-inset-top));}
+    .detailBody{padding-top: 10px;}
+
+    .detailTabs{
+      position: sticky;
+      top: calc(56px + env(safe-area-inset-top));
+      z-index: 3;
+      display:flex;
+      gap:8px;
+      padding: 10px 12px;
+      background: rgba(248,250,252,.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(11,18,32,.08);
+    }
+    .detailTab{
+      flex: 1;
+      border: 1px solid rgba(11,18,32,.10);
+      background: rgba(255,255,255,.78);
+      color: rgba(11,18,32,.76);
+      border-radius: 999px;
+      padding: 10px 10px;
+      font-weight: 1000;
+      font-size: 12px;
+      cursor: pointer;
+      transition: .14s ease;
+    }
+    .detailTab.active{
+      background: rgba(11,18,32,.92);
+      color: rgba(255,255,255,.96);
+      border-color: rgba(11,18,32,.10);
+      box-shadow: 0 10px 26px rgba(16,24,40,.18);
+    }
+
+    .detailKPIWrap{
+      position: sticky;
+      top: calc(56px + 56px + env(safe-area-inset-top)); /* top + tabs */
+      z-index: 2;
+      padding: 12px;
+      background: rgba(248,250,252,.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(11,18,32,.08);
+    }
+    .detailKPIGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .detailKPI{
+      border-radius: 18px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 12px 34px rgba(16,24,40,.10);
+      padding: 10px 12px;
+      overflow:hidden;
+    }
+    .detailKPI .k{font-size:11px; color: rgba(11,18,32,.58); font-weight:900;}
+    .detailKPI .v{
+      margin-top: 6px;
+      font-size: 20px;
+      line-height: 1.1;
+      font-weight: 1100;
+      letter-spacing: -0.02em;
+      color: rgba(11,18,32,.92);
+      display:flex; align-items:baseline; gap:6px; justify-content:space-between;
+    }
+    .detailKPI .v .sar{font-size:12px; color: rgba(11,18,32,.55); font-weight:900;}
+    .detailKPI .sub{
+      margin-top: 6px;
+      font-size: 11px;
+      color: rgba(11,18,32,.58);
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .detailPanel{display:none; padding: 12px;}
+    .detailPanel.active{display:block;}
+
+    .stageList{display:flex; flex-direction:column; gap:10px;}
+    .stageRow{
+      border-radius: 18px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 12px 34px rgba(16,24,40,.10);
+      padding: 12px;
+    }
+    .stageRowTop{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+    .stageName{font-weight:1100; font-size:13px; color: rgba(11,18,32,.86);}
+    .stageTarget{font-weight:1100; font-size:18px; color: rgba(11,18,32,.92);}
+    .stageTarget .sar{font-size:12px; color: rgba(11,18,32,.55); font-weight:900; margin-inline-start:6px;}
+    .stageBar{height: 10px; border-radius: 999px; background: rgba(11,18,32,.08); overflow:hidden; margin-top:10px;}
+    .stageFill{height:100%; border-radius:999px; width:0%;}
+    .stageMeta{margin-top:8px; display:flex; justify-content:space-between; font-size:11px; color: rgba(11,18,32,.60); font-weight:850;}
+
+    /* Gesture hint */
+    .detailHint{
+      padding: 10px 12px;
+      font-size: 11px;
+      color: rgba(11,18,32,.55);
+      font-weight: 800;
+      text-align:center;
+    }
+
+    @media (max-width: 640px){
+      .detailPage{background: rgba(248,250,252,.98);}
+      .detailBody{padding: 0;}
+      .detailPanel{padding-bottom: 96px;}
+    }
 </style>
 
   <!-- PWA / iOS Add to Home Screen -->
@@ -1136,7 +1247,20 @@
         <div class="detailTitle" id="detailTitle">التفاصيل</div>
         <button class="btn small adminOnly" id="detailPublish">نشر</button>
       </div>
-      <div class="detailBody" id="detailBody"></div>
+      
+      <div class="detailTabs" id="detailTabs">
+        <button class="detailTab active" data-tab="summary">ملخص</button>
+        <button class="detailTab" data-tab="stages">المراحل</button>
+        <button class="detailTab" data-tab="full">كامل</button>
+      </div>
+      <div class="detailKPIWrap" id="detailKPIWrap"></div>
+      <div class="detailBody" id="detailBody">
+        <div class="detailPanel active" id="detailPanelSummary"></div>
+        <div class="detailPanel" id="detailPanelStages"></div>
+        <div class="detailPanel" id="detailPanelFull"></div>
+        <div class="detailHint">اسحب للأسفل للإغلاق • أو اسحب من الطرف الأيسر للرجوع</div>
+      </div>
+
     </section>
 
 </main>
@@ -2894,6 +3018,214 @@
       }
     }
     window.addEventListener("hashchange", ()=>{ try{ handleRoute(); }catch(e){} });
+
+
+    
+    // ===== iPhone detail tabs renderer (keeps all existing data/logic) =====
+    const detailTabs = document.getElementById("detailTabs");
+    const detailKPIWrap = document.getElementById("detailKPIWrap");
+    const detailPanelSummary = document.getElementById("detailPanelSummary");
+    const detailPanelStages = document.getElementById("detailPanelStages");
+    const detailPanelFull = document.getElementById("detailPanelFull");
+
+    function money(v){
+      try{
+        if(typeof fmtMoney === "function") return fmtMoney(v);
+      }catch(e){}
+      try{
+        const n = Number(v||0)||0;
+        return new Intl.NumberFormat("ar-SA").format(Math.round(n));
+      }catch(e){
+        return String(v||0);
+      }
+    }
+    function pct(v){
+      try{
+        const n = Number(v||0);
+        if(!isFinite(n)) return "—";
+        return (n*100).toFixed(n<0.1?1:0) + "%";
+      }catch(e){ return "—"; }
+    }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+    function renderDetailKpis(card){
+      if(!detailKPIWrap) return;
+      const total = Number(card.total||0)||0;
+      const covered = Number(card.covered||0)||0;
+      const covPct = total>0 ? covered/total : 0;
+      const goal = Number(card.portfolioGoal||card.goal||0)||0;
+
+      detailKPIWrap.innerHTML = `
+        <div class="detailKPIGrid">
+          <div class="detailKPI">
+            <div class="k">التكلفة الإجمالية</div>
+            <div class="v"><span>${money(total)}</span><span class="sar">﷼</span></div>
+            <div class="sub">عدد الطلاب: ${money(card.students||0)}</div>
+          </div>
+          <div class="detailKPI">
+            <div class="k">المغطّى الحالي</div>
+            <div class="v"><span>${money(covered)}</span><span class="sar">﷼</span></div>
+            <div class="sub">نسبة التغطية: ${pct(covPct)}</div>
+          </div>
+          <div class="detailKPI">
+            <div class="k">هدف المحفظة</div>
+            <div class="v"><span>${money(goal)}</span><span class="sar">﷼</span></div>
+            <div class="sub">مبني على إعدادات المنصة</div>
+          </div>
+          <div class="detailKPI">
+            <div class="k">المجمع / الدور</div>
+            <div class="v" style="font-size:14px; align-items:center; justify-content:space-between;">
+              <span>${escapeHtml(card.compoundCategory||"—")}</span>
+              <span style="font-size:12px; color: rgba(11,18,32,.55); font-weight:900;">${escapeHtml(card.dawr||"")}</span>
+            </div>
+            <div class="sub">اضغط تحديث لجلب آخر نسخة عند الحاجة</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDetailSummary(card){
+      if(!detailPanelSummary) return;
+      // Reuse existing compact card header/progress UI by cloning the visible card in list if possible:
+      const cardEl = document.querySelector(`[data-card-id="${CSS.escape(card.id)}"]`);
+      if(cardEl){
+        const clone = cardEl.cloneNode(true);
+        clone.querySelectorAll(".no-print").forEach(n=>n.remove());
+        detailPanelSummary.innerHTML = "";
+        detailPanelSummary.appendChild(clone);
+      }else{
+        detailPanelSummary.innerHTML = `<div class="stageRow"><div class="stageName">${escapeHtml(card.name||"")}</div></div>`;
+      }
+      // Add a small narrative line (non-invasive)
+      const p = document.createElement("div");
+      p.className = "stageRow";
+      p.innerHTML = `<div class="stageName">الفكرة</div><div class="stageMeta"><span>نرفع التغطية عبر مراحل واضحة</span><span>ثم نحدّث المدراء بالنسخة الأحدث</span></div>`;
+      detailPanelSummary.appendChild(p);
+    }
+
+    function stageColor(i){
+      // Use existing stage color if present, otherwise cycle gentle palette
+      const palette = ["#3B82F6","#22C55E","#F59E0B","#A855F7","#EF4444","#14B8A6","#E11D48","#6366F1"];
+      return palette[i % palette.length];
+    }
+
+    function renderDetailStages(card){
+      if(!detailPanelStages) return;
+      const total = Number(card.total||0)||0;
+      const covered = Number(card.covered||0)||0;
+      const covPct = total>0 ? covered/total : 0;
+
+      const list = (stages||[]).map((s,i)=>{
+        const target = Number(s.target||0)||0;
+        // We show progress relative to total cost by default (stage target as amount)
+        const stagePct = total>0 ? clamp(target/total,0,1) : 0;
+        const color = s.color || stageColor(i);
+        return { name: s.name || `مرحلة ${i+1}`, target, stagePct, color };
+      });
+
+      if(!list.length){
+        detailPanelStages.innerHTML = `<div class="stageRow"><div class="stageName">لا توجد مراحل مُعرّفة</div></div>`;
+        return;
+      }
+
+      detailPanelStages.innerHTML = `
+        <div class="stageList">
+          ${list.map((x,idx)=>`
+            <div class="stageRow">
+              <div class="stageRowTop">
+                <div class="stageName"><span style="display:inline-block;width:10px;height:10px;border-radius:999px;background:${x.color};margin-inline-end:8px;"></span>${escapeHtml(x.name)}</div>
+                <div class="stageTarget">${money(x.target)}<span class="sar">﷼</span></div>
+              </div>
+              <div class="stageBar"><div class="stageFill" style="background:${x.color}; width:${(x.stagePct*100).toFixed(1)}%"></div></div>
+              <div class="stageMeta">
+                <span>نسبة من التكلفة: ${pct(x.stagePct)}</span>
+                <span>التغطية الحالية: ${pct(covPct)}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderDetailFull(){
+      if(!detailPanelFull) return;
+      const vp = document.getElementById("viewPane");
+      const clone = vp ? vp.cloneNode(true) : document.createElement("div");
+      clone?.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
+      detailPanelFull.innerHTML = "";
+      detailPanelFull.appendChild(clone);
+    }
+
+    function setDetailTab(tab){
+      if(!detailTabs) return;
+      detailTabs.querySelectorAll(".detailTab").forEach(b=>{
+        b.classList.toggle("active", b.getAttribute("data-tab")===tab);
+      });
+      const map = { summary: detailPanelSummary, stages: detailPanelStages, full: detailPanelFull };
+      Object.entries(map).forEach(([k,el])=>{
+        el?.classList.toggle("active", k===tab);
+      });
+      // keep KPI visible on all tabs
+    }
+
+    detailTabs?.addEventListener("click", (e)=>{
+      const b = e.target.closest(".detailTab");
+      if(!b) return;
+      setDetailTab(b.getAttribute("data-tab"));
+    });
+
+    // Enhance existing openDetail to render tabs content
+    const __origOpenDetail = (typeof openDetail === "function") ? openDetail : null;
+    if(__origOpenDetail){
+      window.openDetail = function(id){
+        __origOpenDetail(id);
+        const card = cards.find(x=>x.id===id);
+        if(card){
+          renderDetailKpis(card);
+          renderDetailSummary(card);
+          renderDetailStages(card);
+          renderDetailFull();
+          setDetailTab("summary");
+        }
+      };
+    }
+
+    // Gestures on detail page: swipe down to close, edge swipe back
+    (function(){
+      if(!detailPage) return;
+      let sx=0, sy=0, cx=0, cy=0, dragging=false, edge=false;
+      detailPage.addEventListener("touchstart", (e)=>{
+        if(!detailPage.classList.contains("isOpen")) return;
+        const t = e.touches[0];
+        sx = cx = t.clientX;
+        sy = cy = t.clientY;
+        edge = sx < 18; // left edge
+        dragging = true;
+      }, {passive:true});
+
+      detailPage.addEventListener("touchmove", (e)=>{
+        if(!dragging) return;
+        const t = e.touches[0];
+        cx = t.clientX; cy = t.clientY;
+      }, {passive:true});
+
+      detailPage.addEventListener("touchend", ()=>{
+        if(!dragging) return;
+        dragging = false;
+        const dx = cx - sx;
+        const dy = cy - sy;
+
+        // Edge swipe back
+        if(edge && dx > 80 && Math.abs(dy) < 60){
+          try{ detailBack?.click(); }catch(e){}
+          return;
+        }
+        // Swipe down close
+        if(dy > 140 && Math.abs(dx) < 90){
+          try{ detailBack?.click(); }catch(e){}
+        }
+      });
+    })();
 
 
     // ===== Init =====
