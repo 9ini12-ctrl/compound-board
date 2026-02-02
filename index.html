@@ -578,6 +578,103 @@
       .mT{font-size:11px; line-height:1}
       .mSep{width:1px; height:34px; background: rgba(11,18,32,.10); border-radius: 999px}
     }
+
+
+    /* Detail sheet (mobile master-detail) */
+    .sheetBackdrop{
+      position:fixed; inset:0; z-index:90;
+      background: rgba(11,18,32,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .sheet{
+      position:fixed;
+      left:10px; right:10px; bottom:10px;
+      z-index:95;
+      border-radius: 24px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 28px 90px rgba(16,24,40,.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      max-height: calc(88vh - 10px);
+      display:flex;
+      flex-direction:column;
+      transform: translateY(12px);
+      opacity: 0;
+      pointer-events:none;
+      transition: .18s ease;
+    }
+    .sheet.isOpen{ transform: translateY(0); opacity:1; pointer-events:auto; }
+    .sheetHandle{
+      width: 52px; height: 6px; border-radius: 999px;
+      background: rgba(11,18,32,.14);
+      margin: 10px auto 0;
+    }
+    .sheetHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid rgba(11,18,32,.08);
+    }
+    .sheetTitle{min-width:0}
+    .sheetKicker{font-size:11px; color: rgba(11,18,32,.55); font-weight:800; letter-spacing:.02em}
+    .sheetName{font-size:16px; font-weight:1000; color: rgba(11,18,32,.86); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .sheetNav{display:flex; gap:8px}
+    .sheetBody{padding: 12px; overflow:auto; -webkit-overflow-scrolling:touch}
+
+    /* Keep the large detail panel visible on desktop; on mobile prefer sheet to avoid jumping */
+    @media (max-width: 640px){
+      .detailPanel{display:none !important;} /* we still render data (for exports/desktop), but hide in phone */
+      .list{display:grid; grid-template-columns: 1fr; gap: 10px; }
+    }
+    @media (max-width: 640px) and (min-width: 460px){
+      .list{grid-template-columns: 1fr 1fr;}
+    }
+
+    /* Sheet inner blocks (use same visual language) */
+    .sheetCard{
+      border-radius: 18px;
+      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(11,18,32,.08);
+      box-shadow: 0 10px 30px rgba(16,24,40,.08);
+      overflow:hidden;
+      margin-bottom: 10px;
+    }
+    .sheetCard .pad{padding: 12px}
+    .sheetGrid{
+      display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .sheetGrid .tile{
+      background: rgba(255,255,255,.60);
+      border: 1px solid rgba(11,18,32,.08);
+      border-radius: 16px;
+      padding: 10px;
+      box-shadow: 0 10px 20px rgba(16,24,40,.06);
+    }
+    .sheetGrid .tile .t{font-size:11px; color: rgba(11,18,32,.55); font-weight:900}
+    .sheetGrid .tile .v{font-size:15px; font-weight:1000; margin-top:6px}
+    .sheetGrid .tile .s{font-size:12px; color: rgba(11,18,32,.55); margin-top:4px}
+    .sheetStages{
+      display:grid; grid-template-columns: 1fr; gap: 10px;
+    }
+    .sheetStage{
+      border-radius: 16px;
+      border: 1px solid rgba(11,18,32,.08);
+      background: rgba(255,255,255,.60);
+      box-shadow: 0 10px 20px rgba(16,24,40,.06);
+      padding: 10px;
+    }
+    .sheetStage .row{display:flex; justify-content:space-between; gap:10px; align-items:center}
+    .sheetStage b{font-weight:1000}
+    .sheetStage .lbl{font-size:11px; color: rgba(11,18,32,.55); font-weight:900; margin-top:6px}
+    .sheetStage .amt{font-size:20px; font-weight:1100; letter-spacing:.01em}
+    .sheetStage .cur{font-size:12px; margin-inline-start:4px; opacity:.7; font-weight:900}
+
+
+
+    .noScroll{overflow:hidden !important;}
 </style>
 </head>
 <body>
@@ -1422,8 +1519,8 @@
       el.className="card"+(c.id===selectedId?" selected":"");
       el.setAttribute("role","button");
       el.setAttribute("tabindex","0");
-      el.addEventListener("click", ()=>selectCard(c.id));
-      el.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectCard(c.id);} });
+      el.addEventListener("click", ()=>selectCard(c.id, true));
+      el.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectCard(c.id, true);} });
 
       el.innerHTML=`
         <div class="cardTop">
@@ -1455,7 +1552,7 @@
     }
 
     // ===== Inspector =====
-    function selectCard(id){
+    function selectCard(id, openSheet=false){
       selectedId=id;
       renderCards();
       const c=cards.find(x=>x.id===id);
@@ -1513,8 +1610,153 @@
           </div>
         `).join("") || `<div class="note" style="margin:0">لا توجد مراحل فعّالة — عدّل المراحل من تبويب (إدارة).</div>`;
 
+      // Mobile sheet (avoid scrolling to bottom on phones)
+      if(openSheet && isMobile()){
+        renderSheetForCard(c, plan);
+        openDetailSheet();
+        syncSheetNav();
+      }
+
       save();
     }
+    // ===== Mobile sheet rendering (better UX for long lists) =====
+    function isMobile(){
+      return window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+    }
+
+    function openDetailSheet(){
+      const sh = document.getElementById("detailSheet");
+      const bd = document.getElementById("sheetBackdrop");
+      if(!sh || !bd) return;
+      sh.hidden = false; bd.hidden = false;
+      requestAnimationFrame(()=> sh.classList.add("isOpen"));
+      document.documentElement.classList.add("noScroll");
+      document.body.classList.add("noScroll");
+    }
+    function closeDetailSheet(){
+      const sh = document.getElementById("detailSheet");
+      const bd = document.getElementById("sheetBackdrop");
+      if(!sh || !bd) return;
+      sh.classList.remove("isOpen");
+      document.documentElement.classList.remove("noScroll");
+      document.body.classList.remove("noScroll");
+      setTimeout(()=>{ sh.hidden = true; bd.hidden = true; }, 180);
+    }
+
+    function currentFilteredIds(){
+      const q=(elSearch.value||"").trim().toLowerCase();
+      return cards
+        .filter(c=>!q || (c.branch_name||"").toLowerCase().includes(q))
+        .map(c=>c.id);
+    }
+
+    function renderSheetForCard(c, plan){
+      const shName = document.getElementById("sheetName");
+      const shBody = document.getElementById("sheetBody");
+      if(!shBody) return;
+
+      if(shName) shName.textContent = c.branch_name || "—";
+
+      const total = plan.total;
+      const stageSum = plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
+      const afterAmt = plan.coveredNow + stageSum;
+      const afterPct = total>0 ? (afterAmt/total*100) : 0;
+      const coveredPct = total>0 ? (plan.coveredNow/total*100) : 0;
+
+      // Build progress segments (current + stages + remaining)
+      const segs = [
+        {amount: plan.coveredNow, color:"rgba(247,168,163,1)", label:"الحالي"},
+        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color, label:p.name})),
+        {amount: plan.remain, color:"#e5e7eb", label:"المتبقي"}
+      ].filter(s=>s.amount>0.0001);
+
+      const segHtml = segs.map(s=>{
+        const w = total>0 ? (s.amount/total*100) : 0;
+        return `<span class="seg" style="width:${w}%; background:${s.color}"></span>`;
+      }).join("");
+
+      const legendSmall = `
+        <div class="legend" style="margin-top:10px">
+          <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي</span>
+          <span class="leg"><span class="dot" style="background:#111827"></span>المراحل</span>
+          <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي</span>
+        </div>
+      `;
+
+      const stagesHtml = (plan.plans||[])
+        .filter(p=>p.incrementAmount>0.0001)
+        .map(p=>`
+          <div class="sheetStage" style="outline:2px solid color-mix(in srgb, ${p.color} 28%, transparent); outline-offset:-2px">
+            <div class="row">
+              <b>${escapeHtml(p.name)}</b>
+              <span style="color: rgba(11,18,32,.55); font-size:12px; font-weight:900">${escapeHtml(p.period||"")}</span>
+            </div>
+            <div class="lbl">هدف المرحلة</div>
+            <div class="amt">${fmtMoney(p.goal)}<span class="cur">﷼</span></div>
+          </div>
+        `).join("") || `<div class="note" style="margin:0">لا توجد مراحل فعّالة — عدّل المراحل من تبويب (إدارة).</div>`;
+
+      shBody.innerHTML = `
+        <div class="sheetCard">
+          <div class="pad">
+            <div class="sheetGrid">
+              <div class="tile">
+                <div class="t">التكلفة الإجمالية</div>
+                <div class="v">${fmtMoney(total)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
+                <div class="s">${fmtNumber(c.students)} طالب/طالبة</div>
+              </div>
+              <div class="tile">
+                <div class="t">التغطية الحالية</div>
+                <div class="v">${fmtMoney(plan.coveredNow)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
+                <div class="s">${fmtPct(coveredPct)} من الإجمالي</div>
+              </div>
+              <div class="tile">
+                <div class="t">هدف المحفظة الاستثمارية</div>
+                <div class="v">${fmtMoney(plan.goal)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
+                <div class="s">مركزي (نسبة التغطية + العائد)</div>
+              </div>
+              <div class="tile">
+                <div class="t">الوضع الآن وخطة المراحل</div>
+                <div class="barWrap" style="margin-top:10px">
+                  <div class="bar">${segHtml}</div>
+                  ${legendSmall}
+                </div>
+                <div class="s" style="margin-top:10px">بعد المراحل: ${fmtMoney(afterAmt)} ﷼ • ${fmtPct(afterPct)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheetCard">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px">
+              <div style="font-weight:1000; color: rgba(11,18,32,.82)">خطة المراحل</div>
+              <div class="chip" style="padding:7px 10px">${(plan.plans||[]).filter(p=>p.incrementAmount>0.0001).length} مراحل</div>
+            </div>
+            <div class="sheetStages">${stagesHtml}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function syncSheetNav(){
+      const ids = currentFilteredIds();
+      const i = ids.indexOf(selectedId);
+      const prev = document.getElementById("sheetPrev");
+      const next = document.getElementById("sheetNext");
+      if(prev) prev.disabled = (i<=0);
+      if(next) next.disabled = (i<0 || i>=ids.length-1);
+    }
+
+    function sheetGo(delta){
+      const ids = currentFilteredIds();
+      const i = ids.indexOf(selectedId);
+      if(i<0) return;
+      const j = i + delta;
+      if(j<0 || j>=ids.length) return;
+      selectCard(ids[j], true);
+    }
+
 
     // ===== Manage table =====
     function renderRows(){
@@ -1739,6 +1981,24 @@
     remotePushUrl?.addEventListener("change", ()=>{ markDirty(); save(); });
     remoteToken?.addEventListener("change", ()=>{ markDirty(); save(); });
 
+    // Sheet events
+    const sheetBackdrop = document.getElementById("sheetBackdrop");
+    const detailSheet = document.getElementById("detailSheet");
+    const sheetClose = document.getElementById("sheetClose");
+    const sheetPrev = document.getElementById("sheetPrev");
+    const sheetNext = document.getElementById("sheetNext");
+    sheetBackdrop?.addEventListener("click", closeDetailSheet);
+    sheetClose?.addEventListener("click", closeDetailSheet);
+    sheetPrev?.addEventListener("click", ()=>sheetGo(-1));
+    sheetNext?.addEventListener("click", ()=>sheetGo(1));
+
+    // ESC closes
+    window.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && detailSheet && !detailSheet.hidden) closeDetailSheet(); });
+
+    // When search changes, keep nav state accurate
+    elSearch?.addEventListener("input", ()=>{ if(detailSheet && !detailSheet.hidden) syncSheetNav(); });
+
+
     document.getElementById("btnExportCSS").addEventListener("click", ()=>{
       const css=document.getElementById("appCSS")?.innerHTML || "";
       downloadBlob("compound_board.css", new Blob([css], {type:"text/css;charset=utf-8"}));
@@ -1950,5 +2210,24 @@
       save();
     })();
   </script>
+
+  <!-- Mobile detail sheet (prevents jumping/scrolling to bottom on long lists) -->
+  <div class="sheetBackdrop no-print" id="sheetBackdrop" hidden></div>
+  <section class="sheet no-print" id="detailSheet" hidden aria-label="تفاصيل المجمع">
+    <div class="sheetHandle" id="sheetHandle" aria-hidden="true"></div>
+    <div class="sheetHead">
+      <div class="sheetTitle">
+        <div class="sheetKicker">تفاصيل</div>
+        <div class="sheetName" id="sheetName">—</div>
+      </div>
+      <div class="sheetNav">
+        <button class="btn small" id="sheetPrev" title="السابق">‹</button>
+        <button class="btn small" id="sheetNext" title="التالي">›</button>
+        <button class="btn small" id="sheetClose" title="إغلاق">✕</button>
+      </div>
+    </div>
+    <div class="sheetBody" id="sheetBody"></div>
+  </section>
+
 </body>
 </html>
