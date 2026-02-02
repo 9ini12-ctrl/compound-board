@@ -812,6 +812,29 @@
       .cardOverlayBody .name{font-size:18px;}
       .cardOverlayBody .pill{padding: 8px 10px;}
     }
+
+
+    /* Online badge */
+    .onlineBadge{
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 12px 30px rgba(16,24,40,.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(11,18,32,.78);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .onlineBadge .dot{width:8px; height:8px; border-radius:99px; background: rgba(34,197,94,.85);}
+    .onlineBadge .lbl{font-size:12px;}
+    .onlineBadge .num{font-size:13px; padding: 2px 8px; border-radius: 999px; background: rgba(11,18,32,.06); color: rgba(11,18,32,.88);}
+    @media (max-width: 640px){
+      .onlineBadge{justify-content:space-between; width:100%;}
+      .onlineBadge .lbl{font-size:11px;}
+    }
 </style>
 
   <!-- PWA / iOS Add to Home Screen -->
@@ -828,6 +851,11 @@
     <div class="topInner">
       <div class="brand">
         <div class="mark" aria-hidden="true"></div>
+        <div class="onlineBadge" id="onlineBadge" title="الموجودين الآن">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="lbl">الموجودين الآن</span>
+          <span class="num" id="onlineCount">—</span>
+        </div>
         <div>
           <h1>لوحة الفروع</h1>
           <p>عرض مبسّط للمدراء • إدارة مركزية للمراحل والمحفظة</p>
@@ -2251,6 +2279,8 @@
       // Ensure sync endpoints and pull latest immediately (so new visitors see last published data)
       ensureRemoteUrls();
       try{ await fetchRemoteOnce(true); }catch(e){}
+      startPresence();
+      startAlwaysPull();
         if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
 
         localUpdatedAt = remoteUpdated || Date.now();
@@ -2641,7 +2671,109 @@
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); } });
     window.addEventListener('focus', ()=>{ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); });
 
-// ===== Init =====
+
+    // ===== Presence + autosync v2 (no settings; everyone pulls, admins auto-push) =====
+    const presenceCountEl = document.getElementById("onlineCount");
+
+    // Stable anonymous session id for presence
+    const SID_KEY = "compound_presence_sid_v1";
+    function getSid(){
+      try{
+        let sid = localStorage.getItem(SID_KEY);
+        if(!sid){
+          sid = (crypto?.randomUUID?.() || ("sid_" + Math.random().toString(16).slice(2) + Date.now()));
+          localStorage.setItem(SID_KEY, sid);
+        }
+        return sid;
+      }catch(e){
+        return "sid_" + Math.random().toString(16).slice(2) + Date.now();
+      }
+    }
+
+    function getPresenceBase(){
+      try{
+        return location.origin + "/.netlify/functions";
+      }catch(e){ return "/.netlify/functions"; }
+    }
+
+    async function presencePing(){
+      const url = getPresenceBase() + "/presence-ping";
+      try{
+        await fetch(url, {
+          method:"POST",
+          headers: {"Content-Type":"application/json"},
+          cache:"no-store",
+          body: JSON.stringify({ sid: getSid(), t: Date.now() })
+        });
+      }catch(e){}
+    }
+
+    async function presenceCount(){
+      const url = getPresenceBase() + "/presence-count";
+      try{
+        const res = await fetch(url, { cache:"no-store" });
+        if(!res.ok) throw new Error("bad");
+        const j = await res.json();
+        if(presenceCountEl) presenceCountEl.textContent = (j?.count ?? "—");
+      }catch(e){
+        if(presenceCountEl) presenceCountEl.textContent = "—";
+      }
+    }
+
+    function startPresence(){
+      presencePing(); presenceCount();
+      setInterval(presencePing, 20000);
+      setInterval(presenceCount, 25000);
+      document.addEventListener("visibilitychange", ()=>{
+        if(!document.hidden){ presencePing(); presenceCount(); }
+      });
+      window.addEventListener("focus", ()=>{ presencePing(); presenceCount(); });
+    }
+
+    // Autosync:
+    // - Everyone pulls frequently.
+    // - Only unlocked admins (code 111) auto-push on changes (debounced).
+    let autoPushTimer = null;
+    function scheduleAutoPush(){
+      try{
+        if(typeof isUnlocked === "function" && !isUnlocked()) return; // only admins publish
+        if(autoPushTimer) clearTimeout(autoPushTimer);
+        autoPushTimer = setTimeout(()=>{
+          try{
+            ensureRemoteUrls?.();
+            // publishRemote is the existing "نشر للجميع" action; we call it silently
+            publishRemote?.();
+          }catch(e){}
+        }, 650);
+      }catch(e){}
+    }
+
+    // Hook into existing save() to also schedule push
+    const __origSave = (typeof save === "function") ? save : null;
+    if(__origSave){
+      window.save = function(){
+        const r = __origSave.apply(this, arguments);
+        scheduleAutoPush();
+        return r;
+      };
+    }
+
+    // Faster pull interval for everyone (freshness)
+    function startAlwaysPull(){
+      try{
+        ensureRemoteUrls?.();
+        fetchRemoteOnce?.(true).catch(()=>{});
+      }catch(e){}
+      setInterval(()=>{
+        try{
+          ensureRemoteUrls?.();
+          fetchRemoteOnce?.(true).catch(()=>{});
+        }catch(e){}
+      }, 6000); // every 6s
+    }
+
+
+    // ===== Init =====
     (async function init(){
       const ok=load();
       if(!ok){
