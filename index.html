@@ -489,7 +489,86 @@
       .shell{padding:0}
       .card{break-inside: avoid;}
     }
-  </style>
+  
+
+/* ===== Card UI (restored: segmented stages) ===== */
+#cardGrid.grid{
+  padding: 12px;
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+}
+@media (max-width: 760px){ #cardGrid.grid{grid-template-columns:1fr} }
+
+.card{
+  background: linear-gradient(180deg, #fff, rgba(255,255,255,.92));
+  border:1px solid rgba(11,18,32,.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 30px rgba(16,24,40,.10);
+  padding: 12px;
+  cursor:pointer;
+  transition: .14s ease;
+  position:relative;
+  overflow:hidden;
+}
+.card:hover{transform: translateY(-2px)}
+.cardTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
+.name{font-size: 18px; font-weight:1000; line-height:1.15; margin:0;}
+.kpi{text-align:left; min-width: 140px;}
+.kpi .l{font-size:11px; font-weight:1000; color:rgba(11,18,32,.45)}
+.kpi .v{font-size:16px; font-weight:1000; margin-top:4px}
+.kpi .v strong{font-size:18px}
+.meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+.pill{display:inline-flex; align-items:center; gap:8px; padding:7px 9px; border-radius:999px; border:1px solid rgba(11,18,32,.08); background: rgba(248,250,252,.75); font-size:11px; font-weight:1000; color: rgba(11,18,32,.75);}
+.pill span{color: rgba(11,18,32,.45); font-weight:900}
+.barWrap{margin-top:8px}
+.bar{height: 14px; border-radius: 999px; overflow:hidden; border:1px solid rgba(11,18,32,.08); background: #f3f4f6; display:flex;}
+.segm{height:100%}
+.legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:9px}
+.leg{display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:1000; color: rgba(11,18,32,.72);}
+.dot{width:10px; height:10px; border-radius:999px; background:#111827}
+
+/* ===== Detail restored blocks ===== */
+.hero{padding: 4px 0 2px;}
+.heroTitle{font-size:18px; font-weight:1100;}
+.heroSub{font-size:12px; color: rgba(11,18,32,.62); margin-top:4px;}
+.heroKpis{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px;}
+@media (max-width: 760px){ .heroKpis{grid-template-columns:1fr} }
+.tile{background: rgba(255,255,255,.86); border:1px solid rgba(11,18,32,.10); border-radius:18px; padding:12px;}
+.tK{font-size:11px; font-weight:1000; color: rgba(11,18,32,.55)}
+.tV{font-size:18px; font-weight:1100; margin-top:6px}
+.tVSmall{font-size:14px}
+.tS{font-size:12px; color: rgba(11,18,32,.62); margin-top:6px}
+.muted{color: rgba(11,18,32,.55); font-weight:1000}
+
+.bigCard{background: rgba(255,255,255,.86); border:1px solid rgba(11,18,32,.10); border-radius:22px; padding:12px;}
+.bigTop{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.bigK{font-size:12px; font-weight:1100; color: rgba(11,18,32,.62)}
+.bigNote{font-size:12px; color: rgba(11,18,32,.62)}
+.bigBar{margin-top:10px; height: 16px; border-radius:999px; overflow:hidden; border:1px solid rgba(11,18,32,.10); background:#f3f4f6; display:flex;}
+.afterPlan{margin-top:10px; font-size:12px; color: rgba(11,18,32,.62)}
+
+.stageGrid{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+@media (max-width: 760px){ .stageGrid{grid-template-columns:1fr} }
+.stage{background: rgba(255,255,255,.86); border:1px solid rgba(11,18,32,.10); border-radius:22px; padding:12px; position:relative; overflow:hidden;}
+.stage::before{content:""; position:absolute; inset:0; background: linear-gradient(180deg, color-mix(in oklab, var(--stageColor) 12%, transparent), transparent); pointer-events:none;}
+.stage .row{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+.stage .row b{font-size:13px; font-weight:1100;}
+.stage .row span{font-size:11px; color: rgba(11,18,32,.62); font-weight:900;}
+.lbl{font-size:11px; color: rgba(11,18,32,.55); font-weight:1000; margin-top:10px;}
+.amt{font-size:22px; font-weight:1100; margin-top:4px;}
+.cur{font-size:12px; color: rgba(11,18,32,.55); font-weight:900; margin-right:6px;}
+.mini{font-size:12px; color: rgba(11,18,32,.62); margin-top:6px}
+
+.fullGrid{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px;}
+@media (max-width: 760px){ .fullGrid{grid-template-columns:1fr} }
+.fullCard{background: rgba(255,255,255,.86); border:1px solid rgba(11,18,32,.10); border-radius:22px; padding:12px;}
+.fullH{font-size:12px; font-weight:1100; color: rgba(11,18,32,.62); margin-bottom:10px}
+.fullRow{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(11,18,32,.10); font-size:13px;}
+.fullRow:last-child{border-bottom:none}
+.fullRow.total{border-top:1px solid rgba(11,18,32,.10); padding-top:12px; margin-top:6px; font-weight:1100}
+
+</style>
 </head>
 
 <body class="adminLocked">
@@ -642,6 +721,18 @@
           <input class="edit" id="setCoverageRatio" type="number" step="0.01" placeholder="فارغ = حسب البيانات" />
         </div>
       </div>
+        <div style="flex:1; min-width:240px;">
+          <div class="k">العائد السنوي للمحفظة (%)</div>
+          <input class="edit" id="setReturnRate" type="number" step="0.1" placeholder="مثال: 9" />
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <div class="k">نطاق هدف المحفظة</div>
+          <select class="edit" id="setGoalScope">
+            <option value="remaining">تغطية المتبقي بعد التغطية الحالية</option>
+            <option value="total">تغطية التكلفة الإجمالية</option>
+          </select>
+        </div>
+
 
       <div class="rowBtns" style="margin-top:10px;">
         <button class="btn primary adminOnly" id="btnSaveSettings">حفظ الإعدادات</button>
@@ -849,34 +940,108 @@
   }
 
   function normalizeStagesV2(stages){
-    const arr = Array.isArray(stages) ? stages : [];
-    const cleaned = arr.map((st,i)=>({
-      id: String(st.id || uid("st")),
-      name: String(st.name || ("مرحلة " + (i+1))),
-      // Store either ratio OR absolute amount; prefer ratio to stay consistent for all cards
-      target_ratio: (st.target_ratio==null || st.target_ratio==="") ? null : clamp(Number(st.target_ratio)||0, 0, 1.5),
-      target: (st.target==null || st.target==="") ? null : Math.max(0, Number(st.target)||0),
-      color: String(st.color || ["#3B82F6","#22C55E","#F59E0B","#A855F7","#EF4444","#14B8A6","#6366F1"][i%7])
-    }));
-    // If no stages, provide 4 equal stages
-    if(!cleaned.length){
-      return [
-        { id: uid("st"), name:"المرحلة الأولى", target_ratio:0.25, target:null, color:"#3B82F6" },
-        { id: uid("st"), name:"المرحلة الثانية", target_ratio:0.25, target:null, color:"#22C55E" },
-        { id: uid("st"), name:"المرحلة الثالثة", target_ratio:0.25, target:null, color:"#F59E0B" },
-        { id: uid("st"), name:"المرحلة الرابعة", target_ratio:0.25, target:null, color:"#A855F7" }
-      ];
+  const arr = Array.isArray(stages) ? stages : [];
+  let cumulative = 0;
+  const cleaned = arr.map((st,i)=>{
+    const id = String(st.id || uid("st"));
+    const name = String(st.name || ("المرحلة " + (i+1)));
+    const period = String(st.period || "");
+    // target_pct is cumulative coverage after this stage (0..100)
+    let target_pct = st.target_pct;
+    if(target_pct==null || target_pct===""){
+      if(st.target_ratio!=null && st.target_ratio!==""){
+        cumulative += clamp(Number(st.target_ratio)||0, 0, 1.5) * 100;
+        target_pct = cumulative;
+      } else if(st.target!=null && st.target!==""){
+        // fallback: if someone pasted percent into "target"
+        target_pct = Number(st.target)||0;
+      } else {
+        // default ladder
+        target_pct = [65,80,90,100][i] ?? 100;
+      }
     }
-    // If all target_ratio null, auto set equal ratios
-    const hasAnyRatio = cleaned.some(x=>x.target_ratio!=null);
-    if(!hasAnyRatio){
-      const r = 1/cleaned.length;
-      cleaned.forEach(x=>x.target_ratio = r);
-    }else{
-      cleaned.forEach(x=>{ if(x.target_ratio==null) x.target_ratio = 0; });
-    }
-    return cleaned;
+    target_pct = clamp(Number(target_pct)||0, 0, 100);
+    cumulative = Math.max(cumulative, target_pct);
+
+    const color = String(st.color || ["#2563eb","#16a34a","#f59e0b","#a855f7","#ef4444","#14b8a6","#0ea5e9"][i%7]);
+    return { id, name, period, target_pct, color };
+  });
+
+  if(!cleaned.length){
+    return [
+      { id: uid("st"), name:"المرحلة الأولى", period:"خلال رمضان", target_pct:65, color:"#2563eb" },
+      { id: uid("st"), name:"المرحلة الثانية", period:"بعد رمضان", target_pct:80, color:"#16a34a" },
+      { id: uid("st"), name:"المرحلة الثالثة", period:"لاحقاً", target_pct:90, color:"#f59e0b" },
+      { id: uid("st"), name:"المرحلة الرابعة", period:"اكتمال الخطة", target_pct:100, color:"#a855f7" }
+    ];
   }
+
+  // ensure ascending by target_pct
+  cleaned.sort((a,b)=>a.target_pct-b.target_pct);
+  return cleaned;
+}
+
+
+function calcPortfolioGoal(total, coveredAmt){
+  const ratePct = parseNumber(state.settings.return_rate ?? 9); // % سنوي
+  const rate = Number.isFinite(ratePct) ? ratePct/100 : 0;
+  const scope = (state.settings.goal_scope ?? "remaining"); // total | remaining
+  const amountToCover = (scope==="total") ? Math.max(0,total) : Math.max(0,total - coveredAmt);
+  if(rate<=0) return {goal: NaN, amountToCover, rate};
+  return {goal: amountToCover / rate, amountToCover, rate};
+}
+function stageGoal(coverAmount, rate){
+  if(!rate || rate<=0) return NaN;
+  return Math.max(0, coverAmount) / rate;
+}
+function stageColor(idx){
+  const palette = ["#111827","#2563eb","#16a34a","#f59e0b","#ef4444","#a855f7","#14b8a6","#0ea5e9","#f97316","#22c55e"];
+  return palette[idx % palette.length];
+}
+function normalizeStages(){
+  // backward compatibility for old fields target_ratio / target
+  state.stages = (state.stages||[]).map((s,i)=>{
+    const out = {...s};
+    if(out.target_pct==null){
+      if(out.target_ratio!=null) out.target_pct = clamp(parseNumber(out.target_ratio)*100,0,100);
+      else if(out.target!=null && Number.isFinite(parseNumber(out.target))) out.target_pct = clamp(parseNumber(out.target),0,100); // treat as pct if user used old field
+      else out.target_pct = [65,80,90,100][i] ?? 100;
+    }
+    if(out.name==null) out.name = `المرحلة ${i+1}`;
+    if(out.period==null) out.period = "";
+    return out;
+  });
+}
+function computeStagePlan(card){
+  const total = Number(card.total||0)||0;
+  const coveredNow = clamp(Number(card.covered||0)||0, 0, total);
+  const {rate} = calcPortfolioGoal(total, coveredNow);
+
+  const sorted = (state.stages||[])
+    .map((s,i)=>({ ...s, t: clamp(parseNumber(s.target_pct),0,100)}))
+    .sort((a,b)=>a.t-b.t);
+
+  let current = coveredNow;
+  const plans = sorted.map((s, idx)=>{
+    const desired = total * (s.t/100);
+    const inc = Math.max(0, Math.min(total, desired) - current);
+    current += inc;
+    return {
+      name:(s.name??`مرحلة ${idx+1}`).toString(),
+      period:(s.period??"").toString(),
+      targetPct: s.t,
+      incrementAmount: inc,
+      goal: stageGoal(inc, rate),
+      color: (s.color??stageColor(idx)),
+    };
+  });
+
+  const afterCovered = Math.min(total, current);
+  const remain = Math.max(0, total - afterCovered);
+  return {total, coveredNow, plans, afterCovered, remain, rate};
+}
+
+
 
   function normalizeCardsV2(cards){
     const arr = Array.isArray(cards) ? cards : [];
@@ -1268,9 +1433,11 @@
 
   // ===== Board render =====
   function goalForCard(card){
-    const ratio = Number(state.settings.goal_ratio||1) || 1;
-    return Math.round((Number(card.total||0)||0) * ratio);
-  }
+  const total = Number(card.total||0)||0;
+  const covered = clamp(Number(card.covered||0)||0,0,total);
+  const {goal} = calcPortfolioGoal(total, covered);
+  return Number.isFinite(goal) ? goal : 0;
+}
   function coverageRatioForCard(card){
     const fixed = state.settings.coverage_ratio;
     if(fixed==null || fixed==="") return null;
@@ -1287,46 +1454,44 @@
   }
 
   function cardHtml(card){
-    const total = Number(card.total||0)||0;
-    const covered = Number(card.covered||0)||0;
-    const cov = cardCoverage(card);
-    const goal = goalForCard(card);
-    const gap = Math.max(0, goal - covered);
-    const pctText = pct01(Math.min(1, cov));
-    const w = clamp(cov,0,1) * 100;
+  const plan = computeStagePlan(card);
+  const total = plan.total;
+  const pct = (amt)=> total>0 ? (amt/total*100) : 0;
 
-    return `
-      <article class="card" data-id="${escapeHtml(card.id)}">
-        <div class="cardIn">
-          <div class="row">
-            <div style="min-width:0;">
-              <div class="name">${escapeHtml(card.name||"")}</div>
-              <div class="meta">
-                ${card.compoundCategory ? `<span class="pill"><span class="k">المجمع</span><b>${escapeHtml(card.compoundCategory)}</b></span>` : ""}
-                ${card.dawr ? `<span class="pill"><span class="k">الدور</span><b>${escapeHtml(card.dawr)}</b></span>` : ""}
-                <span class="pill"><span class="k">الطلاب</span><b>${fmtInt(card.students||0)}</b></span>
-              </div>
-            </div>
-            <div style="text-align:left;">
-              <div class="k">التكلفة</div>
-              <div class="big"><span>${fmtMoney(total)}</span><span class="sar">﷼</span></div>
-            </div>
-          </div>
+  const barSegs=[
+    {amount: plan.coveredNow, color:"rgba(247,168,163,1)"},
+    ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color})),
+    {amount: plan.remain, color:"#e5e7eb"}
+  ].filter(s=>s.amount>0.0001);
 
-          <div class="bar" aria-label="نسبة التغطية"><div class="fill" style="width:${w.toFixed(1)}%"></div></div>
-          <div class="smallRow">
-            <span>المغطّى: ${fmtMoney(covered)} ﷼</span>
-            <span>التغطية: ${pctText}</span>
-          </div>
+  const covPct = total>0 ? (plan.coveredNow/total*100) : 0;
 
-          <div class="smallRow" style="margin-top:6px;">
-            <span>هدف المحفظة: ${fmtMoney(goal)} ﷼</span>
-            <span>الفجوة: ${fmtMoney(gap)} ﷼</span>
-          </div>
+  return `
+    <article class="card" data-id="${escapeHtml(card.id)}" role="button" tabindex="0" aria-label="${escapeHtml(card.name||"")}"
+      onclick="openCard('${escapeHtml(card.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); openCard('${escapeHtml(card.id)}')}">
+      <div class="cardTop">
+        <h3 class="name">${escapeHtml(card.name||"—")}</h3>
+        <div class="kpi">
+          <div class="l">التكلفة</div>
+          <div class="v"><strong>${fmtMoney(total)}</strong><span class="sar">﷼</span></div>
         </div>
-      </article>
-    `;
-  }
+      </div>
+
+      <div class="meta">
+        ${card.compoundCategory ? `<span class="pill"><span>المجمع</span>${escapeHtml(card.compoundCategory)}</span>` : ``}
+        ${card.dawr ? `<span class="pill"><span>الدور</span>${escapeHtml(card.dawr)}</span>` : ``}
+        <span class="pill"><span>طلاب</span>${fmtInt(card.students||0)}</span>
+        <span class="pill"><span>تغطية</span>${fmtPct(covPct)}</span>
+      </div>
+
+      <div class="barWrap">
+        <div class="bar">
+          ${barSegs.map(s=>`<div class="segm" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("")}
+        </div>
+      </div>
+    </article>
+  `;
+}
 
   function renderBoard(){
     const grid = $("#cardGrid");
@@ -1424,137 +1589,127 @@
   });
 
   function renderDetail(card){
-    if(!card) return;
-    detailTitle.textContent = card.name || "التفاصيل";
+  if(!card) return;
 
-    const total = Number(card.total||0)||0;
-    const covered = Number(card.covered||0)||0;
-    const cov = cardCoverage(card);
-    const goal = goalForCard(card);
+  normalizeStages(); // ensure stage schema
+  detailTitle.textContent = card.name || "التفاصيل";
 
-    detailKPIWrap.innerHTML = `
-      <div class="detailKPIGrid">
-        <div class="detailKPI">
-          <div class="kk">التكلفة الإجمالية</div>
-          <div class="vv"><span>${fmtMoney(total)}</span><span class="sar">﷼</span></div>
-          <div class="sub">عدد الطلاب: ${fmtInt(card.students||0)}</div>
+  const plan = computeStagePlan(card);
+  const total = plan.total;
+  const covered = plan.coveredNow;
+  const covPct = total>0 ? (covered/total*100) : 0;
+
+  const {goal, amountToCover, rate} = calcPortfolioGoal(total, covered);
+  const stageSum = plan.plans.reduce((a,p)=>a + p.incrementAmount, 0);
+
+  // KPIs (Sticky-style but inside existing wrapper)
+  detailKPIWrap.innerHTML = `
+    <div class="hero">
+      <div class="heroTitle">${escapeHtml(card.name||"—")}</div>
+      <div class="heroSub">التكلفة، التغطية، هدف المحفظة، ثم المراحل.</div>
+      <div class="heroKpis">
+        <div class="tile">
+          <div class="tK">التكلفة الإجمالية</div>
+          <div class="tV">${fmtMoney(total)}<span class="sar">﷼</span></div>
+          <div class="tS">عدد الطلاب: ${fmtInt(card.students||0)}</div>
         </div>
-        <div class="detailKPI">
-          <div class="kk">المغطّى الحالي</div>
-          <div class="vv"><span>${fmtMoney(covered)}</span><span class="sar">﷼</span></div>
-          <div class="sub">نسبة التغطية: ${pct01(Math.min(1, cov))}</div>
+        <div class="tile">
+          <div class="tK">المغطّى الحالي</div>
+          <div class="tV">${fmtMoney(covered)}<span class="sar">﷼</span></div>
+          <div class="tS">نسبة التغطية: ${fmtPct(covPct)}</div>
         </div>
-        <div class="detailKPI">
-          <div class="kk">هدف المحفظة</div>
-          <div class="vv"><span>${fmtMoney(goal)}</span><span class="sar">﷼</span></div>
-          <div class="sub">النسبة: ${fmtInt((state.settings.goal_ratio||1)*100)}%</div>
+        <div class="tile">
+          <div class="tK">هدف المحفظة</div>
+          <div class="tV">${fmtMoney(Number.isFinite(goal)?goal:0)}<span class="sar">﷼</span></div>
+          <div class="tS">العائد السنوي: ${fmtPct((rate||0)*100)}</div>
         </div>
-        <div class="detailKPI">
-          <div class="kk">المجمع / الدور</div>
-          <div class="vv" style="font-size:14px;">
-            <span>${escapeHtml(card.compoundCategory||"—")}</span>
-            <span style="font-size:12px; color: rgba(11,18,32,.55); font-weight:900;">${escapeHtml(card.dawr||"")}</span>
+        <div class="tile">
+          <div class="tK">التصنيف</div>
+          <div class="tV tVSmall">${escapeHtml(card.compoundCategory||"—")} <span class="muted">${escapeHtml(card.dawr||"")}</span></div>
+          <div class="tS">اضغط “تحديث” لجلب آخر نسخة</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Summary panel: big segmented bar + legend
+  const pct=(amt)=> total>0 ? (amt/total*100) : 0;
+  const barSegs=[
+    {amount: covered, color:"rgba(247,168,163,1)", label:`الحالي: ${fmtMoney(covered)} ﷼`},
+    ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color, label:`${p.name}: ${fmtMoney(p.incrementAmount)} ﷼`})),
+    {amount: plan.remain, color:"#e5e7eb", label:`المتبقي: ${fmtMoney(plan.remain)} ﷼`}
+  ].filter(s=>s.amount>0.0001);
+
+  detailPanelSummary.innerHTML = `
+    <div class="bigCard">
+      <div class="bigTop">
+        <div class="bigK">ملخص الخطة</div>
+        <div class="bigNote">مبلغ التغطية المطلوب: <b>${fmtMoney(amountToCover)}</b> ﷼</div>
+      </div>
+      <div class="bigBar">${barSegs.map(s=>`<div class="segm" title="${escapeHtml(s.label)}" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("")}</div>
+      <div class="legend">
+        <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي: ${fmtMoney(covered)} ﷼</span>
+        <span class="leg"><span class="dot" style="background:#111827"></span>المراحل: ${fmtMoney(stageSum)} ﷼</span>
+        <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي: ${fmtMoney(plan.remain)} ﷼</span>
+      </div>
+      <div class="afterPlan">بعد خطة المراحل: تصل التغطية إلى <b>${fmtPct(total>0 ? (plan.afterCovered/total*100) : 0)}</b></div>
+    </div>
+  `;
+
+  // Stages panel: goal prominent, per-stage color
+  detailPanelStages.innerHTML = `
+    <div class="stageGrid">
+      ${plan.plans.filter(p=>p.incrementAmount>0.0001).map((p, idx)=>`
+        <div class="stage" style="--stageColor:${escapeHtml(p.color)}">
+          <div class="row">
+            <b>${escapeHtml(p.name)}</b>
+            <span>${escapeHtml(p.period||"")}</span>
           </div>
-          <div class="sub">اضغط تحديث لجلب آخر نسخة عند الحاجة</div>
+          <div class="lbl">هدف المرحلة</div>
+          <div class="amt">${fmtMoney(p.goal)}<span class="cur">﷼</span></div>
+          <div class="mini">تغطية: ${fmtMoney(p.incrementAmount)} ﷼</div>
         </div>
-      </div>
-    `;
+      `).join("")}
+    </div>
+  `;
 
-    // Summary: a focused card
-    detailPanelSummary.innerHTML = `
-      <div class="stageRow">
-        <div class="stageRowTop">
-          <div class="stageName">الملخص</div>
-          <div class="stageTarget">${fmtMoney(Math.max(0, goal - covered))}<span class="sar">﷼</span></div>
-        </div>
-        <div class="stageMeta">
-          <span>الفجوة إلى هدف المحفظة</span>
-          <span>تحديث: يدوي</span>
-        </div>
-        <div class="stageBar"><div class="stageFill" style="background: linear-gradient(90deg, rgba(59,130,246,.92), rgba(16,185,129,.80)); width:${clamp(cov,0,1)*100}%"></div></div>
-        <div class="stageMeta">
-          <span>التغطية الحالية</span>
-          <span>${pct01(Math.min(1,cov))}</span>
-        </div>
-      </div>
-    `;
+  // Full panel: breakdown + raw numbers
+  const admin = Number(card.admin||0)||0;
+  const halaqat = Number(card.halaqat||0)||0;
+  const programs = Number(card.programs||0)||0;
 
-    // Stages: ratio-based targets mapped to total cost (or absolute if stage.target)
-    const list = (state.stages||[]).map((st,i)=>{
-      const amt = (st.target!=null) ? Number(st.target||0)||0 : Math.round((Number(st.target_ratio||0)||0) * total);
-      const ratio = total>0 ? amt/total : 0;
-      return { name: st.name, amt, ratio: clamp(ratio,0,1.5), color: st.color };
-    });
-
-    detailPanelStages.innerHTML = `
-      <div class="stageList">
-        ${list.map(x=>`
-          <div class="stageRow">
-            <div class="stageRowTop">
-              <div class="stageName"><span style="display:inline-block;width:10px;height:10px;border-radius:999px;background:${x.color};margin-inline-end:8px;"></span>${escapeHtml(x.name)}</div>
-              <div class="stageTarget">${fmtMoney(x.amt)}<span class="sar">﷼</span></div>
-            </div>
-            <div class="stageBar"><div class="stageFill" style="background:${x.color}; width:${(x.ratio*100).toFixed(1)}%"></div></div>
-            <div class="stageMeta">
-              <span>نسبة من التكلفة: ${pct01(x.ratio)}</span>
-              <span>التغطية الحالية: ${pct01(Math.min(1,cov))}</span>
-            </div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-
-    // Full: editable mini-form (admin only) + read-only details
-    detailPanelFull.innerHTML = `
-      <div class="stageRow">
-        <div class="stageName">البيانات</div>
-        <div class="stageMeta"><span>هنا عرض كامل</span><span>—</span></div>
+  detailPanelFull.innerHTML = `
+    <div class="fullGrid">
+      <div class="fullCard">
+        <div class="fullH">تفاصيل التكلفة</div>
+        <div class="fullRow"><span>تكلفة الإدارة</span><b>${fmtMoney(admin)} ﷼</b></div>
+        <div class="fullRow"><span>تكلفة الحلقات</span><b>${fmtMoney(halaqat)} ﷼</b></div>
+        <div class="fullRow"><span>تكلفة البرامج</span><b>${fmtMoney(programs)} ﷼</b></div>
+        <div class="fullRow total"><span>الإجمالي</span><b>${fmtMoney(total)} ﷼</b></div>
       </div>
 
-      <div class="stageRow adminOnly">
-        <div class="stageRowTop">
-          <div class="stageName">تعديل سريع</div>
-          <div class="stageMeta"><span>سيؤثر على الجميع بعد النشر</span><span></span></div>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-          <div><div class="k">الاسم</div><input class="edit" id="d_name" value="${escapeHtml(card.name)}"></div>
-          <div><div class="k">المجمع</div><input class="edit" id="d_comp" value="${escapeHtml(card.compoundCategory)}"></div>
-          <div><div class="k">الدور</div><input class="edit" id="d_dawr" value="${escapeHtml(card.dawr)}"></div>
-          <div><div class="k">الطلاب</div><input class="edit" id="d_students" type="number" value="${escapeHtml(card.students)}"></div>
-          <div><div class="k">التكلفة</div><input class="edit" id="d_total" type="number" value="${escapeHtml(card.total)}"></div>
-          <div><div class="k">المغطّى</div><input class="edit" id="d_covered" type="number" value="${escapeHtml(card.covered)}"></div>
-        </div>
-        <div class="rowBtns" style="margin-top:10px;">
-          <button class="btn primary adminOnly" id="d_save">حفظ</button>
-        </div>
+      <div class="fullCard">
+        <div class="fullH">التغطية</div>
+        <div class="fullRow"><span>المغطّى الحالي</span><b>${fmtMoney(covered)} ﷼</b></div>
+        <div class="fullRow"><span>نسبة التغطية</span><b>${fmtPct(covPct)}</b></div>
+        <div class="fullRow"><span>المتبقي</span><b>${fmtMoney(Math.max(0,total-covered))} ﷼</b></div>
       </div>
-    `;
 
-    // Bind detail save
-    const btn = $("#d_save");
-    if(btn){
-      btn.addEventListener("click", ()=>{
-        if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
-        card.name = $("#d_name").value;
-        card.compoundCategory = $("#d_comp").value;
-        card.dawr = $("#d_dawr").value;
-        card.students = Math.max(0, Number($("#d_students").value||0)||0);
-        card.total = Math.max(0, Number($("#d_total").value||0)||0);
-        card.covered = Math.max(0, Number($("#d_covered").value||0)||0);
-        state.cards = normalizeCardsV2(state.cards);
-        state.meta.updated_at = now();
-        saveLocal();
-        markDirty(true);
-        refreshFilters();
-        renderAll();
-        toast("تم الحفظ");
-      });
-    }
+      <div class="fullCard">
+        <div class="fullH">هدف المحفظة</div>
+        <div class="fullRow"><span>الهدف</span><b>${fmtMoney(Number.isFinite(goal)?goal:0)} ﷼</b></div>
+        <div class="fullRow"><span>نطاق الهدف</span><b>${(state.settings.goal_scope==="total"?"الإجمالي":"المتبقي")}</b></div>
+        <div class="fullRow"><span>العائد السنوي</span><b>${fmtPct((rate||0)*100)}</b></div>
+      </div>
+    </div>
+  `;
+}
 
-    setDetailTab("summary");
-  }
+  function openCard(id){ openDetail(id); }
 
-  function openDetail(id){
+function openDetail(id){
+  // alias used by cardHtml
+
     selectedId = id;
     const card = state.cards.find(x=>x.id===id);
     if(!card) return;
@@ -1826,70 +1981,69 @@
 
   // ===== Stage editor (admin) =====
   function renderStageEditor(){
-    const el = $("#stageEditor");
-    if(!el) return;
-    if(!isUnlocked()){ el.innerHTML = ""; return; }
+  const el = $("#stageEditor");
+  if(!el) return;
+  if(!isUnlocked()){ el.innerHTML = ""; return; }
 
-    el.innerHTML = `
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        ${(state.stages||[]).map((st,i)=>`
-          <div class="stageRow" data-id="${escapeHtml(st.id)}" style="box-shadow:none;">
-            <div class="stageRowTop">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:${escapeHtml(st.color)};"></span>
-                <input class="edit" data-k="name" value="${escapeHtml(st.name)}" style="max-width:220px;">
+  normalizeStages();
+  el.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      ${(state.stages||[]).map((st,i)=>`
+        <div class="stageRow" data-id="${escapeHtml(st.id)}" style="box-shadow:none;">
+          <div class="stageRowTop">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:${escapeHtml(st.color)};"></span>
+              <input class="edit" data-k="name" value="${escapeHtml(st.name)}" style="max-width:210px;">
+              <input class="edit" data-k="period" value="${escapeHtml(st.period||"")}" placeholder="مثال: خلال رمضان" style="max-width:190px;">
+            </div>
+            <div style="display:flex; align-items:end; gap:10px; flex-wrap:wrap;">
+              <div>
+                <div class="k">نسبة التغطية بعد المرحلة</div>
+                <input class="edit" data-k="target_pct" type="number" step="1" value="${escapeHtml(st.target_pct)}" style="width:120px;">
               </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div>
-                  <div class="k">نسبة من التكلفة</div>
-                  <input class="edit" data-k="target_ratio" type="number" step="0.01" value="${escapeHtml(st.target_ratio)}" style="width:120px;">
-                </div>
-                <div>
-                  <div class="k">لون</div>
-                  <input class="edit" data-k="color" type="color" value="${escapeHtml(st.color)}" style="width:58px; height:40px; padding:0; border-radius:12px;">
-                </div>
-                <button class="btn small" data-act="del">حذف</button>
+              <div>
+                <div class="k">لون</div>
+                <input class="edit" data-k="color" type="color" value="${escapeHtml(st.color)}" style="width:58px; height:40px; padding:0; border-radius:12px;">
               </div>
+              <button class="btn small" data-act="del">حذف</button>
             </div>
           </div>
-        `).join("")}
-      </div>
-    `;
+        </div>
+      `).join("")}
+    </div>
+  `;
 
-    el.querySelectorAll("input.edit").forEach(inp=>{
-      inp.addEventListener("change", ()=>{
-        const row = inp.closest("[data-id]");
-        const id = row.getAttribute("data-id");
-        const st = state.stages.find(x=>x.id===id);
-        if(!st) return;
-        const k = inp.getAttribute("data-k");
-        let v = inp.value;
-        if(k==="target_ratio"){
-          v = clamp(Number(v||0)||0, 0, 1.5);
-        }
-        st[k] = v;
-        state.stages = normalizeStagesV2(state.stages);
-        state.meta.updated_at = now();
-        saveLocal();
-        markDirty(true);
-        renderAll();
-      });
+  el.querySelectorAll("input.edit").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      const row = inp.closest("[data-id]");
+      const id = row.getAttribute("data-id");
+      const st = state.stages.find(x=>x.id===id);
+      if(!st) return;
+      const k = inp.getAttribute("data-k");
+      let v = inp.value;
+      if(k==="target_pct") v = clamp(Number(v||0)||0, 0, 100);
+      st[k] = v;
+      state.stages = normalizeStagesV2(state.stages);
+      state.meta.updated_at = now();
+      saveLocal();
+      markDirty(true);
+      renderAll();
     });
+  });
 
-    el.querySelectorAll("button[data-act='del']").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const row = btn.closest("[data-id]");
-        const id = row.getAttribute("data-id");
-        if(!confirm("حذف المرحلة؟")) return;
-        state.stages = state.stages.filter(x=>x.id!==id);
-        state.stages = normalizeStagesV2(state.stages);
-        state.meta.updated_at = now();
-        saveLocal();
-        markDirty(true);
-        renderAll();
-      });
+  el.querySelectorAll("button[data-act='del']").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const row = btn.closest("[data-id]");
+      const id = row.getAttribute("data-id");
+      state.stages = (state.stages||[]).filter(x=>x.id!==id);
+      state.stages = normalizeStagesV2(state.stages);
+      state.meta.updated_at = now();
+      saveLocal();
+      markDirty(true);
+      renderAll();
     });
-  }
+  });
+}
   $("#btnAddStage").addEventListener("click", ()=>{
     if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
     state.stages.push({ id: uid("st"), name: "مرحلة جديدة", target_ratio: 0.1, target:null, color: "#6366F1" });
@@ -1903,11 +2057,20 @@
   // ===== Settings (admin) =====
   $("#btnSaveSettings").addEventListener("click", ()=>{
     if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+
+    // Legacy ratio controls (kept)
     const r = Number($("#setGoalRatio").value || 1);
     let c = $("#setCoverageRatio").value;
     c = (c==="" || c==null) ? null : Number(c);
     state.settings.goal_ratio = (isFinite(r) && r>0) ? r : 1;
     state.settings.coverage_ratio = (c==null || !isFinite(c)) ? null : clamp(c,0,1.5);
+
+    // Portfolio settings (recommended)
+    const rr = Number($("#setReturnRate")?.value ?? (state.settings.return_rate ?? 9));
+    const scope = $("#setGoalScope")?.value || (state.settings.goal_scope ?? "remaining");
+    state.settings.return_rate = (isFinite(rr) && rr>0) ? rr : 9;
+    state.settings.goal_scope = (scope==="total") ? "total" : "remaining";
+
     state.meta.updated_at = now();
     saveLocal();
     markDirty(true);
@@ -1942,6 +2105,8 @@
     // settings fields
     if($("#setGoalRatio")) $("#setGoalRatio").value = String(state.settings.goal_ratio ?? 1);
     if($("#setCoverageRatio")) $("#setCoverageRatio").value = (state.settings.coverage_ratio==null ? "" : String(state.settings.coverage_ratio));
+    if($("#setReturnRate")) $("#setReturnRate").value = String(state.settings.return_rate ?? 9);
+    if($("#setGoalScope")) $("#setGoalScope").value = String(state.settings.goal_scope ?? "remaining");
 
     // update last sync display from state meta
     setLastSync(state.meta.updated_at || 0);
