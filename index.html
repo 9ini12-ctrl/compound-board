@@ -1,0 +1,1821 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>لوحة الفروع — عرض بسيط • إدارة دقيقة</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style id="appCSS">
+    :root{
+      /* Apple: quiet palette + depth */
+      --bg: #f6f7f9;
+      --paper: rgba(255,255,255,.86);
+      --card: #ffffff;
+      --ink: #0b1220;
+      --sub: rgba(11,18,32,.62);
+      --line: rgba(11,18,32,.10);
+      --line2: rgba(11,18,32,.07);
+
+      --shadow: 0 26px 72px rgba(16,24,40,.12);
+      --shadow2: 0 14px 34px rgba(16,24,40,.10);
+
+      --r-xl: 28px;
+      --r-lg: 22px;
+      --r-md: 16px;
+      --r-sm: 12px;
+
+      /* Google: functional blue, but toned down */
+      --accent: #2563eb;
+      --accent2:#0f172a;
+      --ok: #10b981;
+      --warn:#f59e0b;
+
+      /* Stage colors (soft, craft) */
+      --s1:#2563eb;
+      --s2:#06b6d4;
+      --s3:#10b981;
+      --s4:#f59e0b;
+      --s5:#ef4444;
+      --s6:#a855f7;
+
+      /* Japanese craft: rhythm + precision */
+      --space: 14px;
+      --space2: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"IBM Plex Sans Arabic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 650px at 88% -10%, rgba(37,99,235,.10), transparent 58%),
+        radial-gradient(850px 600px at 8% 0%, rgba(16,185,129,.08), transparent 55%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Top bar (Jony Ive: minimal, exact) */
+    .top{
+      position:sticky; top:0; z-index:50;
+      padding: 12px 12px 10px;
+      backdrop-filter: blur(12px);
+      background: rgba(246,247,249,.72);
+      border-bottom:1px solid var(--line2);
+    }
+    .topInner{
+      max-width:1240px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:10px}
+    .mark{
+      width:34px; height:34px; border-radius:12px;
+      background: linear-gradient(180deg, #111827, #0b1220);
+      box-shadow: 0 14px 30px rgba(17,24,39,.20);
+      position:relative;
+    }
+    .mark:after{
+      content:""; position:absolute; inset:8px; border-radius:8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.04));
+    }
+    .brand h1{margin:0; font-size:14px; font-weight:1000; letter-spacing:.2px}
+    .brand p{margin:2px 0 0; font-size:12px; font-weight:900; color:var(--sub)}
+
+    .seg{
+      display:flex; gap:6px;
+      padding:5px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow2);
+    }
+    .seg button{
+      border:0; background:transparent; cursor:pointer;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:1000; font-size:13px;
+      color: rgba(11,18,32,.72);
+      transition: .14s ease;
+    }
+    .seg button.active{
+      background:#fff;
+      color: var(--ink);
+      box-shadow: 0 10px 18px rgba(16,24,40,.10);
+    }
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      appearance:none;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.84);
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight:1000;
+      font-size:13px;
+      cursor:pointer;
+      transition:.14s ease;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      user-select:none;
+      box-shadow: 0 10px 20px rgba(16,24,40,.07);
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn.primary{
+      border-color: transparent;
+      background: linear-gradient(180deg, var(--accent2), #0b1220);
+      color:#fff;
+      box-shadow: 0 16px 30px rgba(15,23,42,.24);
+    }
+    .btn.ghost{background:transparent; box-shadow:none}
+    .btn.danger{border-color: rgba(239,68,68,.35); color:#b91c1c; box-shadow:none; background:#fff}
+    .btn.small{padding:8px 10px; border-radius:12px; font-size:12px; box-shadow:none}
+
+    /* Layout */
+    .wrap{max-width:1240px; margin:0 auto; padding: 12px 12px 26px}
+    .layout{
+      display:grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .layout{grid-template-columns:1fr} }
+
+    /* Panels */
+    .panel{
+      background: var(--paper);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding: 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      border-bottom:1px solid var(--line2);
+      background: rgba(255,255,255,.72);
+    }
+    .panelHead b{font-size:13px; font-weight:1000}
+    .panelBody{padding:14px}
+
+    /* Search + list (Apple Photos-like) */
+    .searchRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .search{
+      flex:1; min-width:240px;
+      border:1px solid var(--line2);
+      background:#fff;
+      border-radius: 14px;
+      padding: 10px 12px;
+      outline:none;
+      font-weight:900;
+      font-size:13px;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.84);
+      font-size:12px;
+      font-weight:1000;
+      color: rgba(11,18,32,.78);
+      white-space:nowrap;
+    }
+
+    .list{
+      padding: 12px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width: 760px){ .list{grid-template-columns:1fr} }
+
+    /* Card (Japanese craft: clean structure, no noise) */
+    .card{
+      background: linear-gradient(180deg, #fff, rgba(255,255,255,.92));
+      border:1px solid rgba(11,18,32,.08);
+      border-radius: 22px;
+      box-shadow: 0 14px 30px rgba(16,24,40,.10);
+      padding: 12px;
+      cursor:pointer;
+      transition: .14s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:hover{transform: translateY(-2px)}
+    .card.selected{
+      outline: 3px solid rgba(37,99,235,.18);
+      border-color: rgba(37,99,235,.20);
+    }
+    .cardTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .name{
+      font-size: 18px;
+      font-weight:1000;
+      line-height:1.15;
+      margin:0;
+    }
+    .kpi{
+      text-align:left;
+      min-width: 140px;
+    }
+    .kpi .l{font-size:11px; font-weight:1000; color:rgba(11,18,32,.45)}
+    .kpi .v{font-size:16px; font-weight:1000; margin-top:4px}
+    .kpi .v strong{font-size:18px}
+
+    .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-bottom:10px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 9px;
+      border-radius:999px;
+      border:1px solid rgba(11,18,32,.08);
+      background: rgba(248,250,252,.75);
+      font-size:11px;
+      font-weight:1000;
+      color: rgba(11,18,32,.75);
+    }
+    .pill span{color: rgba(11,18,32,.45); font-weight:900}
+
+    /* Single progress (current + stages + remaining) */
+    .barWrap{margin-top:8px}
+    .bar{
+      height: 14px;
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid rgba(11,18,32,.08);
+      background: #f3f4f6;
+      display:flex;
+    }
+    .segm{height:100%}
+    .legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:9px}
+    .leg{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid rgba(11,18,32,.08);
+      background: rgba(255,255,255,.78);
+      font-size:11px; font-weight:1000;
+      color: rgba(11,18,32,.72);
+      white-space:nowrap;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;border:1px solid rgba(0,0,0,.12)}
+
+    /* Inspector (Apple Settings + Google clarity) */
+    .inspector{
+      position:sticky; top:84px;
+    }
+    @media (max-width: 980px){ .inspector{position:static} }
+
+    .hero{
+      padding: 16px;
+      background:
+        radial-gradient(700px 450px at 20% 0%, rgba(37,99,235,.14), transparent 62%),
+        rgba(255,255,255,.72);
+      border-bottom:1px solid var(--line2);
+    }
+    .hero h2{
+      margin:0;
+      font-size: 22px;
+      font-weight:1000;
+      letter-spacing:.1px;
+      line-height:1.15;
+    }
+    .hero p{
+      margin:6px 0 0;
+      color: var(--sub);
+      font-size:12px;
+      font-weight:900;
+      line-height:1.7;
+    }
+
+    .big{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px;
+    }
+    .tile{
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.86);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .tile .t{font-size:12px; font-weight:1000; color:var(--sub)}
+    .tile .v{
+      margin-top:8px;
+      font-size: 30px;
+      font-weight:1000;
+      line-height:1.05;
+      letter-spacing:.1px;
+      color: var(--ink);
+    }
+    .tile .v .cur{font-size:14px; font-weight:1000; color:rgba(11,18,32,.55); margin-right:6px}
+    .tile .s{margin-top:8px; font-size:12px; font-weight:900; color:var(--sub); line-height:1.7}
+
+    .stageGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+    @media (max-width: 980px){ .stageGrid{grid-template-columns:1fr} }
+
+    .stage{
+      border:1px solid rgba(11,18,32,.08);
+      background: rgba(255,255,255,.86);
+      border-radius: 18px;
+      padding: 12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .stage:before{
+      content:"";
+      position:absolute; inset:0 0 auto 0;
+      height:6px;
+      background: var(--stageColor, var(--s1));
+    }
+    .stage .row{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .stage .row b{font-size:12px; font-weight:1000}
+    .stage .row span{font-size:11px; font-weight:900; color:var(--sub)}
+    .stage .lbl{font-size:12px; font-weight:1000; color:var(--sub); margin-bottom:6px}
+    .stage .amt{
+      font-size: 34px;
+      font-weight:1000;
+      line-height:1.05;
+      color: var(--ink);
+    }
+    .stage .amt .cur{font-size:14px; font-weight:1000; color:rgba(11,18,32,.55); margin-right:6px}
+
+    /* Manage */
+    .note{
+      font-size:12px;
+      font-weight:900;
+      color: var(--sub);
+      line-height:1.7;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.82);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .note code{
+      font-family: var(--mono);
+      font-weight:1000;
+      background:#f8fafc;
+      border:1px solid rgba(11,18,32,.08);
+      padding:2px 6px;
+      border-radius:8px;
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    @media (max-width: 980px){ .form{grid-template-columns:1fr} }
+
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:12px; font-weight:900; color: var(--sub)}
+    .field input, .field select, .field textarea{
+      border:1px solid var(--line2);
+      background:#fff;
+      border-radius: 14px;
+      padding:10px 12px;
+      outline:none;
+      font-size:13px;
+      font-weight:900;
+    }
+    .field textarea{min-height:120px; resize:vertical; font-family:var(--mono); font-weight:800; font-size:12px; line-height:1.6}
+
+    .tableWrap{
+      margin-top:12px;
+      border:1px solid var(--line2);
+      border-radius: 18px;
+      overflow:auto;
+      background:#fff;
+    }
+    table{border-collapse:separate; border-spacing:0; width:100%; min-width: 900px; font-size:12px}
+    th, td{
+      padding:10px;
+      border-bottom:1px solid var(--line2);
+      border-left:1px solid var(--line2);
+      text-align:right;
+      vertical-align:top;
+      background:#fff;
+    }
+    th:last-child, td:last-child{border-left:none}
+    th{
+      position:sticky; top:0;
+      background:#f8fafc;
+      font-weight:1000;
+      white-space:nowrap;
+      z-index:1;
+    }
+    tr:last-child td{border-bottom:none}
+    .cell{
+      width:100%;
+      border:1px solid transparent;
+      border-radius: 10px;
+      padding:8px 10px;
+      outline:none;
+      font:inherit;
+      font-weight:900;
+      background:transparent;
+    }
+    .cell:focus{
+      border-color: rgba(37,99,235,.35);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+      background:#fff;
+    }
+
+    .stageBuilder{
+      margin-top:12px;
+      border:1px solid var(--line2);
+      border-radius: 18px;
+      background: rgba(255,255,255,.82);
+      padding:12px;
+    }
+    .stageItem{
+      border:1px solid rgba(11,18,32,.08);
+      background:#fff;
+      border-radius: 16px;
+      padding:10px;
+      margin-top:10px;
+    }
+    .stageTop{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line2);
+      background:#f8fafc;
+      font-size:11px;
+      font-weight:1000;
+      color: rgba(11,18,32,.78);
+    }
+    .swatch{width:14px;height:14px;border-radius:999px;border:1px solid rgba(0,0,0,.12)}
+    .stageForm{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    @media (max-width: 980px){ .stageForm{grid-template-columns:1fr} }
+
+    /* Print / export (native print only) */
+    @media print{
+      .top, .no-print{display:none!important}
+      body{background:#fff!important}
+      .wrap{max-width:none; padding:0}
+      .layout{grid-template-columns:1fr}
+      .panel{box-shadow:none; border:none; border-radius:0}
+      .card{box-shadow:none}
+      .inspector{position:static}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="topInner">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"></div>
+        <div>
+          <h1>لوحة الفروع</h1>
+          <p>عرض مبسّط للمدراء • إدارة مركزية للمراحل والمحفظة</p>
+        </div>
+      </div>
+
+      <div class="seg" role="tablist" aria-label="mode">
+        <button id="tabView" class="active" role="tab" aria-selected="true">عرض</button>
+        <button id="tabManage" role="tab" aria-selected="false">إدارة</button>
+        <button id="tabSettings" role="tab" aria-selected="false">إعدادات</button>
+      </div>
+
+      <div class="actions no-print">
+        <button class="btn primary" id="btnAddSample">مثال جاهز</button>
+        <button class="btn" id="btnPrint">طباعة / PDF</button>
+        <button class="btn" id="btnExportImage">تصدير صورة</button>
+        <button class="btn" id="btnExportImagesZip">تصدير صور ZIP</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="layout">
+      <!-- LEFT: Cards -->
+      <div class="panel" id="panelCards">
+        <div class="panelHead">
+          <div class="searchRow" style="flex:1">
+            <input id="search" class="search" placeholder="ابحث باسم المجمع..." />
+            <span class="chip" id="countChip">0 بطاقة</span>
+          </div>
+          <div class="actions no-print">
+            <button class="btn small" id="btnFocus">تركيز</button>
+            <button class="btn small ghost" id="btnHow">طريقة الإدخال</button>
+          </div>
+        </div>
+        <div class="list" id="cardList"></div>
+      </div>
+
+      <!-- RIGHT: Inspector / Manage / Settings -->
+      <div class="panel inspector" id="panelRight">
+        <!-- View inspector -->
+        <div id="viewPane">
+          <div class="hero">
+            <h2 id="heroTitle">اختر مجمعًا</h2>
+            <p id="heroSub">اضغط على بطاقة من اليسار لعرض التفاصيل هنا.</p>
+          </div>
+
+          <div class="big" id="bigTiles" style="display:none">
+            <div class="tile">
+              <div class="t">التكلفة الإجمالية</div>
+              <div class="v" id="vTotal">—</div>
+              <div class="s" id="sStudents">—</div>
+            </div>
+
+            <div class="tile">
+              <div class="t">التغطية الحالية</div>
+              <div class="v" id="vCovered">—</div>
+              <div class="s" id="sCoveredNote">—</div>
+            </div>
+
+            <div class="tile">
+              <div class="t">هدف المحفظة الاستثمارية</div>
+              <div class="v" id="vGoal">—</div>
+              <div class="s" id="sGoalNote">—</div>
+            </div>
+
+            <div class="tile">
+              <div class="t">الوضع الآن وخطة المراحل</div>
+              <div class="barWrap">
+                <div class="bar" id="bigBar"></div>
+                <div class="legend" id="bigLegend"></div>
+              </div>
+              <div class="s" id="sAfterPlan">—</div>
+            </div>
+          </div>
+
+          <div class="panelBody" id="stageBlock" style="display:none; padding-top:0">
+            <b style="display:block; font-size:13px; font-weight:1000; margin:10px 2px 10px;">أهداف المراحل</b>
+            <div class="stageGrid" id="stageGrid"></div>
+          </div>
+        </div>
+
+        <!-- Manage pane -->
+        <div id="managePane" style="display:none">
+          <div class="panelHead">
+            <b>إدارة البيانات</b>
+            <div class="actions no-print">
+              <button class="btn small" id="btnAddRow">إضافة صف</button>
+              <button class="btn small danger" id="btnClear">مسح</button>
+            </div>
+          </div>
+          <div class="panelBody">
+            <div class="note">
+              <b>إدخال سريع (لصق):</b> انسخ من Google Sheets/Excel والصق هنا (CSV أو TSV).<br>
+              الترتيب: <code>اسم المجمع</code> — <code>التكلفة الإجمالية</code> — <code>عدد الطلاب</code> — <code>نسبة التغطية الحالية %</code> (اختياري) — <code>مبلغ التغطية الحالية</code> (اختياري)
+            </div>
+
+            <div class="form">
+              <div class="field" style="grid-column:1/-1">
+                <label>لصق البيانات</label>
+                <textarea id="paste" placeholder="مثال:
+مجمع زيد بن ثابت	123234	420	37
+مجمع الإمام عاصم	310000	980		115000"></textarea>
+              </div>
+            </div>
+
+            <div class="actions no-print" style="margin-top:10px">
+              <button class="btn primary" id="btnApplyPaste">تطبيق اللصق</button>
+              <button class="btn" id="btnExportJSON">تصدير JSON</button>
+              <button class="btn" id="btnImportJSON">استيراد JSON</button>
+              <input id="jsonFile" type="file" accept="application/json" style="display:none" />
+            </div>
+
+            <div class="tableWrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="min-width:260px">اسم المجمع</th>
+                    <th style="min-width:160px">التكلفة الإجمالية</th>
+                    <th style="min-width:120px">عدد الطلاب</th>
+                    <th style="min-width:160px">نسبة التغطية الحالية %</th>
+                    <th style="min-width:180px">مبلغ التغطية الحالية</th>
+                    <th style="min-width:90px">حذف</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+
+            <div class="stageBuilder">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                <b style="font-size:13px; font-weight:1000">المراحل (مركزية)</b>
+                <div class="actions no-print">
+                  <button class="btn small" id="btnAddStage">+ إضافة</button>
+                  <button class="btn small ghost" id="btnResetStages">افتراضي</button>
+                </div>
+              </div>
+              <div class="note" style="margin-top:10px">
+                لكل مرحلة: اسم + فترة + <b>نسبة تغطية مستهدفة (تراكمية %)</b>.
+                النسبة لا تُعرض للمدراء — تُستخدم فقط لحساب هدف المرحلة.
+              </div>
+              <div id="stageList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings pane -->
+        <div id="settingsPane" style="display:none">
+          <div class="panelHead">
+            <b>إعدادات مركزية</b>
+            <div class="actions no-print">
+              <button class="btn small" id="btnExportCSS">تصدير CSS</button>
+              <button class="btn small ghost" id="btnResetAll">إرجاع كل شيء</button>
+            </div>
+          </div>
+          <div class="panelBody">
+            <div class="note">
+              <b>المبدأ:</b> المدير يرى “النتيجة” وأنت تتحكم بـ “القواعد”.<br>
+              هدف المحفظة يُحسب = مبلغ التغطية المطلوب ÷ (العائد السنوي).
+            </div>
+
+            <div class="form">
+              <div class="field">
+                <label>نسبة العائد السنوي (%)</label>
+                <input id="returnRate" type="number" min="0" step="0.1" value="9">
+              </div>
+              <div class="field">
+                <label>هدف المحفظة يغطي</label>
+                <select id="goalScope">
+                  <option value="remaining" selected>المتبقي بعد التغطية الحالية</option>
+                  <option value="total">التكلفة الإجمالية</option>
+                </select>
+              </div>
+              <div class="field" style="grid-column:1/-1">
+                <label>إظهار في بطاقة اليسار</label>
+                <select id="leftDensity">
+                  <option value="calm" selected>هادئ (مختصر)</option>
+                  <option value="rich">غني (تفاصيل أكثر)</option>
+                </select>
+              
+            <div class="note" style="margin-top:12px">
+              <b>مزامنة جماعية (تحديث للجميع):</b> ضع رابط ملف JSON عام (GET) ليتم تحميل أحدث البيانات تلقائيًا عند كل المستخدمين.
+              يمكنك أيضًا وضع رابط حفظ (POST) إن كان لديك API في منصتك لحفظ البيانات مباشرة.
+            </div>
+
+            <div class="form">
+              <div class="field" style="grid-column:1/-1">
+                <label>رابط البيانات (JSON GET)</label>
+                <input id="remoteGetUrl" type="url" placeholder="مثال: https://yourdomain.com/data/compounds_data.json">
+              </div>
+
+              <div class="field">
+                <label>تحديث تلقائي</label>
+                <select id="remoteAutoOn">
+                  <option value="on" selected>مفعل</option>
+                  <option value="off">متوقف</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>كل كم ثانية يتم التحديث؟</label>
+                <input id="remoteInterval" type="number" min="5" step="1" value="20">
+              </div>
+
+              <div class="field" style="grid-column:1/-1">
+                <label>رابط الحفظ (اختياري POST)</label>
+                <input id="remotePushUrl" type="url" placeholder="مثال: https://yourdomain.com/api/compounds/save">
+              </div>
+
+              <div class="field" style="grid-column:1/-1">
+                <label>Token (اختياري) — يوضع في Authorization: Bearer</label>
+                <input id="remoteToken" type="password" placeholder="اتركه فارغًا إذا لا يوجد">
+              </div>
+            </div>
+
+            <div class="actions no-print" style="margin-top:10px">
+              <button class="btn primary" id="btnFetchRemote">جلب أحدث نسخة</button>
+              <button class="btn" id="btnPublishRemote">نشر التعديل للجميع</button>
+              <span class="chip" id="syncState">غير متصل</span>
+            </div>
+</div>
+            </div>
+
+            <div class="note" style="margin-top:12px">
+              <b>تصدير/مشاركة:</b> استخدم زر <b>طباعة / PDF</b> من الأعلى (يتوافق مع iOS) لطباعة الصفحة كاملة أو حفظها PDF.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  
+  <!-- Export overlay -->
+  <div id="exportOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.55); backdrop-filter: blur(10px); padding:14px;">
+    <div style="max-width:520px; margin:0 auto; background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.28); border-radius:22px; box-shadow: 0 26px 72px rgba(16,24,40,.22); padding:14px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <b style="font-size:13px; font-weight:1000; color:#0b1220">تصدير الصور</b>
+        <button class="btn small danger" id="btnExportClose">إغلاق</button>
+      </div>
+      <div id="exportStatus" style="margin-top:10px; font-size:12px; font-weight:900; color:rgba(11,18,32,.72); line-height:1.7">
+        جاري التحضير…
+      </div>
+      <div style="margin-top:10px; height:10px; background:rgba(11,18,32,.08); border-radius:999px; overflow:hidden; border:1px solid rgba(11,18,32,.08)">
+        <div id="exportBar" style="height:100%; width:0%; background:linear-gradient(90deg, rgba(37,99,235,.85), rgba(16,185,129,.85)); border-radius:999px"></div>
+      </div>
+      <div style="margin-top:10px; font-size:11px; font-weight:900; color:rgba(11,18,32,.55)">
+        ملاحظة: المزامنة تعتمد على رابط JSON عام (GET). يمكن تشغيل التصدير أونلاين (أفضل) أو أوفلاين (بديل).
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script>
+    // ===== Utilities =====
+    const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+    const fmtSAR=(n)=>{
+      if(n===null||n===undefined||Number.isNaN(n)) return "—";
+      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0})+" ريال";
+    };
+    const fmtMoney=(n)=>{
+      if(n===null||n===undefined||Number.isNaN(n)) return "—";
+      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0});
+    };
+    const fmtPct=(n)=>{
+      if(n===null||n===undefined||Number.isNaN(n)) return "—";
+      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0})+"%";
+    };
+
+    function markDirty(){
+      // Any local edit should bump updated timestamp (used for shared sync)
+      localUpdatedAt = Date.now();
+    }
+    function parseNumber(v){
+      if(v===null||v===undefined) return NaN;
+      if(typeof v==="number") return v;
+      const s=String(v).trim();
+      if(!s) return NaN;
+      const normalized=s.replace(/[٬,]/g,"").replace(/ريال|ر\.س|SAR/gi,"").replace(/\s+/g,"");
+      const n=Number(normalized);
+      return Number.isFinite(n)?n:NaN;
+    }
+    function escapeHtml(s){
+      return String(s??"")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function uid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16); }
+    function safeFilename(name){ return (name||"data").toString().replace(/[\\/:*?"<>|]/g,"-").trim(); }
+    function downloadBlob(filename, blob){
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=url; a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    }
+    function detectDelimiter(line){
+      const comma=(line.match(/,/g)||[]).length;
+      const tab=(line.match(/\t/g)||[]).length;
+      const semi=(line.match(/;/g)||[]).length;
+      if(tab>=comma && tab>=semi && tab>0) return "\t";
+      if(semi>comma) return ";";
+      return ",";
+    }
+    function parseDelimited(text){
+      const lines=(text||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").filter(l=>l.trim()!=="");
+      if(!lines.length) return [];
+      const delim=detectDelimiter(lines[0]);
+      return lines.map(line=> line.split(delim).map(x=>String(x??"").trim()));
+    }
+    function stageColor(i){
+      const palette=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)"];
+      return palette[i % palette.length];
+    }
+
+    // ===== Elements =====
+    const tabView = document.getElementById("tabView");
+    const tabManage = document.getElementById("tabManage");
+    const tabSettings = document.getElementById("tabSettings");
+
+    const viewPane = document.getElementById("viewPane");
+    const managePane = document.getElementById("managePane");
+    const settingsPane = document.getElementById("settingsPane");
+
+    const elSearch = document.getElementById("search");
+    const elCountChip = document.getElementById("countChip");
+    const elList = document.getElementById("cardList");
+
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSub = document.getElementById("heroSub");
+    const bigTiles = document.getElementById("bigTiles");
+    const stageBlock = document.getElementById("stageBlock");
+
+    const vTotal = document.getElementById("vTotal");
+    const sStudents = document.getElementById("sStudents");
+
+    const vCovered = document.getElementById("vCovered");
+    const sCoveredNote = document.getElementById("sCoveredNote");
+
+    const vGoal = document.getElementById("vGoal");
+    const sGoalNote = document.getElementById("sGoalNote");
+
+    const bigBar = document.getElementById("bigBar");
+    const bigLegend = document.getElementById("bigLegend");
+    const sAfterPlan = document.getElementById("sAfterPlan");
+
+    const stageGrid = document.getElementById("stageGrid");
+
+    // Manage
+    const paste = document.getElementById("paste");
+    const rowsTbody = document.getElementById("rows");
+    const stageList = document.getElementById("stageList");
+
+    // Settings
+    const returnRate = document.getElementById("returnRate");
+    const goalScope = document.getElementById("goalScope");
+    const leftDensity = document.getElementById("leftDensity");
+
+    // Sync (shared data)
+    const remoteGetUrl = document.getElementById("remoteGetUrl");
+    const remoteAutoOn = document.getElementById("remoteAutoOn");
+    const remoteInterval = document.getElementById("remoteInterval");
+    const remotePushUrl = document.getElementById("remotePushUrl");
+    const remoteToken = document.getElementById("remoteToken");
+    const btnFetchRemote = document.getElementById("btnFetchRemote");
+    const btnPublishRemote = document.getElementById("btnPublishRemote");
+    const syncState = document.getElementById("syncState");
+
+    // Buttons
+    document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
+
+    // ===== Export images (selected / ZIP) =====
+    const exportOverlay = document.getElementById("exportOverlay");
+    const exportStatus = document.getElementById("exportStatus");
+    const exportBar = document.getElementById("exportBar");
+    const btnExportClose = document.getElementById("btnExportClose");
+    const btnExportImage = document.getElementById("btnExportImage");
+    const btnExportImagesZip = document.getElementById("btnExportImagesZip");
+
+    function showExport(msg, p){
+      exportStatus.textContent = msg || "…";
+      exportBar.style.width = `${clamp(Number(p||0),0,100)}%`;
+      exportOverlay.style.display = "block";
+    }
+    function hideExport(){ exportOverlay.style.display = "none"; }
+
+    btnExportClose?.addEventListener("click", hideExport);
+
+    async function ensureExportLibs(){
+      // Keep the original html2canvas path if available, but allow an offline fallback.
+      // If html2canvas is missing (no internet / blocked CDN), we will use an offline SVG renderer.
+      return true;
+    }
+
+    function buildInspectorSnapshotNode(){
+      // Snapshot is based on the View inspector only (clean, manager-friendly)
+      const root = document.createElement("div");
+      root.dir = "rtl";
+      root.lang = "ar";
+      root.className = "arabicFixSnapshot";
+      root.style.background = "#fff";
+      root.style.padding = "14px";
+      root.style.width = "1100px";
+      root.style.maxWidth = "1100px";
+      // Strong Arabic-safe font fallback chain (prevents disjoint letters in some render paths)
+      root.style.fontFamily = `"IBM Plex Sans Arabic","Noto Naskh Arabic","Noto Sans Arabic","Geeza Pro","Tahoma","Arial",sans-serif`;
+      root.style.direction = "rtl";
+      root.style.unicodeBidi = "plaintext";
+      root.style.letterSpacing = "normal";
+
+      // Clone just the inspector view (hero + tiles + stages)
+      const view = document.getElementById("viewPane");
+      const clone = view.cloneNode(true);
+
+      // Remove any no-print elements inside snapshot (none expected)
+      clone.querySelectorAll(".no-print, .seg, .actions").forEach(n=>n.remove());
+
+      // Force visibility of tiles if hidden (when no selection)
+      const bt = clone.querySelector("#bigTiles");
+      const sb = clone.querySelector("#stageBlock");
+      if(bt) bt.style.display = "";
+      if(sb) sb.style.display = "";
+
+      // Make it look like a single page (no sticky/scroll)
+      clone.style.display = "";
+      root.appendChild(clone);
+
+      // Apply current styles by cloning the CSS (keeps styling identical in the temp snapshot)
+      const styleEl = document.getElementById("appCSS");
+      if(styleEl){
+        const style = document.createElement("style");
+        style.textContent = styleEl.textContent || "";
+        root.prepend(style);
+      }
+
+      // Extra CSS fixes for Arabic shaping/ligatures in export capture
+      const fix = document.createElement("style");
+      fix.textContent = `
+        .arabicFixSnapshot, .arabicFixSnapshot *{
+          direction: rtl !important;
+          unicode-bidi: plaintext !important;
+          font-family: "IBM Plex Sans Arabic","Noto Naskh Arabic","Noto Sans Arabic","Geeza Pro","Tahoma","Arial",sans-serif !important;
+          -webkit-text-size-adjust: 100%;
+          font-kerning: normal;
+          text-rendering: geometricPrecision;
+        }
+      `;
+      root.prepend(fix);
+
+      return root;
+    }
+
+    async function renderSnapshotCanvas(){
+      // Create temp container (inside same document so fonts are already available)
+      const temp = document.createElement("div");
+      temp.style.position="fixed";
+      temp.style.inset="0";
+      temp.style.zIndex="9998";
+      temp.style.background="#fff";
+      temp.style.overflow="auto";
+      temp.style.padding="10px";
+      const node = buildInspectorSnapshotNode();
+      temp.appendChild(node);
+      document.body.appendChild(temp);
+
+      try{
+        // Ensure web fonts are ready before capture (prevents Arabic letter disjoint in some cases)
+        if(document.fonts && document.fonts.ready){
+          await document.fonts.ready;
+        }
+        
+
+    // ===== Offline fallback renderer (no external libs) =====
+    function nodeToSvgData(node, width, height){
+      // Wrap HTML in SVG foreignObject (offline rasterization path)
+      const serializer = new XMLSerializer();
+      const xhtml = document.createElement("div");
+      xhtml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      xhtml.style.width = width + "px";
+      xhtml.style.height = height + "px";
+      xhtml.style.background = "#fff";
+      xhtml.appendChild(node);
+
+      const htmlStr = serializer.serializeToString(xhtml);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+          <foreignObject x="0" y="0" width="100%" height="100%">
+            ${htmlStr}
+          </foreignObject>
+        </svg>
+      `.trim();
+      return svg;
+    }
+
+    async function renderSnapshotCanvasOffline(){
+      // Create temp container to measure layout precisely
+      const temp = document.createElement("div");
+      temp.style.position = "fixed";
+      temp.style.left = "-10000px";
+      temp.style.top = "0";
+      temp.style.width = "1100px";
+      temp.style.background = "#fff";
+      temp.style.zIndex = "9998";
+      temp.style.pointerEvents = "none";
+
+      const node = buildInspectorSnapshotNode();
+      temp.appendChild(node);
+      document.body.appendChild(temp);
+
+      try{
+        if(document.fonts && document.fonts.ready){
+          await document.fonts.ready;
+        }
+        await new Promise(r=>setTimeout(r, 120));
+        await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+        const rect = node.getBoundingClientRect();
+        const w = Math.max(1, Math.ceil(rect.width));
+        const h = Math.max(1, Math.ceil(rect.height));
+
+        const svgStr = nodeToSvgData(node, w, h);
+        const blob = new Blob([svgStr], {type:"image/svg+xml;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+
+        try{
+          const img = new Image();
+          img.decoding = "sync";
+          const loaded = new Promise((resolve, reject)=>{
+            img.onload = resolve;
+            img.onerror = reject;
+          });
+          img.src = url;
+          await loaded;
+
+          const scale = 2;
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(w * scale);
+          canvas.height = Math.round(h * scale);
+          const ctx = canvas.getContext("2d");
+          ctx.setTransform(scale,0,0,scale,0,0);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0,0,w,h);
+          ctx.drawImage(img, 0, 0);
+          return canvas;
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      } finally {
+        temp.remove();
+      }
+    }
+
+    async function renderSnapshotCanvasSmart(){
+      // Prefer html2canvas if available; otherwise offline fallback
+      if(typeof html2canvas === "function"){
+        return await renderSnapshotCanvas();
+      }
+      return await renderSnapshotCanvasOffline();
+    }
+// Give Safari/iOS a moment to apply shaping after font swap
+        await new Promise(r=>setTimeout(r, 120));
+        await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+        const opts = {scale: 2, backgroundColor:"#ffffff", useCORS:true, letterRendering:true, foreignObjectRendering:true};
+        try{
+          const canvas = await html2canvas(node, opts);
+          return canvas;
+        }catch(e){
+          // Fallback path (some browsers dislike foreignObjectRendering)
+          const canvas = await html2canvas(node, {...opts, foreignObjectRendering:false});
+          return canvas;
+        }
+      } finally {
+        temp.remove();
+      }
+    }
+
+    async function exportSelectedImage(){
+      if(!selectedId){
+        alert("اختر مجمعًا أولًا.");
+        return;
+      }
+      if(!await ensureExportLibs()) return;
+
+      showExport("جاري تجهيز الصورة…", 12);
+      try{
+        const canvas = await renderSnapshotCanvasSmart();
+        showExport("جاري حفظ الصورة…", 70);
+        const blob = await new Promise(res=>canvas.toBlob(res, "image/png"));
+        const name = safeFilename(cards.find(c=>c.id===selectedId)?.branch_name || "compound");
+        downloadBlob(`بطاقة_${name}.png`, blob);
+        showExport("تم ✅", 100);
+        setTimeout(hideExport, 650);
+      } catch(e){
+        hideExport();
+        alert("تعذر تصدير الصورة.");
+      }
+    }
+
+    async function exportAllImagesZip(){
+      if(!cards.length){
+        alert("لا توجد بطاقات.");
+        return;
+      }
+      if(!await ensureExportLibs()) return;
+      const hasZip = (typeof JSZip === "function");
+
+      showExport("بدء التصدير…", 2);
+      const zip = hasZip ? new JSZip() : null;
+
+      try{
+        for(let i=0;i<cards.length;i++){
+          const c = cards[i];
+          // select and render
+          selectedId = c.id;
+          renderCards();
+          selectCard(c.id);
+          await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+          showExport(`تصدير: ${c.branch_name} (${i+1}/${cards.length})`, (i/cards.length)*70 + 10);
+
+          const canvas = await renderSnapshotCanvasSmart();
+          const blob = await new Promise(res=>canvas.toBlob(res, "image/png"));
+          const arr = await blob.arrayBuffer();
+          if(zip){
+            zip.file(`البطاقات/بطاقة_${safeFilename(c.branch_name)}.png`, arr);
+          } else {
+            // Offline fallback: download each image separately
+            downloadBlob(`بطاقة_${safeFilename(c.branch_name)}.png`, blob);
+          }
+        }
+
+        if(zip){
+          showExport("تجميع الملف…", 92);
+          const out = await zip.generateAsync({type:"blob"});
+          downloadBlob("البطاقات_صور.zip", out);
+        }
+        showExport("تم ✅", 100);
+        setTimeout(hideExport, 700);
+      } catch(e){
+        hideExport();
+        alert("تعذر تصدير الصور كملف ZIP.");
+      } finally {
+        save();
+      }
+    }
+
+    document.getElementById("btnHow").addEventListener("click", ()=>{
+      alert("الإدخال من تبويب (إدارة): لصق من Google Sheets/Excel ثم (تطبيق اللصق).");
+    });
+    btnExportImage?.addEventListener("click", exportSelectedImage);
+    btnExportImagesZip?.addEventListener("click", exportAllImagesZip);
+
+    document.getElementById("btnFocus").addEventListener("click", ()=>{
+      document.getElementById("panelRight").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+
+    // ===== State =====
+    const LS="compound_kanso_v1";
+    let cards=[];
+    let stages=[];
+    let selectedId=null;
+
+    // Shared sync meta
+    let localUpdatedAt = 0;
+    let syncTimer = null;
+
+    function defaultStages(){
+      return [
+        {id:uid(), name:"المرحلة الأولى", period:"خلال رمضان", target_pct:65},
+        {id:uid(), name:"المرحلة الثانية", period:"بعد رمضان", target_pct:80},
+        {id:uid(), name:"المرحلة الثالثة", period:"نصف السنة", target_pct:90},
+        {id:uid(), name:"المرحلة الرابعة", period:"نهاية السنة", target_pct:100},
+      ];
+    }
+
+    function normalizeCard(obj, id){
+      const total=parseNumber(obj.total_cost);
+      const students=parseNumber(obj.students);
+      let curAmt=parseNumber(obj.covered_current_amount);
+      const curPctIn=parseNumber(obj.covered_current_pct);
+
+      const T = Number.isFinite(total)? total : 0;
+      if(!Number.isFinite(curAmt)){
+        curAmt = (Number.isFinite(curPctIn) && T>0) ? T * clamp(curPctIn,0,100)/100 : 0;
+      }
+      const curPct = (T>0) ? (curAmt/T*100) : 0;
+
+      return {
+        id,
+        branch_name:(obj.branch_name??"").toString().trim(),
+        total_cost:T,
+        students: Number.isFinite(students)? students : 0,
+        covered_current_amount: clamp(curAmt,0,T),
+        covered_current_pct: clamp(curPct,0,100),
+      };
+    }
+
+    function calcPortfolioGoal(total, coveredAmt){
+      const ratePct=parseNumber(returnRate.value);
+      const rate = Number.isFinite(ratePct) ? ratePct/100 : 0;
+      const scope = goalScope.value;
+      const amountToCover = scope==="total" ? Math.max(0,total) : Math.max(0,total - coveredAmt);
+      if(rate<=0) return {goal: NaN, amountToCover, rate};
+      return {goal: amountToCover / rate, amountToCover, rate};
+    }
+    function stageGoal(coverAmount, rate){
+      if(!rate || rate<=0) return NaN;
+      return Math.max(0, coverAmount) / rate;
+    }
+
+    function computeStagePlan(card){
+      const total=card.total_cost||0;
+      const coveredNow=clamp(card.covered_current_amount||0, 0, total);
+      const {rate} = calcPortfolioGoal(total, coveredNow);
+
+      const sorted = stages
+        .map((s,i)=>({ ...s, t: clamp(parseNumber(s.target_pct),0,100)}))
+        .sort((a,b)=>a.t-b.t);
+
+      let current=coveredNow;
+      const plans = sorted.map((s, idx)=>{
+        const desired = total * (s.t/100);
+        const inc = Math.max(0, Math.min(total, desired) - current);
+        current += inc;
+        return {
+          name:(s.name??`مرحلة ${idx+1}`).toString(),
+          period:(s.period??"").toString(),
+          incrementAmount: inc,
+          goal: stageGoal(inc, rate),
+          color: stageColor(idx),
+        };
+      });
+
+      const afterCovered = Math.min(total, current);
+      const remain = Math.max(0, total - afterCovered);
+      return {total, coveredNow, plans, afterCovered, remain, rate};
+    }
+
+    // ===== Persistence =====
+    function save(){
+      // bump updated timestamp on any local change
+      if(!localUpdatedAt) localUpdatedAt = Date.now();
+      const data={
+        meta:{ updated_at: localUpdatedAt, schema: 1 },
+        settings:{
+          returnRate: returnRate.value,
+          goalScope: goalScope.value,
+          leftDensity: leftDensity.value,
+          remoteGetUrl: remoteGetUrl?.value || "",
+          remoteAutoOn: remoteAutoOn?.value || "on",
+          remoteInterval: remoteInterval?.value || "20",
+          remotePushUrl: remotePushUrl?.value || "",
+          remoteToken: remoteToken?.value || ""
+        },
+        cards, stages, selectedId
+      };
+      localStorage.setItem(LS, JSON.stringify(data));
+    }
+    function load(){
+      try{
+        const raw=localStorage.getItem(LS);
+        if(!raw) return false;
+        const d=JSON.parse(raw);
+        if(d?.meta?.updated_at) localUpdatedAt = Number(d.meta.updated_at)||0;
+        if(d?.settings){
+          if(d.settings.returnRate!=null) returnRate.value=d.settings.returnRate;
+          if(d.settings.goalScope!=null) goalScope.value=d.settings.goalScope;
+          if(d.settings.leftDensity!=null) leftDensity.value=d.settings.leftDensity;
+
+          if(remoteGetUrl && d.settings.remoteGetUrl!=null) remoteGetUrl.value=d.settings.remoteGetUrl;
+          if(remoteAutoOn && d.settings.remoteAutoOn!=null) remoteAutoOn.value=d.settings.remoteAutoOn;
+          if(remoteInterval && d.settings.remoteInterval!=null) remoteInterval.value=d.settings.remoteInterval;
+          if(remotePushUrl && d.settings.remotePushUrl!=null) remotePushUrl.value=d.settings.remotePushUrl;
+          if(remoteToken && d.settings.remoteToken!=null) remoteToken.value=d.settings.remoteToken;
+        }
+        if(Array.isArray(d.cards)) cards=d.cards;
+        if(Array.isArray(d.stages)) stages=d.stages;
+        if(d.selectedId) selectedId=d.selectedId;
+        return true;
+      }catch(e){ return false; }
+    }
+
+    // ===== Render cards =====
+    function renderCards(){
+      const q=(elSearch.value||"").trim().toLowerCase();
+      const list=cards.filter(c=>!q || c.branch_name.toLowerCase().includes(q));
+      elList.innerHTML="";
+      list.forEach(c=> elList.appendChild(renderCardMini(c)));
+      elCountChip.textContent = `${list.length} بطاقة`;
+    }
+
+    function renderCardMini(c){
+      const plan=computeStagePlan(c);
+      const total=plan.total;
+      const pct=(amt)=> total>0 ? (amt/total*100) : 0;
+
+      const stageSum=plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
+      const barSegs=[
+        {amount: plan.coveredNow, color:"rgba(247,168,163,1)"},
+        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color})),
+        {amount: plan.remain, color:"#e5e7eb"}
+      ].filter(s=>s.amount>0.0001);
+
+      const dense = (leftDensity.value==="rich");
+
+      const el=document.createElement("div");
+      el.className="card"+(c.id===selectedId?" selected":"");
+      el.setAttribute("role","button");
+      el.setAttribute("tabindex","0");
+      el.addEventListener("click", ()=>selectCard(c.id));
+      el.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectCard(c.id);} });
+
+      el.innerHTML=`
+        <div class="cardTop">
+          <h3 class="name">${escapeHtml(c.branch_name||"—")}</h3>
+          <div class="kpi">
+            <div class="l">التكلفة</div>
+            <div class="v"><strong>${fmtMoney(total)}</strong></div>
+          </div>
+        </div>
+        <div class="meta">
+          <span class="pill"><span>طلاب</span>${Number(c.students||0).toLocaleString("ar-SA")}</span>
+          <span class="pill"><span>تغطية</span>${fmtPct(c.covered_current_pct)}</span>
+          ${dense ? `<span class="pill"><span>حالي</span>${fmtMoney(plan.coveredNow)}</span>` : ``}
+        </div>
+        <div class="barWrap">
+          <div class="bar">
+            ${barSegs.map(s=>`<div class="segm" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("")}
+          </div>
+          ${dense ? `
+            <div class="legend">
+              <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي</span>
+              <span class="leg"><span class="dot" style="background:#111827"></span>المراحل</span>
+              <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي</span>
+            </div>
+          ` : ``}
+        </div>
+      `;
+      return el;
+    }
+
+    // ===== Inspector =====
+    function selectCard(id){
+      selectedId=id;
+      renderCards();
+      const c=cards.find(x=>x.id===id);
+      if(!c) return;
+
+      const plan=computeStagePlan(c);
+      const total=plan.total;
+      const stageSum=plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
+
+      heroTitle.textContent = c.branch_name || "—";
+      heroSub.textContent = "ملخص جاهز للعرض: التكلفة، التغطية، المحفظة، ثم المراحل.";
+
+      bigTiles.style.display="";
+      stageBlock.style.display="";
+
+      vTotal.textContent = fmtSAR(total);
+      sStudents.textContent = `عدد الطلاب: ${Number(c.students||0).toLocaleString("ar-SA")}`;
+
+      vCovered.textContent = `${fmtPct(c.covered_current_pct)}  •  ${fmtSAR(plan.coveredNow)}`;
+      sCoveredNote.textContent = `تغطية الجمعية الحالية من التكلفة الإجمالية.`;
+
+      const {goal, amountToCover, rate} = calcPortfolioGoal(total, plan.coveredNow);
+      vGoal.textContent = fmtSAR(goal);
+      const scopeText = (goalScope.value==="total") ? "لتغطية التكلفة الإجمالية" : "لتغطية المتبقي بعد التغطية الحالية";
+      sGoalNote.textContent = `${scopeText} على عائد سنوي ${fmtPct(parseNumber(returnRate.value))} (مبلغ التغطية المطلوب: ${fmtSAR(amountToCover)}).`;
+
+      // Big progress
+      const pct=(amt)=> total>0 ? (amt/total*100) : 0;
+      const barSegs=[
+        {amount: plan.coveredNow, color:"rgba(247,168,163,1)", label:`الحالي: ${fmtSAR(plan.coveredNow)}`},
+        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color, label:`${p.name}: ${fmtSAR(p.incrementAmount)}`})),
+        {amount: plan.remain, color:"#e5e7eb", label:`المتبقي: ${fmtSAR(plan.remain)}`}
+      ].filter(s=>s.amount>0.0001);
+
+      bigBar.innerHTML = barSegs.map(s=>`<div class="segm" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("");
+      bigLegend.innerHTML = `
+        <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي: ${fmtSAR(plan.coveredNow)}</span>
+        <span class="leg"><span class="dot" style="background:#111827"></span>المراحل: ${fmtSAR(stageSum)}</span>
+        <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي: ${fmtSAR(plan.remain)}</span>
+      `;
+      const afterPct = total>0 ? (plan.afterCovered/total*100) : 0;
+      sAfterPlan.textContent = `بعد خطة المراحل: تصل التغطية إلى ${fmtPct(afterPct)}.`;
+
+      // Stage tiles (goal prominent)
+      stageGrid.innerHTML = plan.plans
+        .filter(p=>p.incrementAmount>0.0001)
+        .map((p, idx)=>`
+          <div class="stage" style="--stageColor:${p.color}">
+            <div class="row">
+              <b>${escapeHtml(p.name)}</b>
+              <span>${escapeHtml(p.period||"")}</span>
+            </div>
+            <div class="lbl">هدف المرحلة</div>
+            <div class="amt">${fmtMoney(p.goal)}<span class="cur">﷼</span></div>
+          </div>
+        `).join("") || `<div class="note" style="margin:0">لا توجد مراحل فعّالة — عدّل المراحل من تبويب (إدارة).</div>`;
+
+      save();
+    }
+
+    // ===== Manage table =====
+    function renderRows(){
+      rowsTbody.innerHTML="";
+      cards.forEach((c, idx)=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td><input class="cell" data-i="${idx}" data-k="branch_name" value="${escapeHtml(c.branch_name)}" placeholder="اسم المجمع"/></td>
+          <td><input class="cell" data-i="${idx}" data-k="total_cost" value="${c.total_cost||""}" placeholder="مثال: 123000"/></td>
+          <td><input class="cell" data-i="${idx}" data-k="students" value="${c.students||""}" placeholder="مثال: 420"/></td>
+          <td><input class="cell" data-i="${idx}" data-k="covered_current_pct" value="${Number.isFinite(c.covered_current_pct)? Math.round(c.covered_current_pct):""}" placeholder="مثال: 37"/></td>
+          <td><input class="cell" data-i="${idx}" data-k="covered_current_amount" value="${c.covered_current_amount||""}" placeholder="مثال: 115000"/></td>
+          <td><button class="btn small danger no-print" data-del="${idx}">حذف</button></td>
+        `;
+        rowsTbody.appendChild(tr);
+      });
+
+      rowsTbody.querySelectorAll("input.cell").forEach(inp=>{
+        inp.addEventListener("input", ()=>{
+          const i=Number(inp.getAttribute("data-i"));
+          const k=inp.getAttribute("data-k");
+          const obj={...cards[i]};
+          obj[k]=inp.value;
+          cards[i]=normalizeCard(obj, cards[i].id);
+          markDirty(); save(); renderCards();
+          if(selectedId===cards[i].id) selectCard(selectedId);
+        });
+      });
+
+      rowsTbody.querySelectorAll("[data-del]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const i=Number(btn.getAttribute("data-del"));
+          const removed=cards[i]?.id;
+          cards.splice(i,1);
+          if(selectedId===removed) selectedId=null;
+          renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
+        });
+      });
+    }
+
+    function applyPaste(){
+      const rows=parseDelimited(paste.value);
+      if(!rows.length){ alert("الصق بيانات أولاً."); return; }
+      rows.forEach(r=>{
+        const obj={
+          branch_name:r[0]??"",
+          total_cost:r[1]??"",
+          students:r[2]??"",
+          covered_current_pct:r[3]??"",
+          covered_current_amount:r[4]??"",
+        };
+        const norm=normalizeCard(obj, uid());
+        if(norm.branch_name) cards.push(norm);
+      });
+      paste.value="";
+      renderRows(); renderCards();
+      if(!selectedId && cards.length) selectCard(cards[0].id);
+      save();
+    }
+
+    // ===== Stages builder =====
+    function renderStages(){
+      stageList.innerHTML="";
+      stages.forEach((st, idx)=>{
+        const color=stageColor(idx);
+        const box=document.createElement("div");
+        box.className="stageItem";
+        box.innerHTML=`
+          <div class="stageTop">
+            <span class="badge"><span class="swatch" style="background:${color}"></span>#${idx+1}</span>
+            <button class="btn small danger no-print" data-remove="${st.id}">حذف</button>
+          </div>
+          <div class="stageForm">
+            <div class="field" style="margin:0">
+              <label>اسم المرحلة</label>
+              <input data-id="${st.id}" data-k="name" value="${escapeHtml(st.name)}"/>
+            </div>
+            <div class="field" style="margin:0">
+              <label>الفترة</label>
+              <input data-id="${st.id}" data-k="period" value="${escapeHtml(st.period)}"/>
+            </div>
+            <div class="field" style="margin:0">
+              <label>نسبة التغطية التراكمية (%)</label>
+              <input type="number" min="0" max="100" step="0.1" data-id="${st.id}" data-k="target_pct" value="${escapeHtml(st.target_pct)}"/>
+            </div>
+          </div>
+        `;
+        stageList.appendChild(box);
+      });
+
+      stageList.querySelectorAll("[data-remove]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const id=b.getAttribute("data-remove");
+          stages = stages.filter(x=>x.id!==id);
+          renderStages(); markDirty(); save(); rerenderAll();
+        });
+      });
+      stageList.querySelectorAll("input[data-id]").forEach(inp=>{
+        inp.addEventListener("input", ()=>{
+          const id=inp.getAttribute("data-id");
+          const k=inp.getAttribute("data-k");
+          const st=stages.find(x=>x.id===id);
+          if(!st) return;
+          st[k]=inp.value;
+          markDirty(); save(); rerenderAll();
+        });
+      });
+    }
+
+    function updateInspectorEmpty(){
+      if(selectedId && cards.some(c=>c.id===selectedId)) return;
+      heroTitle.textContent="اختر مجمعًا";
+      heroSub.textContent="اضغط على بطاقة من اليسار لعرض التفاصيل هنا.";
+      bigTiles.style.display="none";
+      stageBlock.style.display="none";
+    }
+
+    // ===== Mode switching =====
+    function setMode(mode){
+      const isView = mode==="view";
+      const isManage = mode==="manage";
+      const isSettings = mode==="settings";
+
+      tabView.classList.toggle("active", isView);
+      tabManage.classList.toggle("active", isManage);
+      tabSettings.classList.toggle("active", isSettings);
+
+      tabView.setAttribute("aria-selected", isView ? "true" : "false");
+      tabManage.setAttribute("aria-selected", isManage ? "true" : "false");
+      tabSettings.setAttribute("aria-selected", isSettings ? "true" : "false");
+
+      viewPane.style.display = isView ? "" : "none";
+      managePane.style.display = isManage ? "" : "none";
+      settingsPane.style.display = isSettings ? "" : "none";
+
+      save();
+    }
+
+    function rerenderAll(){
+      renderCards();
+      renderRows();
+      if(selectedId) selectCard(selectedId);
+      else updateInspectorEmpty();
+    }
+
+    // ===== Import/Export JSON =====
+    const jsonFile = document.getElementById("jsonFile");
+    document.getElementById("btnExportJSON").addEventListener("click", ()=>{
+      const data={
+        settings:{
+          returnRate:returnRate.value,
+          goalScope:goalScope.value,
+          leftDensity:leftDensity.value
+        },
+        stages, cards
+      };
+      downloadBlob("compounds_data.json", new Blob([JSON.stringify(data,null,2)], {type:"application/json"}));
+    });
+    document.getElementById("btnImportJSON").addEventListener("click", ()=>jsonFile.click());
+    jsonFile.addEventListener("change", async ()=>{
+      const f=jsonFile.files?.[0];
+      if(!f) return;
+      try{
+        const txt=await f.text();
+        const d=JSON.parse(txt);
+        if(d?.settings){
+          if(d.settings.returnRate!=null) returnRate.value=d.settings.returnRate;
+          if(d.settings.goalScope!=null) goalScope.value=d.settings.goalScope;
+          if(d.settings.leftDensity!=null) leftDensity.value=d.settings.leftDensity;
+        }
+        if(Array.isArray(d.stages)) stages=d.stages;
+        if(Array.isArray(d.cards)) cards=d.cards;
+        // normalize
+        cards = cards.map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
+        if(!Array.isArray(stages) || !stages.length) stages=defaultStages();
+        selectedId = cards[0]?.id || null;
+
+        renderStages(); rerenderAll(); save();
+      }catch(e){
+        alert("ملف JSON غير صالح.");
+      }finally{
+        jsonFile.value="";
+      }
+    });
+
+    // ===== Wire buttons =====
+    document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
+    document.getElementById("btnAddRow").addEventListener("click", ()=>{
+      cards.push(normalizeCard({branch_name:"", total_cost:"", students:"", covered_current_pct:"", covered_current_amount:""}, uid()));
+      renderRows(); renderCards(); markDirty(); save();
+    });
+    document.getElementById("btnClear").addEventListener("click", ()=>{
+      if(confirm("مسح كل البيانات؟")){
+        cards=[]; selectedId=null;
+        renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
+      }
+    });
+
+    document.getElementById("btnAddStage").addEventListener("click", ()=>{
+      const last = stages.length ? parseNumber(stages[stages.length-1].target_pct) : 0;
+      const next = Number.isFinite(last) ? Math.min(100, Math.max(0, last + 5)) : 10;
+      stages.push({id:uid(), name:`مرحلة ${stages.length+1}`, period:"", target_pct:next});
+      renderStages(); markDirty(); save(); rerenderAll();
+    });
+    document.getElementById("btnResetStages").addEventListener("click", ()=>{
+      stages=defaultStages();
+      renderStages(); markDirty(); save(); rerenderAll();
+    });
+
+    // Settings events
+    returnRate.addEventListener("input", ()=>{ markDirty(); save(); rerenderAll(); });
+    goalScope.addEventListener("change", ()=>{ markDirty(); save(); rerenderAll(); });
+    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); renderCards(); });
+
+    // Sync UI events
+    btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
+    btnPublishRemote?.addEventListener("click", publishRemote);
+
+    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
+    remoteAutoOn?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
+    remoteInterval?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
+    remotePushUrl?.addEventListener("change", ()=>{ markDirty(); save(); });
+    remoteToken?.addEventListener("change", ()=>{ markDirty(); save(); });
+
+    document.getElementById("btnExportCSS").addEventListener("click", ()=>{
+      const css=document.getElementById("appCSS")?.innerHTML || "";
+      downloadBlob("compound_board.css", new Blob([css], {type:"text/css;charset=utf-8"}));
+    });
+
+    document.getElementById("btnResetAll").addEventListener("click", ()=>{
+      if(!confirm("إرجاع كل شيء للإعدادات الافتراضية؟")) return;
+      localStorage.removeItem(LS);
+      location.reload();
+    });
+
+    // Tabs
+    tabView.addEventListener("click", ()=>setMode("view"));
+    tabManage.addEventListener("click", ()=>setMode("manage"));
+    tabSettings.addEventListener("click", ()=>setMode("settings"));
+
+    // Search
+    elSearch.addEventListener("input", renderCards);
+
+    // Sample data
+    document.getElementById("btnAddSample").addEventListener("click", ()=>{
+      cards=[
+        normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
+        normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
+        normalizeCard({branch_name:"مجمع حفصة بنت عمر", total_cost:"180000", students:"520", covered_current_pct:"22"}, "seed3"),
+        normalizeCard({branch_name:"مجمع عثمان بن عفان", total_cost:"265000", students:"730", covered_current_amount:"92000"}, "seed4"),
+      ];
+      if(!stages.length) stages=defaultStages();
+      selectedId=cards[0].id;
+      renderStages(); rerenderAll(); save();
+      setMode("view");
+    });
+
+    
+    // ===== Shared sync (polling) =====
+    function setSyncBadge(text, ok){
+      if(!syncState) return;
+      syncState.textContent = text;
+      syncState.style.borderColor = ok ? "rgba(16,185,129,.35)" : "rgba(245,158,11,.35)";
+      syncState.style.color = "rgba(11,18,32,.78)";
+      syncState.style.background = ok ? "rgba(16,185,129,.10)" : "rgba(245,158,11,.10)";
+    }
+
+    async function fetchRemoteOnce(silent=false){
+      const url = (remoteGetUrl?.value || "").trim();
+      if(!url){
+        if(!silent) alert("ضع رابط JSON (GET) في الإعدادات أولًا.");
+        setSyncBadge("غير متصل", false);
+        return false;
+      }
+      try{
+        setSyncBadge("يتحقق…", true);
+        const u = new URL(url, location.href);
+        u.searchParams.set("_ts", Date.now().toString()); // cache-bust
+        const res = await fetch(u.toString(), {cache:"no-store"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const data = await res.json();
+
+        const remoteUpdated = Number(data?.meta?.updated_at || 0) || 0;
+        if(remoteUpdated && remoteUpdated <= (localUpdatedAt||0)){
+          setSyncBadge("محدّث", true);
+          return true;
+        }
+
+        // Apply remote data
+        if(data?.settings){
+          if(data.settings.returnRate!=null) returnRate.value = data.settings.returnRate;
+          if(data.settings.goalScope!=null) goalScope.value = data.settings.goalScope;
+          if(data.settings.leftDensity!=null) leftDensity.value = data.settings.leftDensity;
+        }
+        if(Array.isArray(data?.stages)) stages = data.stages;
+        if(Array.isArray(data?.cards)) cards = data.cards;
+
+        cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
+        if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
+
+        localUpdatedAt = remoteUpdated || Date.now();
+        selectedId = (selectedId && cards.some(c=>c.id===selectedId)) ? selectedId : (cards[0]?.id || null);
+
+        renderStages();
+        renderRows();
+        renderCards();
+        if(selectedId) selectCard(selectedId);
+        else updateInspectorEmpty();
+
+        save();
+        setSyncBadge("تم التحديث", true);
+        return true;
+      }catch(e){
+        setSyncBadge("تعذر الجلب", false);
+        if(!silent) alert("تعذر جلب البيانات من الرابط.\nتأكد من الرابط و CORS.");
+        return false;
+      }
+    }
+
+    function startSyncTimer(){
+      stopSyncTimer();
+      const on = (remoteAutoOn?.value || "on") === "on";
+      const url = (remoteGetUrl?.value || "").trim();
+      if(!on || !url){
+        setSyncBadge("غير متصل", false);
+        return;
+      }
+      const sec = clamp(parseNumber(remoteInterval?.value || 20) || 20, 5, 300);
+      setSyncBadge(`مزامنة كل ${sec}ث`, true);
+      syncTimer = setInterval(()=>fetchRemoteOnce(true), sec*1000);
+      fetchRemoteOnce(true);
+    }
+
+    function stopSyncTimer(){
+      if(syncTimer){ clearInterval(syncTimer); syncTimer=null; }
+    }
+
+    async function publishRemote(){
+      const push = (remotePushUrl?.value || "").trim();
+      if(!push){
+        // fallback: export JSON for manual upload
+        const data={
+          meta:{ updated_at: Date.now(), schema: 1 },
+          settings:{
+            returnRate:returnRate.value,
+            goalScope:goalScope.value,
+            leftDensity:leftDensity.value
+          },
+          stages, cards
+        };
+        downloadBlob("compounds_data.json", new Blob([JSON.stringify(data,null,2)], {type:"application/json"}));
+        alert("ما فيه رابط حفظ (POST).\nتم تنزيل ملف JSON — ارفعه على السيرفر بنفس رابط GET ليصل للجميع.");
+        return;
+      }
+
+      try{
+        setSyncBadge("ينشر…", true);
+        const payload={
+          meta:{ updated_at: Date.now(), schema: 1 },
+          settings:{
+            returnRate:returnRate.value,
+            goalScope:goalScope.value,
+            leftDensity:leftDensity.value
+          },
+          stages, cards
+        };
+
+        const headers = {"Content-Type":"application/json"};
+        const token = (remoteToken?.value || "").trim();
+        if(token) headers["Authorization"] = "Bearer " + token;
+
+        const res = await fetch(push, {method:"POST", headers, body: JSON.stringify(payload)});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+
+        localUpdatedAt = payload.meta.updated_at;
+        save();
+        setSyncBadge("تم النشر", true);
+        fetchRemoteOnce(true);
+        alert("تم نشر التعديل ✅\n(إذا كان رابط GET يشير لنفس المصدر، سيصل للجميع تلقائيًا).");
+      }catch(e){
+        setSyncBadge("تعذر النشر", false);
+        alert("تعذر النشر عبر رابط الحفظ.\nتأكد من الرابط و CORS وطريقة التوثيق.");
+      }
+    }
+
+
+    // ===== Init =====
+    (function init(){
+      const ok=load();
+      if(!ok){
+        stages=defaultStages();
+        cards=[
+          normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
+          normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
+        ];
+        selectedId=cards[0].id;
+      }
+      if(!Array.isArray(stages) || !stages.length) stages=defaultStages();
+      cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
+
+      renderStages();
+      renderRows();
+      renderCards();
+      if(selectedId && cards.some(c=>c.id===selectedId)) selectCard(selectedId);
+      else if(cards[0]) selectCard(cards[0].id);
+      else updateInspectorEmpty();
+
+      setMode("view");
+      startSyncTimer();
+      save();
+    })();
+  </script>
+</body>
+</html>
