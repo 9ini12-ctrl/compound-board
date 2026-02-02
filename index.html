@@ -675,6 +675,13 @@
 
 
     .noScroll{overflow:hidden !important;}
+
+    /* Focus pulse when jumping to a card */
+    .pulseFocus{
+      outline: 2px solid rgba(59,130,246,.55);
+      box-shadow: 0 0 0 8px rgba(59,130,246,.14);
+      transition: box-shadow .25s ease, outline-color .25s ease;
+    }
 </style>
 </head>
 <body>
@@ -1325,6 +1332,13 @@
           // select and render
           selectedId = c.id;
           renderCards();
+
+      // Open a card directly if URL hash includes #card=<id>
+      const hid = getCardHash();
+      if(hid && cards.some(c=>c.id===hid)){
+        selectCard(hid);
+        focusCardInList(hid);
+      }
           selectCard(c.id);
           await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 
@@ -2077,6 +2091,7 @@
 
         localUpdatedAt = remoteUpdated || Date.now();
         selectedId = (selectedId && cards.some(c=>c.id===selectedId)) ? selectedId : (cards[0]?.id || null);
+        if(!selectedId) setCardHash(null);
 
         renderStages();
         renderRows();
@@ -2182,6 +2197,34 @@
         }
       });
     })();
+
+
+    
+    // ===== Direct-to-card deep link + focus (mobile friendly) =====
+    function setCardHash(id){
+      try{
+        const url = new URL(location.href);
+        if(id) url.hash = "card=" + encodeURIComponent(id);
+        else url.hash = "";
+        history.replaceState(null, "", url.toString());
+      }catch(e){}
+    }
+    function getCardHash(){
+      try{
+        const h = (location.hash || "").replace(/^#/, "");
+        if(!h) return null;
+        const m = h.match(/(?:^|&)card=([^&]+)/);
+        return m ? decodeURIComponent(m[1]) : null;
+      }catch(e){ return null; }
+    }
+    function focusCardInList(id){
+      const el = document.querySelector(`[data-card-id="${CSS.escape(id)}"]`);
+      if(el){
+        el.scrollIntoView({behavior:"smooth", block:"center", inline:"nearest"});
+        el.classList.add("pulseFocus");
+        setTimeout(()=>el.classList.remove("pulseFocus"), 900);
+      }
+    }
 
 
     // ===== Init =====
