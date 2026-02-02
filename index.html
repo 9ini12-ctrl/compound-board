@@ -2149,7 +2149,9 @@
     btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
     btnPublishRemote?.addEventListener("click", publishRemote);
 
-    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
+    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer();
+      // Ensure first-time users get the latest immediately
+      fetchRemoteOnce(true); });
     remoteAutoOn?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
     remoteInterval?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
     remotePushUrl?.addEventListener("change", ()=>{ markDirty(); save(); });
@@ -2616,6 +2618,14 @@
     // ===== Init =====
     (function init(){
       const ok=load();
+      // Auto-configure remote sync endpoints (hidden UI) for all users
+      try{
+        const origin = location.origin;
+        if(remoteGetUrl && !String(remoteGetUrl.value||"").trim()) remoteGetUrl.value = origin + "/.netlify/functions/compounds-get";
+        if(remotePushUrl && !String(remotePushUrl.value||"").trim()) remotePushUrl.value = origin + "/.netlify/functions/compounds-save";
+        if(remoteAutoOn && !String(remoteAutoOn.value||"").trim()) remoteAutoOn.value = "on";
+        if(remoteInterval && !String(remoteInterval.value||"").trim()) remoteInterval.value = "20";
+      }catch(e){}
       if(!ok){
         stages=defaultStages();
         cards=[
