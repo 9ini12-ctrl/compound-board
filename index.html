@@ -2149,9 +2149,7 @@
     btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
     btnPublishRemote?.addEventListener("click", publishRemote);
 
-    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer();
-      // Ensure first-time users get the latest immediately
-      fetchRemoteOnce(true); });
+    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
     remoteAutoOn?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
     remoteInterval?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
     remotePushUrl?.addEventListener("change", ()=>{ markDirty(); save(); });
@@ -2249,6 +2247,10 @@
         if(Array.isArray(data?.cards)) cards = data.cards;
 
         cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
+
+      // Ensure sync endpoints and pull latest immediately (so new visitors see last published data)
+      ensureRemoteUrls();
+      try{ await fetchRemoteOnce(true); }catch(e){}
         if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
 
         localUpdatedAt = remoteUpdated || Date.now();
@@ -2615,17 +2617,33 @@
     })();
 
 
-    // ===== Init =====
-    (function init(){
-      const ok=load();
-      // Auto-configure remote sync endpoints (hidden UI) for all users
+    
+    // ===== Auto-configure remote sync endpoints (no UI required) =====
+    function ensureRemoteUrls(){
       try{
         const origin = location.origin;
-        if(remoteGetUrl && !String(remoteGetUrl.value||"").trim()) remoteGetUrl.value = origin + "/.netlify/functions/compounds-get";
-        if(remotePushUrl && !String(remotePushUrl.value||"").trim()) remotePushUrl.value = origin + "/.netlify/functions/compounds-save";
-        if(remoteAutoOn && !String(remoteAutoOn.value||"").trim()) remoteAutoOn.value = "on";
-        if(remoteInterval && !String(remoteInterval.value||"").trim()) remoteInterval.value = "20";
+        if(remoteGetUrl && !String(remoteGetUrl.value||"").trim()){
+          remoteGetUrl.value = origin + "/.netlify/functions/compounds-get";
+        }
+        if(remotePushUrl && !String(remotePushUrl.value||"").trim()){
+          remotePushUrl.value = origin + "/.netlify/functions/compounds-save";
+        }
+        // auto on by default
+        if(remoteAutoOn && !String(remoteAutoOn.value||"").trim()){
+          remoteAutoOn.value = "on";
+        }
       }catch(e){}
+    }
+
+
+    
+    // Refresh on app resume (PWA/iOS)
+    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); } });
+    window.addEventListener('focus', ()=>{ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); });
+
+// ===== Init =====
+    (async function init(){
+      const ok=load();
       if(!ok){
         stages=defaultStages();
         cards=[
