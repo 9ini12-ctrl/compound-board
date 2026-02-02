@@ -812,160 +812,6 @@
       .cardOverlayBody .name{font-size:18px;}
       .cardOverlayBody .pill{padding: 8px 10px;}
     }
-
-
-    /* Online badge */
-    .onlineBadge{
-      display:flex; align-items:center; gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 12px 30px rgba(16,24,40,.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: rgba(11,18,32,.78);
-      font-weight:900;
-      white-space:nowrap;
-    }
-    .onlineBadge .dot{width:8px; height:8px; border-radius:99px; background: rgba(34,197,94,.85);}
-    .onlineBadge .lbl{font-size:12px;}
-    .onlineBadge .num{font-size:13px; padding: 2px 8px; border-radius: 999px; background: rgba(11,18,32,.06); color: rgba(11,18,32,.88);}
-    @media (max-width: 640px){
-      .onlineBadge{justify-content:space-between; width:100%;}
-      .onlineBadge .lbl{font-size:11px;}
-    }
-
-    /* Filters */
-    #filterCompound, #filterDawr{cursor:pointer;}
-
-    /* Detail page (acts like a new page inside single file) */
-    .detailPage{display:none; position:fixed; inset:0; z-index:150; background: rgba(248,250,252,.98);}
-    .detailPage.isOpen{display:block;}
-    .detailTop{
-      position:sticky; top:0; z-index:2;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,.86);
-      border-bottom: 1px solid rgba(11,18,32,.10);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    }
-    .detailTitle{font-weight:1000; font-size:14px; color: rgba(11,18,32,.78); text-align:center; flex:1;}
-    .detailBody{height: calc(100% - 56px); overflow:auto; -webkit-overflow-scrolling:touch; padding: 12px;}
-    @media (max-width:640px){
-      .detailBody{padding-bottom: 90px;} /* space for mobile nav */
-    }
-
-    /* iPhone-style detail tabs */
-    .detailTop{padding-top: max(10px, env(safe-area-inset-top));}
-    .detailBody{padding-top: 10px;}
-
-    .detailTabs{
-      position: sticky;
-      top: calc(56px + env(safe-area-inset-top));
-      z-index: 3;
-      display:flex;
-      gap:8px;
-      padding: 10px 12px;
-      background: rgba(248,250,252,.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(11,18,32,.08);
-    }
-    .detailTab{
-      flex: 1;
-      border: 1px solid rgba(11,18,32,.10);
-      background: rgba(255,255,255,.78);
-      color: rgba(11,18,32,.76);
-      border-radius: 999px;
-      padding: 10px 10px;
-      font-weight: 1000;
-      font-size: 12px;
-      cursor: pointer;
-      transition: .14s ease;
-    }
-    .detailTab.active{
-      background: rgba(11,18,32,.92);
-      color: rgba(255,255,255,.96);
-      border-color: rgba(11,18,32,.10);
-      box-shadow: 0 10px 26px rgba(16,24,40,.18);
-    }
-
-    .detailKPIWrap{
-      position: sticky;
-      top: calc(56px + 56px + env(safe-area-inset-top)); /* top + tabs */
-      z-index: 2;
-      padding: 12px;
-      background: rgba(248,250,252,.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(11,18,32,.08);
-    }
-    .detailKPIGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    .detailKPI{
-      border-radius: 18px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 12px 34px rgba(16,24,40,.10);
-      padding: 10px 12px;
-      overflow:hidden;
-    }
-    .detailKPI .k{font-size:11px; color: rgba(11,18,32,.58); font-weight:900;}
-    .detailKPI .v{
-      margin-top: 6px;
-      font-size: 20px;
-      line-height: 1.1;
-      font-weight: 1100;
-      letter-spacing: -0.02em;
-      color: rgba(11,18,32,.92);
-      display:flex; align-items:baseline; gap:6px; justify-content:space-between;
-    }
-    .detailKPI .v .sar{font-size:12px; color: rgba(11,18,32,.55); font-weight:900;}
-    .detailKPI .sub{
-      margin-top: 6px;
-      font-size: 11px;
-      color: rgba(11,18,32,.58);
-      font-weight: 850;
-      line-height: 1.35;
-    }
-
-    .detailPanel{display:none; padding: 12px;}
-    .detailPanel.active{display:block;}
-
-    .stageList{display:flex; flex-direction:column; gap:10px;}
-    .stageRow{
-      border-radius: 18px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 12px 34px rgba(16,24,40,.10);
-      padding: 12px;
-    }
-    .stageRowTop{display:flex; justify-content:space-between; align-items:center; gap:10px;}
-    .stageName{font-weight:1100; font-size:13px; color: rgba(11,18,32,.86);}
-    .stageTarget{font-weight:1100; font-size:18px; color: rgba(11,18,32,.92);}
-    .stageTarget .sar{font-size:12px; color: rgba(11,18,32,.55); font-weight:900; margin-inline-start:6px;}
-    .stageBar{height: 10px; border-radius: 999px; background: rgba(11,18,32,.08); overflow:hidden; margin-top:10px;}
-    .stageFill{height:100%; border-radius:999px; width:0%;}
-    .stageMeta{margin-top:8px; display:flex; justify-content:space-between; font-size:11px; color: rgba(11,18,32,.60); font-weight:850;}
-
-    /* Gesture hint */
-    .detailHint{
-      padding: 10px 12px;
-      font-size: 11px;
-      color: rgba(11,18,32,.55);
-      font-weight: 800;
-      text-align:center;
-    }
-
-    @media (max-width: 640px){
-      .detailPage{background: rgba(248,250,252,.98);}
-      .detailBody{padding: 0;}
-      .detailPanel{padding-bottom: 96px;}
-    }
 </style>
 
   <!-- PWA / iOS Add to Home Screen -->
@@ -982,11 +828,6 @@
     <div class="topInner">
       <div class="brand">
         <div class="mark" aria-hidden="true"></div>
-        <div class="onlineBadge" id="onlineBadge" title="الموجودين الآن">
-          <span class="dot" aria-hidden="true"></span>
-          <span class="lbl">الموجودين الآن</span>
-          <span class="num" id="onlineCount">—</span>
-        </div>
         <div>
           <h1>لوحة الفروع</h1>
           <p>عرض مبسّط للمدراء • إدارة مركزية للمراحل والمحفظة</p>
@@ -1000,8 +841,7 @@
       </div>
 
       <div class="actions no-print">
-        <button class="btn" id="btnManualRefresh" title="جلب أحدث نسخة">تحديث</button>
-<button class="btn primary" id="btnAddSample">مثال جاهز</button>
+        <button class="btn primary" id="btnAddSample">مثال جاهز</button>
         <button class="btn" id="btnPrint">طباعة / PDF</button>
         <button class="btn" id="btnExportImage">تصدير صورة</button>
         <button class="btn" id="btnExportImagesZip">تصدير صور ZIP</button>
@@ -1024,7 +864,10 @@
     <button class="mNavBtn" data-action="print" aria-label="طباعة / PDF">
       <span class="mI">🖨️</span><span class="mT">PDF</span>
     </button>
-    </nav>
+    <button class="mNavBtn" data-action="images" aria-label="تصدير صور">
+      <span class="mI">🖼️</span><span class="mT">صور</span>
+    </button>
+  </nav>
 
 
   <main class="wrap">
@@ -1239,31 +1082,7 @@
 
       </div>
     </section>
-  
-    <!-- Detail page (mobile friendly). Uses same card content logic; no features removed. -->
-    <section id="detailPage" class="detailPage" aria-hidden="true">
-      <div class="detailTop">
-        <button class="btn small" id="detailBack">رجوع</button>
-        <div class="detailTitle" id="detailTitle">التفاصيل</div>
-        <button class="btn small adminOnly" id="detailPublish">نشر</button>
-      </div>
-      
-      <div class="detailTabs" id="detailTabs">
-        <button class="detailTab active" data-tab="summary">ملخص</button>
-        <button class="detailTab" data-tab="stages">المراحل</button>
-        <button class="detailTab" data-tab="full">كامل</button>
-      </div>
-      <div class="detailKPIWrap" id="detailKPIWrap"></div>
-      <div class="detailBody" id="detailBody">
-        <div class="detailPanel active" id="detailPanelSummary"></div>
-        <div class="detailPanel" id="detailPanelStages"></div>
-        <div class="detailPanel" id="detailPanelFull"></div>
-        <div class="detailHint">اسحب للأسفل للإغلاق • أو اسحب من الطرف الأيسر للرجوع</div>
-      </div>
-
-    </section>
-
-</main>
+  </main>
 
 
   <!-- Admin unlock (hidden by default). Triple-tap logo / long-press opens passcode. -->
@@ -1672,9 +1491,7 @@
           const c = cards[i];
           // select and render
           selectedId = c.id;
-          refreshFilterOptions();
-      refreshFilterOptions();
-        renderCards();
+          renderCards();
 
       // Open a card directly if URL hash includes #card=<id>
       const hid = getCardHash();
@@ -1911,8 +1728,7 @@
     // ===== Inspector =====
     function selectCard(id, openSheet=false){
       selectedId=id;
-      refreshFilterOptions();
-        renderCards();
+      renderCards();
       const c=cards.find(x=>x.id===id);
       if(!c) return;
 
@@ -2139,8 +1955,7 @@
           const obj={...cards[i]};
           obj[k]=inp.value;
           cards[i]=normalizeCard(obj, cards[i].id);
-          markDirty(); save(); refreshFilterOptions();
-        renderCards();
+          markDirty(); save(); renderCards();
           if(selectedId===cards[i].id) selectCard(selectedId);
         });
       });
@@ -2151,8 +1966,7 @@
           const removed=cards[i]?.id;
           cards.splice(i,1);
           if(selectedId===removed) selectedId=null;
-          renderRows(); refreshFilterOptions();
-        renderCards(); updateInspectorEmpty(); markDirty(); save();
+          renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
         });
       });
     }
@@ -2172,8 +1986,7 @@
         if(norm.branch_name) cards.push(norm);
       });
       paste.value="";
-      renderRows(); refreshFilterOptions();
-        renderCards();
+      renderRows(); renderCards();
       if(!selectedId && cards.length) selectCard(cards[0].id);
       save();
     }
@@ -2257,8 +2070,7 @@
     }
 
     function rerenderAll(){
-      refreshFilterOptions();
-        renderCards();
+      renderCards();
       renderRows();
       if(selectedId) selectCard(selectedId);
       else updateInspectorEmpty();
@@ -2308,14 +2120,12 @@
     document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
     document.getElementById("btnAddRow").addEventListener("click", ()=>{
       cards.push(normalizeCard({branch_name:"", total_cost:"", students:"", covered_current_pct:"", covered_current_amount:""}, uid()));
-      renderRows(); refreshFilterOptions();
-        renderCards(); markDirty(); save();
+      renderRows(); renderCards(); markDirty(); save();
     });
     document.getElementById("btnClear").addEventListener("click", ()=>{
       if(confirm("مسح كل البيانات؟")){
         cards=[]; selectedId=null;
-        renderRows(); refreshFilterOptions();
-        renderCards(); updateInspectorEmpty(); markDirty(); save();
+        renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
       }
     });
 
@@ -2333,8 +2143,7 @@
     // Settings events
     returnRate.addEventListener("input", ()=>{ markDirty(); save(); rerenderAll(); });
     goalScope.addEventListener("change", ()=>{ markDirty(); save(); rerenderAll(); });
-    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); refreshFilterOptions();
-        renderCards(); });
+    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); renderCards(); });
 
     // Sync UI events
     btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
@@ -2442,8 +2251,6 @@
       // Ensure sync endpoints and pull latest immediately (so new visitors see last published data)
       ensureRemoteUrls();
       try{ await fetchRemoteOnce(true); }catch(e){}
-      startPresence();
-      
         if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
 
         localUpdatedAt = remoteUpdated || Date.now();
@@ -2452,7 +2259,6 @@
 
         renderStages();
         renderRows();
-        refreshFilterOptions();
         renderCards();
         if(selectedId) selectCard(selectedId);
         else updateInspectorEmpty();
@@ -2835,400 +2641,7 @@
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); } });
     window.addEventListener('focus', ()=>{ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); });
 
-
-    // ===== Presence + autosync v2 (no settings; everyone pulls, admins auto-push) =====
-    const presenceCountEl = document.getElementById("onlineCount");
-
-    // Stable anonymous session id for presence
-    const SID_KEY = "compound_presence_sid_v1";
-    function getSid(){
-      try{
-        let sid = localStorage.getItem(SID_KEY);
-        if(!sid){
-          sid = (crypto?.randomUUID?.() || ("sid_" + Math.random().toString(16).slice(2) + Date.now()));
-          localStorage.setItem(SID_KEY, sid);
-        }
-        return sid;
-      }catch(e){
-        return "sid_" + Math.random().toString(16).slice(2) + Date.now();
-      }
-    }
-
-    function getPresenceBase(){
-      try{
-        return location.origin + "/.netlify/functions";
-      }catch(e){ return "/.netlify/functions"; }
-    }
-
-    async function presencePing(){
-      const url = getPresenceBase() + "/presence-ping";
-      try{
-        await fetch(url, {
-          method:"POST",
-          headers: {"Content-Type":"application/json"},
-          cache:"no-store",
-          body: JSON.stringify({ sid: getSid(), t: Date.now() })
-        });
-      }catch(e){}
-    }
-
-    async function presenceCount(){
-      const url = getPresenceBase() + "/presence-count";
-      try{
-        const res = await fetch(url, { cache:"no-store" });
-        if(!res.ok) throw new Error("bad");
-        const j = await res.json();
-        if(presenceCountEl) presenceCountEl.textContent = (j?.count ?? "—");
-      }catch(e){
-        if(presenceCountEl) presenceCountEl.textContent = "—";
-      }
-    }
-
-    function startPresence(){
-      presencePing(); presenceCount();
-      setInterval(presencePing, 20000);
-      setInterval(presenceCount, 25000);
-      document.addEventListener("visibilitychange", ()=>{
-        if(!document.hidden){ presencePing(); presenceCount(); }
-      });
-      window.addEventListener("focus", ()=>{ presencePing(); presenceCount(); });
-    }
-
-    // Autosync:
-    // - Everyone pulls frequently.
-    // - Only unlocked admins (code 111) auto-push on changes (debounced).
-            }, 650);
-      }catch(e){}
-    }
-
-        }
-
-    // Faster pull interval for everyone (freshness)
-          // every 6s
-    }
-
-
-    
-    // ===== Manual refresh button (no auto sync) =====
-    const btnManualRefresh = document.getElementById("btnManualRefresh");
-    btnManualRefresh?.addEventListener("click", async ()=>{
-      try{
-        ensureRemoteUrls?.();
-        await fetchRemoteOnce?.(true);
-        // lightweight feedback
-        btnManualRefresh.textContent = "تم";
-        setTimeout(()=>btnManualRefresh.textContent="تحديث", 900);
-      }catch(e){
-        btnManualRefresh.textContent = "تعذر";
-        setTimeout(()=>btnManualRefresh.textContent="تحديث", 1200);
-      }
-    });
-
-
-    
-    // ===== View filters (compound + daw r) =====
-    const filterCompound = document.getElementById("filterCompound");
-    const filterDawr = document.getElementById("filterDawr");
-
-    function uniqNonEmpty(arr){
-      return Array.from(new Set(arr.map(s=>String(s||"").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ar"));
-    }
-    function refreshFilterOptions(){
-      if(!filterCompound || !filterDawr) return;
-      const compounds = uniqNonEmpty(cards.map(c=>c.compoundCategory));
-      const dawrs = uniqNonEmpty(cards.map(c=>c.dawr));
-      const keepC = filterCompound.value;
-      const keepD = filterDawr.value;
-
-      filterCompound.innerHTML = '<option value="">كل المجمعات</option>' + compounds.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
-      filterDawr.innerHTML = '<option value="">كل الدور</option>' + dawrs.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
-
-      filterCompound.value = compounds.includes(keepC) ? keepC : "";
-      filterDawr.value = dawrs.includes(keepD) ? keepD : "";
-    }
-    function applyFilters(list){
-      const qC = (filterCompound?.value || "").trim();
-      const qD = (filterDawr?.value || "").trim();
-      return (list||[]).filter(c=>{
-        if(qC && String(c.compoundCategory||"") !== qC) return false;
-        if(qD && String(c.dawr||"") !== qD) return false;
-        return true;
-      });
-    }
-    filterCompound?.addEventListener("change", ()=>{ renderCards?.(); });
-    filterDawr?.addEventListener("change", ()=>{ renderCards?.(); });
-
-
-    
-    // ===== Detail page routing =====
-    const detailPage = document.getElementById("detailPage");
-    const detailBody = document.getElementById("detailBody");
-    const detailTitle = document.getElementById("detailTitle");
-    const detailBack = document.getElementById("detailBack");
-    const detailPublish = document.getElementById("detailPublish");
-
-    function openDetail(id){
-      // select card, then clone viewPane into detail body
-      selectCard(id);
-      setCardHash(id); // keep deep link
-      focusCardInList(id);
-      if(detailTitle){
-        const c = cards.find(x=>x.id===id);
-        detailTitle.textContent = c?.name || "التفاصيل";
-      }
-      if(detailBody){
-        const vp = document.getElementById("viewPane");
-        const clone = vp ? vp.cloneNode(true) : document.createElement("div");
-        clone?.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
-        detailBody.innerHTML = "";
-        detailBody.appendChild(clone);
-      }
-      detailPage?.classList.add("isOpen");
-      detailPage?.setAttribute("aria-hidden","false");
-      // hide mobile nav under detail? keep, but it's fine; detail has its own top bar
-    }
-    function closeDetail(){
-      detailPage?.classList.remove("isOpen");
-      detailPage?.setAttribute("aria-hidden","true");
-    }
-
-    detailBack?.addEventListener("click", ()=>{
-      closeDetail();
-      // remove page marker but keep card hash
-      try{
-        const url = new URL(location.href);
-        // keep #card=... only
-        const cid = getCardHash?.();
-        url.hash = cid ? ("card=" + encodeURIComponent(cid)) : "";
-        history.replaceState(null,"",url.toString());
-      }catch(e){}
-    });
-    detailPublish?.addEventListener("click", ()=>{ try{ publishRemote?.(); }catch(e){} });
-
-    function handleRoute(){
-      // If hash has page=detail and card=<id>, open it
-      const h = (location.hash||"").replace(/^#/,"");
-      const mPage = h.match(/(?:^|&)page=([^&]+)/);
-      const page = mPage ? decodeURIComponent(mPage[1]) : "";
-      const id = getCardHash?.();
-      if(page==="detail" && id && cards.some(c=>c.id===id)){
-        openDetail(id);
-      }else{
-        closeDetail();
-      }
-    }
-    window.addEventListener("hashchange", ()=>{ try{ handleRoute(); }catch(e){} });
-
-
-    
-    // ===== iPhone detail tabs renderer (keeps all existing data/logic) =====
-    const detailTabs = document.getElementById("detailTabs");
-    const detailKPIWrap = document.getElementById("detailKPIWrap");
-    const detailPanelSummary = document.getElementById("detailPanelSummary");
-    const detailPanelStages = document.getElementById("detailPanelStages");
-    const detailPanelFull = document.getElementById("detailPanelFull");
-
-    function money(v){
-      try{
-        if(typeof fmtMoney === "function") return fmtMoney(v);
-      }catch(e){}
-      try{
-        const n = Number(v||0)||0;
-        return new Intl.NumberFormat("ar-SA").format(Math.round(n));
-      }catch(e){
-        return String(v||0);
-      }
-    }
-    function pct(v){
-      try{
-        const n = Number(v||0);
-        if(!isFinite(n)) return "—";
-        return (n*100).toFixed(n<0.1?1:0) + "%";
-      }catch(e){ return "—"; }
-    }
-    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
-
-    function renderDetailKpis(card){
-      if(!detailKPIWrap) return;
-      const total = Number(card.total||0)||0;
-      const covered = Number(card.covered||0)||0;
-      const covPct = total>0 ? covered/total : 0;
-      const goal = Number(card.portfolioGoal||card.goal||0)||0;
-
-      detailKPIWrap.innerHTML = `
-        <div class="detailKPIGrid">
-          <div class="detailKPI">
-            <div class="k">التكلفة الإجمالية</div>
-            <div class="v"><span>${money(total)}</span><span class="sar">﷼</span></div>
-            <div class="sub">عدد الطلاب: ${money(card.students||0)}</div>
-          </div>
-          <div class="detailKPI">
-            <div class="k">المغطّى الحالي</div>
-            <div class="v"><span>${money(covered)}</span><span class="sar">﷼</span></div>
-            <div class="sub">نسبة التغطية: ${pct(covPct)}</div>
-          </div>
-          <div class="detailKPI">
-            <div class="k">هدف المحفظة</div>
-            <div class="v"><span>${money(goal)}</span><span class="sar">﷼</span></div>
-            <div class="sub">مبني على إعدادات المنصة</div>
-          </div>
-          <div class="detailKPI">
-            <div class="k">المجمع / الدور</div>
-            <div class="v" style="font-size:14px; align-items:center; justify-content:space-between;">
-              <span>${escapeHtml(card.compoundCategory||"—")}</span>
-              <span style="font-size:12px; color: rgba(11,18,32,.55); font-weight:900;">${escapeHtml(card.dawr||"")}</span>
-            </div>
-            <div class="sub">اضغط تحديث لجلب آخر نسخة عند الحاجة</div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderDetailSummary(card){
-      if(!detailPanelSummary) return;
-      // Reuse existing compact card header/progress UI by cloning the visible card in list if possible:
-      const cardEl = document.querySelector(`[data-card-id="${CSS.escape(card.id)}"]`);
-      if(cardEl){
-        const clone = cardEl.cloneNode(true);
-        clone.querySelectorAll(".no-print").forEach(n=>n.remove());
-        detailPanelSummary.innerHTML = "";
-        detailPanelSummary.appendChild(clone);
-      }else{
-        detailPanelSummary.innerHTML = `<div class="stageRow"><div class="stageName">${escapeHtml(card.name||"")}</div></div>`;
-      }
-      // Add a small narrative line (non-invasive)
-      const p = document.createElement("div");
-      p.className = "stageRow";
-      p.innerHTML = `<div class="stageName">الفكرة</div><div class="stageMeta"><span>نرفع التغطية عبر مراحل واضحة</span><span>ثم نحدّث المدراء بالنسخة الأحدث</span></div>`;
-      detailPanelSummary.appendChild(p);
-    }
-
-    function stageColor(i){
-      // Use existing stage color if present, otherwise cycle gentle palette
-      const palette = ["#3B82F6","#22C55E","#F59E0B","#A855F7","#EF4444","#14B8A6","#E11D48","#6366F1"];
-      return palette[i % palette.length];
-    }
-
-    function renderDetailStages(card){
-      if(!detailPanelStages) return;
-      const total = Number(card.total||0)||0;
-      const covered = Number(card.covered||0)||0;
-      const covPct = total>0 ? covered/total : 0;
-
-      const list = (stages||[]).map((s,i)=>{
-        const target = Number(s.target||0)||0;
-        // We show progress relative to total cost by default (stage target as amount)
-        const stagePct = total>0 ? clamp(target/total,0,1) : 0;
-        const color = s.color || stageColor(i);
-        return { name: s.name || `مرحلة ${i+1}`, target, stagePct, color };
-      });
-
-      if(!list.length){
-        detailPanelStages.innerHTML = `<div class="stageRow"><div class="stageName">لا توجد مراحل مُعرّفة</div></div>`;
-        return;
-      }
-
-      detailPanelStages.innerHTML = `
-        <div class="stageList">
-          ${list.map((x,idx)=>`
-            <div class="stageRow">
-              <div class="stageRowTop">
-                <div class="stageName"><span style="display:inline-block;width:10px;height:10px;border-radius:999px;background:${x.color};margin-inline-end:8px;"></span>${escapeHtml(x.name)}</div>
-                <div class="stageTarget">${money(x.target)}<span class="sar">﷼</span></div>
-              </div>
-              <div class="stageBar"><div class="stageFill" style="background:${x.color}; width:${(x.stagePct*100).toFixed(1)}%"></div></div>
-              <div class="stageMeta">
-                <span>نسبة من التكلفة: ${pct(x.stagePct)}</span>
-                <span>التغطية الحالية: ${pct(covPct)}</span>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    function renderDetailFull(){
-      if(!detailPanelFull) return;
-      const vp = document.getElementById("viewPane");
-      const clone = vp ? vp.cloneNode(true) : document.createElement("div");
-      clone?.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
-      detailPanelFull.innerHTML = "";
-      detailPanelFull.appendChild(clone);
-    }
-
-    function setDetailTab(tab){
-      if(!detailTabs) return;
-      detailTabs.querySelectorAll(".detailTab").forEach(b=>{
-        b.classList.toggle("active", b.getAttribute("data-tab")===tab);
-      });
-      const map = { summary: detailPanelSummary, stages: detailPanelStages, full: detailPanelFull };
-      Object.entries(map).forEach(([k,el])=>{
-        el?.classList.toggle("active", k===tab);
-      });
-      // keep KPI visible on all tabs
-    }
-
-    detailTabs?.addEventListener("click", (e)=>{
-      const b = e.target.closest(".detailTab");
-      if(!b) return;
-      setDetailTab(b.getAttribute("data-tab"));
-    });
-
-    // Enhance existing openDetail to render tabs content
-    const __origOpenDetail = (typeof openDetail === "function") ? openDetail : null;
-    if(__origOpenDetail){
-      window.openDetail = function(id){
-        __origOpenDetail(id);
-        const card = cards.find(x=>x.id===id);
-        if(card){
-          renderDetailKpis(card);
-          renderDetailSummary(card);
-          renderDetailStages(card);
-          renderDetailFull();
-          setDetailTab("summary");
-        }
-      };
-    }
-
-    // Gestures on detail page: swipe down to close, edge swipe back
-    (function(){
-      if(!detailPage) return;
-      let sx=0, sy=0, cx=0, cy=0, dragging=false, edge=false;
-      detailPage.addEventListener("touchstart", (e)=>{
-        if(!detailPage.classList.contains("isOpen")) return;
-        const t = e.touches[0];
-        sx = cx = t.clientX;
-        sy = cy = t.clientY;
-        edge = sx < 18; // left edge
-        dragging = true;
-      }, {passive:true});
-
-      detailPage.addEventListener("touchmove", (e)=>{
-        if(!dragging) return;
-        const t = e.touches[0];
-        cx = t.clientX; cy = t.clientY;
-      }, {passive:true});
-
-      detailPage.addEventListener("touchend", ()=>{
-        if(!dragging) return;
-        dragging = false;
-        const dx = cx - sx;
-        const dy = cy - sy;
-
-        // Edge swipe back
-        if(edge && dx > 80 && Math.abs(dy) < 60){
-          try{ detailBack?.click(); }catch(e){}
-          return;
-        }
-        // Swipe down close
-        if(dy > 140 && Math.abs(dx) < 90){
-          try{ detailBack?.click(); }catch(e){}
-        }
-      });
-    })();
-
-
-    // ===== Init =====
+// ===== Init =====
     (async function init(){
       const ok=load();
       if(!ok){
@@ -3244,8 +2657,7 @@
 
       renderStages();
       renderRows();
-      refreshFilterOptions();
-        renderCards();
+      renderCards();
       if(selectedId && cards.some(c=>c.id===selectedId)) selectCard(selectedId);
       else if(cards[0]) selectCard(cards[0].id);
       else updateInspectorEmpty();
