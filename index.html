@@ -835,6 +835,26 @@
       .onlineBadge{justify-content:space-between; width:100%;}
       .onlineBadge .lbl{font-size:11px;}
     }
+
+    /* Filters */
+    #filterCompound, #filterDawr{cursor:pointer;}
+
+    /* Detail page (acts like a new page inside single file) */
+    .detailPage{display:none; position:fixed; inset:0; z-index:150; background: rgba(248,250,252,.98);}
+    .detailPage.isOpen{display:block;}
+    .detailTop{
+      position:sticky; top:0; z-index:2;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.86);
+      border-bottom: 1px solid rgba(11,18,32,.10);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    }
+    .detailTitle{font-weight:1000; font-size:14px; color: rgba(11,18,32,.78); text-align:center; flex:1;}
+    .detailBody{height: calc(100% - 56px); overflow:auto; -webkit-overflow-scrolling:touch; padding: 12px;}
+    @media (max-width:640px){
+      .detailBody{padding-bottom: 90px;} /* space for mobile nav */
+    }
 </style>
 
   <!-- PWA / iOS Add to Home Screen -->
@@ -869,7 +889,8 @@
       </div>
 
       <div class="actions no-print">
-        <button class="btn primary" id="btnAddSample">مثال جاهز</button>
+        <button class="btn" id="btnManualRefresh" title="جلب أحدث نسخة">تحديث</button>
+<button class="btn primary" id="btnAddSample">مثال جاهز</button>
         <button class="btn" id="btnPrint">طباعة / PDF</button>
         <button class="btn" id="btnExportImage">تصدير صورة</button>
         <button class="btn" id="btnExportImagesZip">تصدير صور ZIP</button>
@@ -892,10 +913,7 @@
     <button class="mNavBtn" data-action="print" aria-label="طباعة / PDF">
       <span class="mI">🖨️</span><span class="mT">PDF</span>
     </button>
-    <button class="mNavBtn" data-action="images" aria-label="تصدير صور">
-      <span class="mI">🖼️</span><span class="mT">صور</span>
-    </button>
-  </nav>
+    </nav>
 
 
   <main class="wrap">
@@ -1110,7 +1128,18 @@
 
       </div>
     </section>
-  </main>
+  
+    <!-- Detail page (mobile friendly). Uses same card content logic; no features removed. -->
+    <section id="detailPage" class="detailPage" aria-hidden="true">
+      <div class="detailTop">
+        <button class="btn small" id="detailBack">رجوع</button>
+        <div class="detailTitle" id="detailTitle">التفاصيل</div>
+        <button class="btn small adminOnly" id="detailPublish">نشر</button>
+      </div>
+      <div class="detailBody" id="detailBody"></div>
+    </section>
+
+</main>
 
 
   <!-- Admin unlock (hidden by default). Triple-tap logo / long-press opens passcode. -->
@@ -1519,7 +1548,9 @@
           const c = cards[i];
           // select and render
           selectedId = c.id;
-          renderCards();
+          refreshFilterOptions();
+      refreshFilterOptions();
+        renderCards();
 
       // Open a card directly if URL hash includes #card=<id>
       const hid = getCardHash();
@@ -1756,7 +1787,8 @@
     // ===== Inspector =====
     function selectCard(id, openSheet=false){
       selectedId=id;
-      renderCards();
+      refreshFilterOptions();
+        renderCards();
       const c=cards.find(x=>x.id===id);
       if(!c) return;
 
@@ -1983,7 +2015,8 @@
           const obj={...cards[i]};
           obj[k]=inp.value;
           cards[i]=normalizeCard(obj, cards[i].id);
-          markDirty(); save(); renderCards();
+          markDirty(); save(); refreshFilterOptions();
+        renderCards();
           if(selectedId===cards[i].id) selectCard(selectedId);
         });
       });
@@ -1994,7 +2027,8 @@
           const removed=cards[i]?.id;
           cards.splice(i,1);
           if(selectedId===removed) selectedId=null;
-          renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
+          renderRows(); refreshFilterOptions();
+        renderCards(); updateInspectorEmpty(); markDirty(); save();
         });
       });
     }
@@ -2014,7 +2048,8 @@
         if(norm.branch_name) cards.push(norm);
       });
       paste.value="";
-      renderRows(); renderCards();
+      renderRows(); refreshFilterOptions();
+        renderCards();
       if(!selectedId && cards.length) selectCard(cards[0].id);
       save();
     }
@@ -2098,7 +2133,8 @@
     }
 
     function rerenderAll(){
-      renderCards();
+      refreshFilterOptions();
+        renderCards();
       renderRows();
       if(selectedId) selectCard(selectedId);
       else updateInspectorEmpty();
@@ -2148,12 +2184,14 @@
     document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
     document.getElementById("btnAddRow").addEventListener("click", ()=>{
       cards.push(normalizeCard({branch_name:"", total_cost:"", students:"", covered_current_pct:"", covered_current_amount:""}, uid()));
-      renderRows(); renderCards(); markDirty(); save();
+      renderRows(); refreshFilterOptions();
+        renderCards(); markDirty(); save();
     });
     document.getElementById("btnClear").addEventListener("click", ()=>{
       if(confirm("مسح كل البيانات؟")){
         cards=[]; selectedId=null;
-        renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
+        renderRows(); refreshFilterOptions();
+        renderCards(); updateInspectorEmpty(); markDirty(); save();
       }
     });
 
@@ -2171,7 +2209,8 @@
     // Settings events
     returnRate.addEventListener("input", ()=>{ markDirty(); save(); rerenderAll(); });
     goalScope.addEventListener("change", ()=>{ markDirty(); save(); rerenderAll(); });
-    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); renderCards(); });
+    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); refreshFilterOptions();
+        renderCards(); });
 
     // Sync UI events
     btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
@@ -2280,7 +2319,7 @@
       ensureRemoteUrls();
       try{ await fetchRemoteOnce(true); }catch(e){}
       startPresence();
-      startAlwaysPull();
+      
         if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
 
         localUpdatedAt = remoteUpdated || Date.now();
@@ -2289,6 +2328,7 @@
 
         renderStages();
         renderRows();
+        refreshFilterOptions();
         renderCards();
         if(selectedId) selectCard(selectedId);
         else updateInspectorEmpty();
@@ -2733,44 +2773,127 @@
     // Autosync:
     // - Everyone pulls frequently.
     // - Only unlocked admins (code 111) auto-push on changes (debounced).
-    let autoPushTimer = null;
-    function scheduleAutoPush(){
-      try{
-        if(typeof isUnlocked === "function" && !isUnlocked()) return; // only admins publish
-        if(autoPushTimer) clearTimeout(autoPushTimer);
-        autoPushTimer = setTimeout(()=>{
-          try{
-            ensureRemoteUrls?.();
-            // publishRemote is the existing "نشر للجميع" action; we call it silently
-            publishRemote?.();
-          }catch(e){}
-        }, 650);
+            }, 650);
       }catch(e){}
     }
 
-    // Hook into existing save() to also schedule push
-    const __origSave = (typeof save === "function") ? save : null;
-    if(__origSave){
-      window.save = function(){
-        const r = __origSave.apply(this, arguments);
-        scheduleAutoPush();
-        return r;
-      };
-    }
+        }
 
     // Faster pull interval for everyone (freshness)
-    function startAlwaysPull(){
+          // every 6s
+    }
+
+
+    
+    // ===== Manual refresh button (no auto sync) =====
+    const btnManualRefresh = document.getElementById("btnManualRefresh");
+    btnManualRefresh?.addEventListener("click", async ()=>{
       try{
         ensureRemoteUrls?.();
-        fetchRemoteOnce?.(true).catch(()=>{});
-      }catch(e){}
-      setInterval(()=>{
-        try{
-          ensureRemoteUrls?.();
-          fetchRemoteOnce?.(true).catch(()=>{});
-        }catch(e){}
-      }, 6000); // every 6s
+        await fetchRemoteOnce?.(true);
+        // lightweight feedback
+        btnManualRefresh.textContent = "تم";
+        setTimeout(()=>btnManualRefresh.textContent="تحديث", 900);
+      }catch(e){
+        btnManualRefresh.textContent = "تعذر";
+        setTimeout(()=>btnManualRefresh.textContent="تحديث", 1200);
+      }
+    });
+
+
+    
+    // ===== View filters (compound + daw r) =====
+    const filterCompound = document.getElementById("filterCompound");
+    const filterDawr = document.getElementById("filterDawr");
+
+    function uniqNonEmpty(arr){
+      return Array.from(new Set(arr.map(s=>String(s||"").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ar"));
     }
+    function refreshFilterOptions(){
+      if(!filterCompound || !filterDawr) return;
+      const compounds = uniqNonEmpty(cards.map(c=>c.compoundCategory));
+      const dawrs = uniqNonEmpty(cards.map(c=>c.dawr));
+      const keepC = filterCompound.value;
+      const keepD = filterDawr.value;
+
+      filterCompound.innerHTML = '<option value="">كل المجمعات</option>' + compounds.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+      filterDawr.innerHTML = '<option value="">كل الدور</option>' + dawrs.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+
+      filterCompound.value = compounds.includes(keepC) ? keepC : "";
+      filterDawr.value = dawrs.includes(keepD) ? keepD : "";
+    }
+    function applyFilters(list){
+      const qC = (filterCompound?.value || "").trim();
+      const qD = (filterDawr?.value || "").trim();
+      return (list||[]).filter(c=>{
+        if(qC && String(c.compoundCategory||"") !== qC) return false;
+        if(qD && String(c.dawr||"") !== qD) return false;
+        return true;
+      });
+    }
+    filterCompound?.addEventListener("change", ()=>{ renderCards?.(); });
+    filterDawr?.addEventListener("change", ()=>{ renderCards?.(); });
+
+
+    
+    // ===== Detail page routing =====
+    const detailPage = document.getElementById("detailPage");
+    const detailBody = document.getElementById("detailBody");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailBack = document.getElementById("detailBack");
+    const detailPublish = document.getElementById("detailPublish");
+
+    function openDetail(id){
+      // select card, then clone viewPane into detail body
+      selectCard(id);
+      setCardHash(id); // keep deep link
+      focusCardInList(id);
+      if(detailTitle){
+        const c = cards.find(x=>x.id===id);
+        detailTitle.textContent = c?.name || "التفاصيل";
+      }
+      if(detailBody){
+        const vp = document.getElementById("viewPane");
+        const clone = vp ? vp.cloneNode(true) : document.createElement("div");
+        clone?.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
+        detailBody.innerHTML = "";
+        detailBody.appendChild(clone);
+      }
+      detailPage?.classList.add("isOpen");
+      detailPage?.setAttribute("aria-hidden","false");
+      // hide mobile nav under detail? keep, but it's fine; detail has its own top bar
+    }
+    function closeDetail(){
+      detailPage?.classList.remove("isOpen");
+      detailPage?.setAttribute("aria-hidden","true");
+    }
+
+    detailBack?.addEventListener("click", ()=>{
+      closeDetail();
+      // remove page marker but keep card hash
+      try{
+        const url = new URL(location.href);
+        // keep #card=... only
+        const cid = getCardHash?.();
+        url.hash = cid ? ("card=" + encodeURIComponent(cid)) : "";
+        history.replaceState(null,"",url.toString());
+      }catch(e){}
+    });
+    detailPublish?.addEventListener("click", ()=>{ try{ publishRemote?.(); }catch(e){} });
+
+    function handleRoute(){
+      // If hash has page=detail and card=<id>, open it
+      const h = (location.hash||"").replace(/^#/,"");
+      const mPage = h.match(/(?:^|&)page=([^&]+)/);
+      const page = mPage ? decodeURIComponent(mPage[1]) : "";
+      const id = getCardHash?.();
+      if(page==="detail" && id && cards.some(c=>c.id===id)){
+        openDetail(id);
+      }else{
+        closeDetail();
+      }
+    }
+    window.addEventListener("hashchange", ()=>{ try{ handleRoute(); }catch(e){} });
 
 
     // ===== Init =====
@@ -2789,7 +2912,8 @@
 
       renderStages();
       renderRows();
-      renderCards();
+      refreshFilterOptions();
+        renderCards();
       if(selectedId && cards.some(c=>c.id===selectedId)) selectCard(selectedId);
       else if(cards[0]) selectCard(cards[0].id);
       else updateInspectorEmpty();
