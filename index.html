@@ -2,2821 +2,1996 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>لوحة الفروع — عرض بسيط • إدارة دقيقة</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style id="appCSS">
-    :root{
-      /* Apple: quiet palette + depth */
-      --bg: #f6f7f9;
-      --paper: rgba(255,255,255,.86);
-      --card: #ffffff;
-      --ink: #0b1220;
-      --sub: rgba(11,18,32,.62);
-      --line: rgba(11,18,32,.10);
-      --line2: rgba(11,18,32,.07);
-
-      --shadow: 0 26px 72px rgba(16,24,40,.12);
-      --shadow2: 0 14px 34px rgba(16,24,40,.10);
-
-      --r-xl: 28px;
-      --r-lg: 22px;
-      --r-md: 16px;
-      --r-sm: 12px;
-
-      /* Google: functional blue, but toned down */
-      --accent: #2563eb;
-      --accent2:#0f172a;
-      --ok: #10b981;
-      --warn:#f59e0b;
-
-      /* Stage colors (soft, craft) */
-      --s1:#2563eb;
-      --s2:#06b6d4;
-      --s3:#10b981;
-      --s4:#f59e0b;
-      --s5:#ef4444;
-      --s6:#a855f7;
-
-      /* Japanese craft: rhythm + precision */
-      --space: 14px;
-      --space2: 18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:"IBM Plex Sans Arabic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(900px 650px at 88% -10%, rgba(37,99,235,.10), transparent 58%),
-        radial-gradient(850px 600px at 8% 0%, rgba(16,185,129,.08), transparent 55%),
-        var(--bg);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    /* Top bar (Jony Ive: minimal, exact) */
-    .top{
-      position:sticky; top:0; z-index:50;
-      padding: 12px 12px 10px;
-      backdrop-filter: blur(12px);
-      background: rgba(246,247,249,.72);
-      border-bottom:1px solid var(--line2);
-    }
-    .topInner{
-      max-width:1240px; margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    }
-    .brand{display:flex; align-items:center; gap:10px}
-    .mark{
-      width:34px; height:34px; border-radius:12px;
-      background: linear-gradient(180deg, #111827, #0b1220);
-      box-shadow: 0 14px 30px rgba(17,24,39,.20);
-      position:relative;
-    }
-    .mark:after{
-      content:""; position:absolute; inset:8px; border-radius:8px;
-      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.04));
-    }
-    .brand h1{margin:0; font-size:14px; font-weight:1000; letter-spacing:.2px}
-    .brand p{margin:2px 0 0; font-size:12px; font-weight:900; color:var(--sub)}
-
-    .seg{
-      display:flex; gap:6px;
-      padding:5px;
-      border-radius:999px;
-      border:1px solid var(--line2);
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow2);
-    }
-    .seg button{
-      border:0; background:transparent; cursor:pointer;
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:1000; font-size:13px;
-      color: rgba(11,18,32,.72);
-      transition: .14s ease;
-    }
-    .seg button.active{
-      background:#fff;
-      color: var(--ink);
-      box-shadow: 0 10px 18px rgba(16,24,40,.10);
-    }
-
-    .actions{display:flex; gap:10px; flex-wrap:wrap}
-    .btn{
-      appearance:none;
-      border:1px solid var(--line2);
-      background: rgba(255,255,255,.84);
-      color: var(--ink);
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-weight:1000;
-      font-size:13px;
-      cursor:pointer;
-      transition:.14s ease;
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      user-select:none;
-      box-shadow: 0 10px 20px rgba(16,24,40,.07);
-    }
-    .btn:hover{transform: translateY(-1px)}
-    .btn:active{transform: translateY(0)}
-    .btn.primary{
-      border-color: transparent;
-      background: linear-gradient(180deg, var(--accent2), #0b1220);
-      color:#fff;
-      box-shadow: 0 16px 30px rgba(15,23,42,.24);
-    }
-    .btn.ghost{background:transparent; box-shadow:none}
-    .btn.danger{border-color: rgba(239,68,68,.35); color:#b91c1c; box-shadow:none; background:#fff}
-    .btn.small{padding:8px 10px; border-radius:12px; font-size:12px; box-shadow:none}
-
-    /* Layout */
-    .wrap{max-width:1240px; margin:0 auto; padding: 12px 12px 26px}
-    .layout{
-      display:grid;
-      grid-template-columns: 1.12fr .88fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){ .layout{grid-template-columns:1fr} }
-
-    /* Panels */
-    .panel{
-      background: var(--paper);
-      border: 1px solid var(--line2);
-      border-radius: var(--r-xl);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panelHead{
-      padding: 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      border-bottom:1px solid var(--line2);
-      background: rgba(255,255,255,.72);
-    }
-    .panelHead b{font-size:13px; font-weight:1000}
-    .panelBody{padding:14px}
-
-    /* Search + list (Apple Photos-like) */
-    .searchRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .search{
-      flex:1; min-width:240px;
-      border:1px solid var(--line2);
-      background:#fff;
-      border-radius: 14px;
-      padding: 10px 12px;
-      outline:none;
-      font-weight:900;
-      font-size:13px;
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid var(--line2);
-      background: rgba(255,255,255,.84);
-      font-size:12px;
-      font-weight:1000;
-      color: rgba(11,18,32,.78);
-      white-space:nowrap;
-    }
-
-    .list{
-      padding: 12px;
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 10px;
-    }
-    @media (max-width: 760px){ .list{grid-template-columns:1fr} }
-
-    /* Card (Japanese craft: clean structure, no noise) */
-    .card{
-      background: linear-gradient(180deg, #fff, rgba(255,255,255,.92));
-      border:1px solid rgba(11,18,32,.08);
-      border-radius: 22px;
-      box-shadow: 0 14px 30px rgba(16,24,40,.10);
-      padding: 12px;
-      cursor:pointer;
-      transition: .14s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .card:hover{transform: translateY(-2px)}
-    .card.selected{
-      outline: 3px solid rgba(37,99,235,.18);
-      border-color: rgba(37,99,235,.20);
-    }
-    .cardTop{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
-    }
-    .name{
-      font-size: 18px;
-      font-weight:1000;
-      line-height:1.15;
-      margin:0;
-    }
-    .kpi{
-      text-align:left;
-      min-width: 140px;
-    }
-    .kpi .l{font-size:11px; font-weight:1000; color:rgba(11,18,32,.45)}
-    .kpi .v{font-size:16px; font-weight:1000; margin-top:4px}
-    .kpi .v strong{font-size:18px}
-
-    .meta{
-      display:flex; flex-wrap:wrap; gap:8px;
-      margin-bottom:10px;
-    }
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 9px;
-      border-radius:999px;
-      border:1px solid rgba(11,18,32,.08);
-      background: rgba(248,250,252,.75);
-      font-size:11px;
-      font-weight:1000;
-      color: rgba(11,18,32,.75);
-    }
-    .pill span{color: rgba(11,18,32,.45); font-weight:900}
-
-    /* Single progress (current + stages + remaining) */
-    .barWrap{margin-top:8px}
-    .bar{
-      height: 14px;
-      border-radius: 999px;
-      overflow:hidden;
-      border:1px solid rgba(11,18,32,.08);
-      background: #f3f4f6;
-      display:flex;
-    }
-    .segm{height:100%}
-    .legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:9px}
-    .leg{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 9px;
-      border-radius:999px;
-      border:1px solid rgba(11,18,32,.08);
-      background: rgba(255,255,255,.78);
-      font-size:11px; font-weight:1000;
-      color: rgba(11,18,32,.72);
-      white-space:nowrap;
-    }
-    .dot{width:10px;height:10px;border-radius:999px;border:1px solid rgba(0,0,0,.12)}
-
-    /* Inspector (Apple Settings + Google clarity) */
-    .inspector{
-      position:sticky; top:84px;
-    }
-    @media (max-width: 980px){ .inspector{position:static} }
-
-    .hero{
-      padding: 16px;
-      background:
-        radial-gradient(700px 450px at 20% 0%, rgba(37,99,235,.14), transparent 62%),
-        rgba(255,255,255,.72);
-      border-bottom:1px solid var(--line2);
-    }
-    .hero h2{
-      margin:0;
-      font-size: 22px;
-      font-weight:1000;
-      letter-spacing:.1px;
-      line-height:1.15;
-    }
-    .hero p{
-      margin:6px 0 0;
-      color: var(--sub);
-      font-size:12px;
-      font-weight:900;
-      line-height:1.7;
-    }
-
-    .big{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 12px;
-    }
-    .tile{
-      border:1px solid var(--line2);
-      background: rgba(255,255,255,.86);
-      border-radius: 18px;
-      padding: 12px;
-    }
-    .tile .t{font-size:12px; font-weight:1000; color:var(--sub)}
-    .tile .v{
-      margin-top:8px;
-      font-size: 30px;
-      font-weight:1000;
-      line-height:1.05;
-      letter-spacing:.1px;
-      color: var(--ink);
-    }
-    .tile .v .cur{font-size:14px; font-weight:1000; color:rgba(11,18,32,.55); margin-right:6px}
-    .tile .s{margin-top:8px; font-size:12px; font-weight:900; color:var(--sub); line-height:1.7}
-
-    .stageGrid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 10px;
-      padding: 12px;
-    }
-    @media (max-width: 980px){ .stageGrid{grid-template-columns:1fr} }
-
-    .stage{
-      border:1px solid rgba(11,18,32,.08);
-      background: rgba(255,255,255,.86);
-      border-radius: 18px;
-      padding: 12px;
-      overflow:hidden;
-      position:relative;
-    }
-    .stage:before{
-      content:"";
-      position:absolute; inset:0 0 auto 0;
-      height:6px;
-      background: var(--stageColor, var(--s1));
-    }
-    .stage .row{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
-    }
-    .stage .row b{font-size:12px; font-weight:1000}
-    .stage .row span{font-size:11px; font-weight:900; color:var(--sub)}
-    .stage .lbl{font-size:12px; font-weight:1000; color:var(--sub); margin-bottom:6px}
-    .stage .amt{
-      font-size: 34px;
-      font-weight:1000;
-      line-height:1.05;
-      color: var(--ink);
-    }
-    .stage .amt .cur{font-size:14px; font-weight:1000; color:rgba(11,18,32,.55); margin-right:6px}
-
-    /* Manage */
-    .note{
-      font-size:12px;
-      font-weight:900;
-      color: var(--sub);
-      line-height:1.7;
-      border:1px solid var(--line2);
-      background: rgba(255,255,255,.82);
-      border-radius: 18px;
-      padding: 12px;
-    }
-    .note code{
-      font-family: var(--mono);
-      font-weight:1000;
-      background:#f8fafc;
-      border:1px solid rgba(11,18,32,.08);
-      padding:2px 6px;
-      border-radius:8px;
-    }
-
-    .form{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap:10px;
-      margin-top:12px;
-    }
-    @media (max-width: 980px){ .form{grid-template-columns:1fr} }
-
-    .field{display:flex; flex-direction:column; gap:6px}
-    .field label{font-size:12px; font-weight:900; color: var(--sub)}
-    .field input, .field select, .field textarea{
-      border:1px solid var(--line2);
-      background:#fff;
-      border-radius: 14px;
-      padding:10px 12px;
-      outline:none;
-      font-size:13px;
-      font-weight:900;
-    }
-    .field textarea{min-height:120px; resize:vertical; font-family:var(--mono); font-weight:800; font-size:12px; line-height:1.6}
-
-    .tableWrap{
-      margin-top:12px;
-      border:1px solid var(--line2);
-      border-radius: 18px;
-      overflow:auto;
-      background:#fff;
-    }
-    table{border-collapse:separate; border-spacing:0; width:100%; min-width: 900px; font-size:12px}
-    th, td{
-      padding:10px;
-      border-bottom:1px solid var(--line2);
-      border-left:1px solid var(--line2);
-      text-align:right;
-      vertical-align:top;
-      background:#fff;
-    }
-    th:last-child, td:last-child{border-left:none}
-    th{
-      position:sticky; top:0;
-      background:#f8fafc;
-      font-weight:1000;
-      white-space:nowrap;
-      z-index:1;
-    }
-    tr:last-child td{border-bottom:none}
-    .cell{
-      width:100%;
-      border:1px solid transparent;
-      border-radius: 10px;
-      padding:8px 10px;
-      outline:none;
-      font:inherit;
-      font-weight:900;
-      background:transparent;
-    }
-    .cell:focus{
-      border-color: rgba(37,99,235,.35);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
-      background:#fff;
-    }
-
-    .stageBuilder{
-      margin-top:12px;
-      border:1px solid var(--line2);
-      border-radius: 18px;
-      background: rgba(255,255,255,.82);
-      padding:12px;
-    }
-    .stageItem{
-      border:1px solid rgba(11,18,32,.08);
-      background:#fff;
-      border-radius: 16px;
-      padding:10px;
-      margin-top:10px;
-    }
-    .stageTop{
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px;
-      border-radius: 999px;
-      border:1px solid var(--line2);
-      background:#f8fafc;
-      font-size:11px;
-      font-weight:1000;
-      color: rgba(11,18,32,.78);
-    }
-    .swatch{width:14px;height:14px;border-radius:999px;border:1px solid rgba(0,0,0,.12)}
-    .stageForm{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:10px;
-    }
-    @media (max-width: 980px){ .stageForm{grid-template-columns:1fr} }
-
-    /* Print / export (native print only) */
-    @media print{
-      .top, .no-print{display:none!important}
-      body{background:#fff!important}
-      .wrap{max-width:none; padding:0}
-      .layout{grid-template-columns:1fr}
-      .panel{box-shadow:none; border:none; border-radius:0}
-      .card{box-shadow:none}
-      .inspector{position:static}
-    }
-  
-
-    /* Mobile polish (phone-first). Keeps all features; only adjusts layout/typography for small screens. */
-    @media (max-width: 640px){
-      .wrap{padding: 10px 10px 90px;} /* extra bottom space for mobile nav */
-      .top{position:sticky; top:0; z-index:60; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);}
-      .topInner{flex-direction:column; align-items:stretch; gap:10px;}
-      .brand{gap:10px}
-      .brand h1{font-size:16px}
-      .brand p{font-size:12px; line-height:1.25}
-      .seg{width:100%; overflow:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start}
-      .seg button{flex:0 0 auto; min-width: 92px; padding:10px 12px; font-size:13px}
-      .actions{width:100%; flex-wrap:wrap}
-      .actions .btn{flex: 1 1 calc(50% - 8px); justify-content:center; padding:10px 12px; border-radius: 16px}
-      .actions .btn.small{flex: 1 1 calc(50% - 8px)}
-      .panel{border-radius: 18px}
-      .panelHead{padding: 12px; gap:10px}
-      .searchRow{min-width:100%}
-      .search{font-size:16px} /* prevent iOS zoom */
-      .chip{padding:8px 10px; font-size:12px}
-
-      /* Cards */
-      .list{padding: 10px; gap: 10px}
-      .card{border-radius: 18px; padding: 12px}
-      .cardTop{flex-direction:column; align-items:stretch; gap:8px}
-      .name{font-size:17px}
-      .kpi{min-width:0; text-align:right}
-      .kpi .v{font-size:15px}
-      .kpi .v strong{font-size:18px}
-      .meta{gap:6px}
-      .pill{font-size:12px; padding:8px 10px}
-
-      /* Progress + stages */
-      .progressRow{gap:10px}
-      .progressBar{height: 12px}
-      .stageStrip{gap:8px; flex-wrap:wrap}
-      .stagePill{flex: 1 1 calc(50% - 8px); min-width: 0}
-      .stagePill .t{font-size:12px}
-      .stagePill .v{font-size:14px}
-
-      /* Manage / settings forms */
-      .form{grid-template-columns: 1fr !important}
-      .field{grid-column:1/-1 !important}
-      input, select, textarea{font-size:16px} /* tap-friendly, no zoom */
-      .tableWrap{border-radius: 16px}
-      table{min-width: 860px} /* still scrollable; slightly lighter */
-
-      /* Reduce motion on phones for comfort */
-      .card:hover{transform:none}
-    }
-
-    /* Mobile bottom nav */
-    .mNav{display:none}
-    @media (max-width: 640px){
-      .mNav{
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-        z-index: 80;
-        display:flex;
-        gap: 10px;
-        align-items:center;
-        justify-content:space-between;
-        padding: 10px 12px;
-        border-radius: 20px;
-        background: rgba(255,255,255,.86);
-        border: 1px solid rgba(11,18,32,.10);
-        box-shadow: 0 20px 60px rgba(16,24,40,.18);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-      }
-      .mNavBtn{
-        appearance:none; border:0; background:transparent;
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        gap:6px;
-        min-width: 54px;
-        padding: 8px 6px;
-        border-radius: 16px;
-        color: rgba(11,18,32,.80);
-        font-weight:1000;
-        cursor:pointer;
-        transition: .12s ease;
-      }
-      .mNavBtn:active{transform: scale(.98)}
-      .mI{font-size:18px; line-height:1}
-      .mT{font-size:11px; line-height:1}
-      .mSep{width:1px; height:34px; background: rgba(11,18,32,.10); border-radius: 999px}
-    }
-
-
-    /* Detail sheet (mobile master-detail) */
-    .sheetBackdrop{
-      position:fixed; inset:0; z-index:90;
-      background: rgba(11,18,32,.38);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-    .sheet{
-      position:fixed;
-      left:10px; right:10px; bottom:10px;
-      z-index:95;
-      border-radius: 24px;
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 28px 90px rgba(16,24,40,.28);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      overflow:hidden;
-      max-height: calc(88vh - 10px);
-      display:flex;
-      flex-direction:column;
-      transform: translateY(12px);
-      opacity: 0;
-      pointer-events:none;
-      transition: .18s ease;
-    }
-    .sheet.isOpen{ transform: translateY(0); opacity:1; pointer-events:auto; }
-    .sheetHandle{
-      width: 52px; height: 6px; border-radius: 999px;
-      background: rgba(11,18,32,.14);
-      margin: 10px auto 0;
-    }
-    .sheetHead{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px;
-      padding: 10px 12px 8px;
-      border-bottom: 1px solid rgba(11,18,32,.08);
-    }
-    .sheetTitle{min-width:0}
-    .sheetKicker{font-size:11px; color: rgba(11,18,32,.55); font-weight:800; letter-spacing:.02em}
-    .sheetName{font-size:16px; font-weight:1000; color: rgba(11,18,32,.86); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .sheetNav{display:flex; gap:8px}
-    .sheetBody{padding: 12px; overflow:auto; -webkit-overflow-scrolling:touch}
-
-    /* Keep the large detail panel visible on desktop; on mobile prefer sheet to avoid jumping */
-    @media (max-width: 640px){
-      .detailPanel{display:none !important;} /* we still render data (for exports/desktop), but hide in phone */
-      .list{display:grid; grid-template-columns: 1fr; gap: 10px; }
-    }
-    @media (max-width: 640px) and (min-width: 460px){
-      .list{grid-template-columns: 1fr 1fr;}
-    }
-
-    /* Sheet inner blocks (use same visual language) */
-    .sheetCard{
-      border-radius: 18px;
-      background: rgba(255,255,255,.70);
-      border: 1px solid rgba(11,18,32,.08);
-      box-shadow: 0 10px 30px rgba(16,24,40,.08);
-      overflow:hidden;
-      margin-bottom: 10px;
-    }
-    .sheetCard .pad{padding: 12px}
-    .sheetGrid{
-      display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    }
-    .sheetGrid .tile{
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(11,18,32,.08);
-      border-radius: 16px;
-      padding: 10px;
-      box-shadow: 0 10px 20px rgba(16,24,40,.06);
-    }
-    .sheetGrid .tile .t{font-size:11px; color: rgba(11,18,32,.55); font-weight:900}
-    .sheetGrid .tile .v{font-size:15px; font-weight:1000; margin-top:6px}
-    .sheetGrid .tile .s{font-size:12px; color: rgba(11,18,32,.55); margin-top:4px}
-    .sheetStages{
-      display:grid; grid-template-columns: 1fr; gap: 10px;
-    }
-    .sheetStage{
-      border-radius: 16px;
-      border: 1px solid rgba(11,18,32,.08);
-      background: rgba(255,255,255,.60);
-      box-shadow: 0 10px 20px rgba(16,24,40,.06);
-      padding: 10px;
-    }
-    .sheetStage .row{display:flex; justify-content:space-between; gap:10px; align-items:center}
-    .sheetStage b{font-weight:1000}
-    .sheetStage .lbl{font-size:11px; color: rgba(11,18,32,.55); font-weight:900; margin-top:6px}
-    .sheetStage .amt{font-size:20px; font-weight:1100; letter-spacing:.01em}
-    .sheetStage .cur{font-size:12px; margin-inline-start:4px; opacity:.7; font-weight:900}
-
-
-
-    .noScroll{overflow:hidden !important;}
-
-    /* Focus pulse when jumping to a card */
-    .pulseFocus{
-      outline: 2px solid rgba(59,130,246,.55);
-      box-shadow: 0 0 0 8px rgba(59,130,246,.14);
-      transition: box-shadow .25s ease, outline-color .25s ease;
-    }
-
-
-    /* Hide sync settings UI (auto-configured) */
-    .syncBlock{display:none !important;}
-    #syncState{display:none !important;}
-
-    /* Card overlay zoom (Jony Ive-ish). Mobile only, desktop unaffected. */
-    .cardOverlay{position:fixed; inset:0; display:none; z-index:120;}
-    .cardOverlay.isOpen{display:block;}
-    .cardOverlayBackdrop{
-      position:absolute; inset:0;
-      background: rgba(10,14,20,.32);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity:0;
-      transition: opacity .22s ease;
-    }
-    .cardOverlay.isOpen .cardOverlayBackdrop{opacity:1;}
-    .cardOverlayShell{
-      position:absolute;
-      left: 12px; right: 12px;
-      top: 64px; bottom: 84px; /* leave space for mobile nav */
-      border-radius: 22px;
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 28px 80px rgba(16,24,40,.26);
-      overflow:hidden;
-      transform: translateY(16px) scale(.98);
-      opacity:0;
-      transition: transform .26s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
-    }
-    .cardOverlay.isOpen .cardOverlayShell{
-      transform: translateY(0) scale(1);
-      opacity:1;
-    }
-    .cardOverlayTop{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(11,18,32,.08);
-      background: linear-gradient(to bottom, rgba(255,255,255,.96), rgba(255,255,255,.78));
-    }
-    .cardOverlayNav{display:flex; gap:8px;}
-    .cardOverlayBody{
-      height: calc(100% - 52px);
-      overflow:auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 12px;
-    }
-
-    /* FLIP clone that expands from tapped card */
-    .flipClone{
-      position:fixed;
-      z-index:130;
-      border-radius: 18px;
-      overflow:hidden;
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 20px 60px rgba(16,24,40,.18);
-      transform-origin: top left;
-      will-change: transform, width, height;
-    }
-    .flipFadeIn{opacity:0; transition: opacity .18s ease;}
-    .flipFadeIn.on{opacity:1;}
-    @media (min-width: 641px){
-      .cardOverlay{display:none !important;}
-    }
-
-
-    /* Admin lock */
-    body.adminLocked .adminOnly{display:none !important;}
-    body.adminLocked #tabManage,
-    body.adminLocked #tabSettings{display:none !important;}
-    body.adminLocked .mNavBtn[data-target="tabManage"],
-    body.adminLocked .mNavBtn[data-target="tabSettings"],
-    body.adminLocked .mNavBtn[data-action="print"],
-    body.adminLocked .mNavBtn[data-action="images"]{display:none !important;}
-    body.adminLocked #btnPrint,
-    body.adminLocked #btnExportZip,
-    body.adminLocked #btnExportImages,
-    body.adminLocked #btnExportHTML,
-    body.adminLocked #btnExportSnippet,
-    body.adminLocked #btnSample,
-    body.adminLocked #btnClear,
-    body.adminLocked #btnFetchRemote,
-    body.adminLocked #btnPublishRemote{display:none !important;}
-
-    /* Lock modal */
-    .adminLockModal{position:fixed; inset:0; display:none; z-index:140;}
-    .adminLockModal.isOpen{display:block;}
-    .adminLockBackdrop{
-      position:absolute; inset:0;
-      background: rgba(10,14,20,.28);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity:0; transition: opacity .18s ease;
-    }
-    .adminLockModal.isOpen .adminLockBackdrop{opacity:1;}
-    .adminLockSheet{
-      position:absolute;
-      left: 12px; right: 12px;
-      bottom: 12px;
-      border-radius: 22px;
-      background: rgba(255,255,255,.94);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 28px 80px rgba(16,24,40,.26);
-      padding: 12px;
-      transform: translateY(16px);
-      opacity:0;
-      transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .16s ease;
-    }
-    .adminLockModal.isOpen .adminLockSheet{transform: translateY(0); opacity:1;}
-    .adminLockHandle{width:42px; height:5px; border-radius:999px; background: rgba(11,18,32,.14); margin: 2px auto 10px;}
-    .adminLockTitle{font-weight:1000; font-size:16px; margin-bottom:4px;}
-    .adminLockHint{font-size:12px; color: rgba(11,18,32,.62); margin-bottom:10px; line-height:1.35;}
-    .adminLockRow{display:flex; gap:10px; align-items:center;}
-    #adminPass{flex:1; padding: 12px 12px; border-radius: 16px; border: 1px solid rgba(11,18,32,.14); background: rgba(255,255,255,.85); font-size:16px;}
-    .adminLockRow2{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;}
-
-    /* Overlay handle + phone typography */
-    .cardOverlayHandle{width:44px; height:5px; border-radius:999px; background: rgba(11,18,32,.14); margin: 6px auto 6px;}
-    @media (max-width: 640px){
-      .cardOverlayShell{top: 10px; bottom: 76px; left: 10px; right: 10px;}
-      .cardOverlayBody{padding: 10px;}
-      .cardOverlayTop{padding: 8px 10px;}
-      .cardOverlayTop .btn.small{padding: 8px 10px; border-radius: 14px;}
-      .cardOverlayNav{gap:6px;}
-      .cardOverlayBody .card{padding: 10px !important;}
-      .cardOverlayBody .name{font-size:18px;}
-      .cardOverlayBody .pill{padding: 8px 10px;}
-    }
-
-
-    /* Online badge */
-    .onlineBadge{
-      display:flex; align-items:center; gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(11,18,32,.10);
-      box-shadow: 0 12px 30px rgba(16,24,40,.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: rgba(11,18,32,.78);
-      font-weight:900;
-      white-space:nowrap;
-    }
-    .onlineBadge .dot{width:8px; height:8px; border-radius:99px; background: rgba(34,197,94,.85);}
-    .onlineBadge .lbl{font-size:12px;}
-    .onlineBadge .num{font-size:13px; padding: 2px 8px; border-radius: 999px; background: rgba(11,18,32,.06); color: rgba(11,18,32,.88);}
-    @media (max-width: 640px){
-      .onlineBadge{justify-content:space-between; width:100%;}
-      .onlineBadge .lbl{font-size:11px;}
-    }
-</style>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>لوحة البطاقات</title>
 
   <!-- PWA / iOS Add to Home Screen -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="بطاقات المجمعات">
+  <meta name="apple-mobile-web-app-title" content="البطاقات">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="icon" href="icons/icon-192.png">
+
+  <style id="appCSS">
+    :root{
+      --bg: #f6f8fb;
+      --ink: rgba(11,18,32,.92);
+      --muted: rgba(11,18,32,.62);
+      --line: rgba(11,18,32,.10);
+      --card: rgba(255,255,255,.86);
+      --glass: rgba(255,255,255,.72);
+      --shadow: 0 18px 54px rgba(16,24,40,.10);
+      --shadow2: 0 26px 80px rgba(16,24,40,.18);
+      --r: 22px;
+      --r2: 18px;
+      --safeTop: env(safe-area-inset-top);
+      --safeBot: env(safe-area-inset-bottom);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),
+                  radial-gradient(900px 600px at 10% 0%, rgba(16,185,129,.10), transparent 55%),
+                  var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .shell{max-width: 1180px; margin: 0 auto; padding: 14px 14px calc(86px + var(--safeBot));}
+
+    header{
+      position: sticky; top: 0; z-index: 30;
+      padding-top: max(10px, var(--safeTop));
+      background: linear-gradient(to bottom, rgba(246,248,251,.92), rgba(246,248,251,.78));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(11,18,32,.06);
+    }
+    .topBar{
+      display:flex; align-items:center; justify-content:space-between; gap: 12px;
+      padding: 10px 14px 12px;
+      max-width: 1180px; margin:0 auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 10px;
+      font-weight: 1100;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      user-select:none;
+    }
+    .mark{
+      width: 34px; height: 34px; border-radius: 12px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.32)),
+                  linear-gradient(135deg, rgba(59,130,246,.68), rgba(16,185,129,.48));
+      box-shadow: 0 16px 36px rgba(16,24,40,.14);
+      border: 1px solid rgba(255,255,255,.55);
+    }
+    .brand .t{display:flex; flex-direction:column; line-height:1.05}
+    .brand .t b{font-size: 14px}
+    .brand .t span{font-size: 11px; color: var(--muted); font-weight: 900}
+
+    .right{
+      display:flex; align-items:center; gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    .onlineBadge{
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 30px rgba(16,24,40,.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(11,18,32,.78);
+      font-weight: 1000;
+      white-space:nowrap;
+    }
+    .onlineBadge .dot{width:8px; height:8px; border-radius:99px; background: rgba(34,197,94,.85);}
+    .onlineBadge .lbl{font-size: 12px}
+    .onlineBadge .num{font-size: 13px; padding: 2px 8px; border-radius: 999px; background: rgba(11,18,32,.06); color: rgba(11,18,32,.88);}
+
+    .chip{
+      display:inline-flex; align-items:center; gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      color: rgba(11,18,32,.78);
+      font-weight: 1000;
+      white-space:nowrap;
+    }
+    .chip .k{font-size: 11px; color: var(--muted); font-weight: 900}
+    .chip .v{font-size: 12px}
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.84);
+      color: rgba(11,18,32,.84);
+      font-weight: 1100;
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(16,24,40,.06);
+      transition: transform .12s ease, box-shadow .14s ease, background .14s ease;
+      user-select:none;
+    }
+    .btn:active{transform: scale(.98)}
+    .btn.primary{
+      border-color: rgba(11,18,32,.12);
+      background: rgba(11,18,32,.92);
+      color: rgba(255,255,255,.96);
+      box-shadow: 0 16px 38px rgba(16,24,40,.16);
+    }
+    .btn.ghost{
+      background: transparent;
+      box-shadow:none;
+    }
+    .btn.small{padding: 8px 10px; font-size: 12px; border-radius: 14px}
+    .btn:disabled{opacity:.55; cursor:not-allowed}
+
+    /* Segmented control */
+    .seg{
+      display:flex; gap: 8px;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(11,18,32,.08);
+      box-shadow: 0 16px 40px rgba(16,24,40,.06);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .seg button{
+      border: 0; background: transparent;
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 1100;
+      color: rgba(11,18,32,.68);
+      transition: .14s ease;
+    }
+    .seg button.active{
+      background: rgba(11,18,32,.92);
+      color: rgba(255,255,255,.96);
+      box-shadow: 0 14px 34px rgba(16,24,40,.14);
+    }
+
+    /* Toolbar */
+    .toolbar{
+      margin-top: 12px;
+      display:flex; align-items:center; justify-content:space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .search{
+      flex: 1;
+      min-width: 220px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 38px rgba(16,24,40,.06);
+    }
+    .search input{
+      border:0; outline:0; background:transparent;
+      width:100%;
+      font-weight: 900;
+      color: rgba(11,18,32,.82);
+      font-size: 14px;
+    }
+    select, input, textarea{font-family: inherit}
+    .filters{
+      display:flex; gap: 10px; flex-wrap: wrap;
+    }
+    .select{
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.82);
+      padding: 10px 12px;
+      font-weight: 1000;
+      color: rgba(11,18,32,.78);
+      box-shadow: 0 14px 38px rgba(16,24,40,.06);
+    }
+
+    /* Views */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* Board */
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 640px){ .grid{grid-template-columns: 1fr;} }
+
+    .card{
+      border-radius: var(--r);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      cursor:pointer;
+      transform: translateZ(0);
+      transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:active{transform: scale(.99)}
+    .card:hover{box-shadow: var(--shadow2); border-color: rgba(11,18,32,.14)}
+    .cardIn{
+      padding: 12px 12px 12px;
+    }
+    .row{display:flex; align-items:center; justify-content:space-between; gap: 10px;}
+    .name{
+      font-weight: 1200;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      color: rgba(11,18,32,.92);
+      line-height: 1.15;
+    }
+    .meta{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 900;
+      margin-top: 6px;
+      display:flex; gap: 8px; flex-wrap: wrap;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(11,18,32,.05);
+      color: rgba(11,18,32,.78);
+      font-weight: 1000;
+      border: 1px solid rgba(11,18,32,.07);
+    }
+    .pill b{font-weight: 1200}
+    .k{font-size: 11px; color: rgba(11,18,32,.55); font-weight: 900}
+    .big{
+      font-weight: 1300;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      display:flex; align-items:baseline; gap: 6px;
+    }
+    .sar{font-size: 12px; color: rgba(11,18,32,.55); font-weight: 900}
+    .bar{
+      margin-top: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(11,18,32,.08);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(59,130,246,.92), rgba(16,185,129,.80));
+    }
+    .smallRow{
+      margin-top: 10px;
+      display:flex; justify-content:space-between; gap: 10px;
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(11,18,32,.62);
+    }
+
+    /* List (table) */
+    .tableWrap{
+      margin-top: 14px;
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    table{width:100%; border-collapse: collapse; font-size: 12px;}
+    thead th{
+      text-align: right;
+      padding: 12px 12px;
+      color: rgba(11,18,32,.62);
+      font-weight: 1000;
+      border-bottom: 1px solid rgba(11,18,32,.08);
+      background: rgba(255,255,255,.78);
+      position: sticky; top: 0; z-index: 1;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    tbody td{
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(11,18,32,.06);
+      color: rgba(11,18,32,.82);
+      font-weight: 900;
+      vertical-align: top;
+    }
+    tbody tr:hover td{background: rgba(59,130,246,.04)}
+    .edit{
+      width: 100%;
+      border: 1px solid rgba(11,18,32,.10);
+      background: rgba(255,255,255,.78);
+      border-radius: 12px;
+      padding: 9px 10px;
+      font-weight: 900;
+      color: rgba(11,18,32,.84);
+      outline: none;
+    }
+    .edit:focus{border-color: rgba(59,130,246,.40); box-shadow: 0 0 0 6px rgba(59,130,246,.10)}
+    .rowBtns{display:flex; gap: 8px; flex-wrap: wrap;}
+
+    /* Detail page (iPhone style) */
+    .detailPage{display:none; position:fixed; inset:0; z-index: 80; background: rgba(248,250,252,.98);}
+    .detailPage.isOpen{display:block}
+    .detailTop{
+      position: sticky; top:0; z-index: 5;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px 12px;
+      padding-top: max(10px, var(--safeTop));
+      background: rgba(255,255,255,.86);
+      border-bottom: 1px solid rgba(11,18,32,.10);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .detailTitle{font-weight:1200; font-size: 14px; color: rgba(11,18,32,.78); text-align:center; flex:1;}
+    .detailTabs{
+      position: sticky;
+      top: calc(56px + var(--safeTop));
+      z-index: 4;
+      display:flex; gap:8px;
+      padding: 10px 12px;
+      background: rgba(248,250,252,.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(11,18,32,.08);
+    }
+    .detailTab{
+      flex:1;
+      border: 1px solid rgba(11,18,32,.10);
+      background: rgba(255,255,255,.78);
+      color: rgba(11,18,32,.74);
+      border-radius: 999px;
+      padding: 10px 10px;
+      font-weight: 1100;
+      font-size: 12px;
+      cursor:pointer;
+      transition: .14s ease;
+    }
+    .detailTab.active{
+      background: rgba(11,18,32,.92);
+      color: rgba(255,255,255,.96);
+      box-shadow: 0 10px 26px rgba(16,24,40,.18);
+    }
+    .detailKPIWrap{
+      position: sticky;
+      top: calc(56px + 56px + var(--safeTop));
+      z-index: 3;
+      padding: 12px;
+      background: rgba(248,250,252,.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(11,18,32,.08);
+    }
+    .detailKPIGrid{display:grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+    .detailKPI{
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 12px 34px rgba(16,24,40,.10);
+      padding: 10px 12px;
+    }
+    .detailKPI .kk{font-size:11px; color: rgba(11,18,32,.58); font-weight: 900}
+    .detailKPI .vv{margin-top: 6px; font-size: 20px; font-weight: 1300; letter-spacing:-0.02em; display:flex; align-items:baseline; justify-content:space-between; gap: 8px;}
+    .detailKPI .vv .sar{font-size:12px}
+    .detailKPI .sub{margin-top: 6px; font-size: 11px; color: rgba(11,18,32,.58); font-weight: 900; line-height:1.35}
+
+    .detailBody{height: calc(100% - 56px); overflow:auto; -webkit-overflow-scrolling:touch;}
+    .detailPanel{display:none; padding: 12px 12px 96px;}
+    .detailPanel.active{display:block}
+
+    .stageList{display:flex; flex-direction:column; gap:10px;}
+    .stageRow{
+      border-radius: var(--r2);
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 12px 34px rgba(16,24,40,.10);
+      padding: 12px;
+    }
+    .stageRowTop{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+    .stageName{font-weight: 1100; font-size: 13px; color: rgba(11,18,32,.86);}
+    .stageTarget{font-weight: 1300; font-size: 18px; color: rgba(11,18,32,.92);}
+    .stageTarget .sar{font-size: 12px; color: rgba(11,18,32,.55); font-weight: 900; margin-inline-start: 6px;}
+    .stageBar{height: 10px; border-radius: 999px; background: rgba(11,18,32,.08); overflow:hidden; margin-top:10px;}
+    .stageFill{height:100%; border-radius:999px; width:0%;}
+    .stageMeta{margin-top: 8px; display:flex; justify-content:space-between; font-size: 11px; color: rgba(11,18,32,.60); font-weight: 900;}
+
+    .hint{padding: 10px 12px; font-size: 11px; color: rgba(11,18,32,.55); font-weight: 900; text-align:center;}
+
+    /* Bottom nav (mobile) */
+    .mNav{
+      position: fixed;
+      left: 10px; right: 10px;
+      bottom: max(10px, var(--safeBot));
+      z-index: 60;
+      border-radius: 999px;
+      padding: 6px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 18px 60px rgba(16,24,40,.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:none;
+    }
+    .mNav .seg{width:100%; justify-content:space-between}
+    @media (max-width: 640px){ .mNav{display:block} }
+
+    /* Modal (Admin unlock + Conflict) */
+    .modal{position:fixed; inset:0; display:none; z-index:120;}
+    .modal.open{display:block;}
+    .backdrop{position:absolute; inset:0; background: rgba(10,14,20,.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); opacity:0; transition: opacity .16s ease;}
+    .modal.open .backdrop{opacity:1}
+    .sheet{
+      position:absolute;
+      left: 12px; right: 12px; bottom: 12px;
+      border-radius: var(--r);
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(11,18,32,.10);
+      box-shadow: 0 28px 80px rgba(16,24,40,.26);
+      padding: 12px;
+      transform: translateY(16px);
+      opacity:0;
+      transition: transform .20s cubic-bezier(.2,.9,.2,1), opacity .14s ease;
+    }
+    .modal.open .sheet{transform: translateY(0); opacity: 1;}
+    .handle{width:42px; height:5px; border-radius:999px; background: rgba(11,18,32,.14); margin: 2px auto 10px;}
+    .title{font-weight: 1200; font-size: 16px; margin-bottom: 4px;}
+    .subt{font-size: 12px; color: rgba(11,18,32,.62); font-weight: 900; line-height:1.35;}
+    .row2{display:flex; gap: 10px; align-items:center; margin-top: 10px;}
+    .row2 input{
+      flex:1;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(11,18,32,.14);
+      background: rgba(255,255,255,.85);
+      font-size: 16px;
+      font-weight: 900;
+      outline:none;
+    }
+    .row2 input:focus{border-color: rgba(59,130,246,.40); box-shadow: 0 0 0 6px rgba(59,130,246,.12)}
+    .warn{
+      margin-top: 10px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid rgba(245,158,11,.22);
+      background: rgba(245,158,11,.10);
+      color: rgba(11,18,32,.78);
+      font-weight: 900;
+      font-size: 12px;
+      line-height:1.35;
+    }
+
+    /* Admin-only visibility */
+    body.adminLocked .adminOnly{display:none !important;}
+
+    /* Print */
+    @media print{
+      header, .mNav, .noPrint{display:none !important;}
+      body{background:white;}
+      .shell{padding:0}
+      .card{break-inside: avoid;}
+    }
+  </style>
 </head>
-<body>
-  <header class="top">
-    <div class="topInner">
-      <div class="brand">
-        <div class="mark" aria-hidden="true"></div>
-        <div class="onlineBadge" id="onlineBadge" title="الموجودين الآن">
-          <span class="dot" aria-hidden="true"></span>
-          <span class="lbl">الموجودين الآن</span>
-          <span class="num" id="onlineCount">—</span>
-        </div>
-        <div>
-          <h1>لوحة الفروع</h1>
-          <p>عرض مبسّط للمدراء • إدارة مركزية للمراحل والمحفظة</p>
-        </div>
-      </div>
 
-      <div class="seg" role="tablist" aria-label="mode">
-        <button id="tabView" class="active" role="tab" aria-selected="true">عرض</button>
-        <button id="tabManage" role="tab" aria-selected="false">إدارة</button>
-        <button id="tabSettings" role="tab" aria-selected="false">إعدادات</button>
-      </div>
-
-      <div class="actions no-print">
-        <button class="btn primary" id="btnAddSample">مثال جاهز</button>
-        <button class="btn" id="btnPrint">طباعة / PDF</button>
-        <button class="btn" id="btnExportImage">تصدير صورة</button>
-        <button class="btn" id="btnExportImagesZip">تصدير صور ZIP</button>
+<body class="adminLocked">
+<header>
+  <div class="topBar">
+    <div class="brand" id="brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div class="t">
+        <b>لوحة البطاقات</b>
+        <span id="subtitle">عرض سريع • تفاصيل واضحة</span>
       </div>
     </div>
-  </header>
 
-  <!-- Mobile bottom navigation (keeps all existing controls; adds easier access on phones) -->
-  <nav class="mNav no-print" aria-label="تنقل الهاتف">
-    <button class="mNavBtn" data-target="tabView" aria-label="عرض">
-      <span class="mI">👁️</span><span class="mT">عرض</span>
-    </button>
-    <button class="mNavBtn" data-target="tabManage" aria-label="إدارة">
-      <span class="mI">🛠️</span><span class="mT">إدارة</span>
-    </button>
-    <button class="mNavBtn" data-target="tabSettings" aria-label="إعدادات">
-      <span class="mI">⚙️</span><span class="mT">إعدادات</span>
-    </button>
-    <span class="mSep" aria-hidden="true"></span>
-    <button class="mNavBtn" data-action="print" aria-label="طباعة / PDF">
-      <span class="mI">🖨️</span><span class="mT">PDF</span>
-    </button>
-    <button class="mNavBtn" data-action="images" aria-label="تصدير صور">
-      <span class="mI">🖼️</span><span class="mT">صور</span>
-    </button>
-  </nav>
-
-
-  <main class="wrap">
-    <section class="layout">
-      <!-- LEFT: Cards -->
-      <div class="panel" id="panelCards">
-        <div class="panelHead">
-          <div class="searchRow" style="flex:1">
-            <input id="search" class="search" placeholder="ابحث باسم المجمع..." />
-            <span class="chip" id="countChip">0 بطاقة</span>
-          </div>
-          <div class="actions no-print">
-            <button class="btn small" id="btnFocus">تركيز</button>
-            <button class="btn small ghost" id="btnHow">طريقة الإدخال</button>
-          </div>
-        </div>
-        <div class="list" id="cardList"></div>
+    <div class="right">
+      <div class="onlineBadge" title="الموجودين الآن">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="lbl">الموجودين</span>
+        <span class="num" id="onlineCount">—</span>
       </div>
 
-      <!-- RIGHT: Inspector / Manage / Settings -->
-      <div class="panel inspector" id="panelRight">
-        <!-- View inspector -->
-        <div id="viewPane">
-          <div class="hero">
-            <h2 id="heroTitle">اختر مجمعًا</h2>
-            <p id="heroSub">اضغط على بطاقة من اليسار لعرض التفاصيل هنا.</p>
-          </div>
-
-          <div class="big" id="bigTiles" style="display:none">
-            <div class="tile">
-              <div class="t">التكلفة الإجمالية</div>
-              <div class="v" id="vTotal">—</div>
-              <div class="s" id="sStudents">—</div>
-            </div>
-
-            <div class="tile">
-              <div class="t">التغطية الحالية</div>
-              <div class="v" id="vCovered">—</div>
-              <div class="s" id="sCoveredNote">—</div>
-            </div>
-
-            <div class="tile">
-              <div class="t">هدف المحفظة الاستثمارية</div>
-              <div class="v" id="vGoal">—</div>
-              <div class="s" id="sGoalNote">—</div>
-            </div>
-
-            <div class="tile">
-              <div class="t">الوضع الآن وخطة المراحل</div>
-              <div class="barWrap">
-                <div class="bar" id="bigBar"></div>
-                <div class="legend" id="bigLegend"></div>
-              </div>
-              <div class="s" id="sAfterPlan">—</div>
-            </div>
-          </div>
-
-          <div class="panelBody" id="stageBlock" style="display:none; padding-top:0">
-            <b style="display:block; font-size:13px; font-weight:1000; margin:10px 2px 10px;">أهداف المراحل</b>
-            <div class="stageGrid" id="stageGrid"></div>
-          </div>
-        </div>
-
-        <!-- Manage pane -->
-        <div id="managePane" style="display:none">
-          <div class="panelHead">
-            <b>إدارة البيانات</b>
-            <div class="actions no-print">
-              <button class="btn small" id="btnAddRow">إضافة صف</button>
-              <button class="btn small danger" id="btnClear">مسح</button>
-            </div>
-          </div>
-          <div class="panelBody">
-            <div class="note">
-              <b>إدخال سريع (لصق):</b> انسخ من Google Sheets/Excel والصق هنا (CSV أو TSV).<br>
-              الترتيب: <code>اسم المجمع</code> — <code>التكلفة الإجمالية</code> — <code>عدد الطلاب</code> — <code>نسبة التغطية الحالية %</code> (اختياري) — <code>مبلغ التغطية الحالية</code> (اختياري)
-            </div>
-
-            <div class="form">
-              <div class="field" style="grid-column:1/-1">
-                <label>لصق البيانات</label>
-                <textarea id="paste" placeholder="مثال:
-مجمع زيد بن ثابت	123234	420	37
-مجمع الإمام عاصم	310000	980		115000"></textarea>
-              </div>
-            </div>
-
-            <div class="actions no-print" style="margin-top:10px">
-              <button class="btn primary" id="btnApplyPaste">تطبيق اللصق</button>
-              <button class="btn" id="btnExportJSON">تصدير JSON</button>
-              <button class="btn" id="btnImportJSON">استيراد JSON</button>
-              <input id="jsonFile" type="file" accept="application/json" style="display:none" />
-            </div>
-
-            <div class="tableWrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th style="min-width:260px">اسم المجمع</th>
-                    <th style="min-width:160px">التكلفة الإجمالية</th>
-                    <th style="min-width:120px">عدد الطلاب</th>
-                    <th style="min-width:160px">نسبة التغطية الحالية %</th>
-                    <th style="min-width:180px">مبلغ التغطية الحالية</th>
-                    <th style="min-width:90px">حذف</th>
-                  </tr>
-                </thead>
-                <tbody id="rows"></tbody>
-              </table>
-            </div>
-
-            <div class="stageBuilder">
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                <b style="font-size:13px; font-weight:1000">المراحل (مركزية)</b>
-                <div class="actions no-print">
-                  <button class="btn small" id="btnAddStage">+ إضافة</button>
-                  <button class="btn small ghost" id="btnResetStages">افتراضي</button>
-                </div>
-              </div>
-              <div class="note" style="margin-top:10px">
-                لكل مرحلة: اسم + فترة + <b>نسبة تغطية مستهدفة (تراكمية %)</b>.
-                النسبة لا تُعرض للمدراء — تُستخدم فقط لحساب هدف المرحلة.
-              </div>
-              <div id="stageList"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Settings pane -->
-        <div id="settingsPane" style="display:none">
-          <div class="panelHead">
-            <b>إعدادات مركزية</b>
-            <div class="actions no-print">
-              <button class="btn small" id="btnExportCSS">تصدير CSS</button>
-              <button class="btn small ghost" id="btnResetAll">إرجاع كل شيء</button>
-            </div>
-          </div>
-          <div class="panelBody">
-            <div class="note">
-              <b>المبدأ:</b> المدير يرى “النتيجة” وأنت تتحكم بـ “القواعد”.<br>
-              هدف المحفظة يُحسب = مبلغ التغطية المطلوب ÷ (العائد السنوي).
-            </div>
-
-            <div class="form">
-              <div class="field">
-                <label>نسبة العائد السنوي (%)</label>
-                <input id="returnRate" type="number" min="0" step="0.1" value="9">
-              </div>
-              <div class="field">
-                <label>هدف المحفظة يغطي</label>
-                <select id="goalScope">
-                  <option value="remaining" selected>المتبقي بعد التغطية الحالية</option>
-                  <option value="total">التكلفة الإجمالية</option>
-                </select>
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>إظهار في بطاقة اليسار</label>
-                <select id="leftDensity">
-                  <option value="calm" selected>هادئ (مختصر)</option>
-                  <option value="rich">غني (تفاصيل أكثر)</option>
-                </select>
-              
-            <div class="syncBlock" aria-hidden="true">
-<div class="note" style="margin-top:12px">
-              <b>مزامنة جماعية (تحديث للجميع):</b> ضع رابط ملف JSON عام (GET) ليتم تحميل أحدث البيانات تلقائيًا عند كل المستخدمين.
-              يمكنك أيضًا وضع رابط حفظ (POST) إن كان لديك API في منصتك لحفظ البيانات مباشرة.
-            </div>
-
-            <div class="form">
-              <div class="field" style="grid-column:1/-1">
-                <label>رابط البيانات (JSON GET)</label>
-                <input id="remoteGetUrl" type="url" placeholder="مثال: https://yourdomain.com/data/compounds_data.json">
-              </div>
-
-              <div class="field">
-                <label>تحديث تلقائي</label>
-                <select id="remoteAutoOn">
-                  <option value="on" selected>مفعل</option>
-                  <option value="off">متوقف</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label>كل كم ثانية يتم التحديث؟</label>
-                <input id="remoteInterval" type="number" min="5" step="1" value="20">
-              </div>
-
-              <div class="field" style="grid-column:1/-1">
-                <label>رابط الحفظ (اختياري POST)</label>
-                <input id="remotePushUrl" type="url" placeholder="مثال: https://yourdomain.com/api/compounds/save">
-              </div>
-
-              <div class="field" style="grid-column:1/-1">
-                <label>Token (اختياري) — يوضع في Authorization: Bearer</label>
-                <input id="remoteToken" type="password" placeholder="اتركه فارغًا إذا لا يوجد">
-              </div>
-            </div>
-
-            <div class="actions no-print" style="margin-top:10px">
-              <button class="btn primary" id="btnFetchRemote">جلب أحدث نسخة</button>
-              <button class="btn" id="btnPublishRemote">نشر التعديل للجميع</button>
-              <span class="chip" id="syncState">غير متصل</span>
-            </div>
-</div>
-</div>
-            </div>
-
-            <div class="note" style="margin-top:12px">
-              <b>تصدير/مشاركة:</b> استخدم زر <b>طباعة / PDF</b> من الأعلى (يتوافق مع iOS) لطباعة الصفحة كاملة أو حفظها PDF.
-            </div>
-          </div>
-        </div>
-
+      <div class="chip" title="حالة البيانات">
+        <span class="k">آخر تحديث</span>
+        <span class="v" id="lastSync">—</span>
       </div>
-    </section>
-  </main>
 
+      <button class="btn" id="btnRefresh" title="جلب أحدث نسخة">تحديث</button>
+      <button class="btn primary adminOnly" id="btnPublish" title="نشر للجميع">نشر</button>
+    </div>
+  </div>
+</header>
 
-  <!-- Admin unlock (hidden by default). Triple-tap logo / long-press opens passcode. -->
-  <div id="adminLockModal" class="adminLockModal no-print" aria-hidden="true">
-    <div class="adminLockBackdrop" id="adminLockBackdrop"></div>
-    <div class="adminLockSheet" role="dialog" aria-modal="true" aria-label="رمز الدخول">
-      <div class="adminLockHandle" aria-hidden="true"></div>
-      <div class="adminLockTitle">رمز الدخول</div>
-      <div class="adminLockHint">أدخل الرمز لإظهار الإعدادات والتصدير وتعديل المراحل.</div>
-      <div class="adminLockRow">
-        <input id="adminPass" inputmode="numeric" autocomplete="one-time-code" placeholder="•••" maxlength="6">
-        <button class="btn primary" id="adminUnlockBtn">دخول</button>
-      </div>
-      <div class="adminLockRow2">
-        <button class="btn" id="adminLockBtn">إخفاء الخيارات</button>
-        <span class="chip" id="adminLockState">مخفي</span>
-      </div>
+<div class="shell">
+  <div class="toolbar">
+    <div class="seg noPrint" id="viewSeg">
+      <button data-view="board" class="active">لوحة</button>
+      <button data-view="list">قائمة</button>
+      <button data-view="manage" class="adminOnly">إدارة</button>
+      <button data-view="settings" class="adminOnly">إعدادات</button>
+    </div>
+
+    <div class="search noPrint">
+      <span style="opacity:.7">🔎</span>
+      <input id="q" placeholder="ابحث بالاسم…" />
+    </div>
+
+    <div class="filters noPrint">
+      <select id="filterCompound" class="select" aria-label="تصفية المجمع">
+        <option value="">كل المجمعات</option>
+      </select>
+      <select id="filterDawr" class="select" aria-label="تصفية الدور">
+        <option value="">كل الدور</option>
+      </select>
+      <select id="sortBy" class="select" aria-label="ترتيب">
+        <option value="name">الاسم</option>
+        <option value="gap">فجوة التغطية</option>
+        <option value="total">التكلفة</option>
+        <option value="students">الطلاب</option>
+      </select>
     </div>
   </div>
 
-  
-  <!-- Export overlay -->
-  <div id="exportOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.55); backdrop-filter: blur(10px); padding:14px;">
-    <div style="max-width:520px; margin:0 auto; background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.28); border-radius:22px; box-shadow: 0 26px 72px rgba(16,24,40,.22); padding:14px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-        <b style="font-size:13px; font-weight:1000; color:#0b1220">تصدير الصور</b>
-        <button class="btn small danger" id="btnExportClose">إغلاق</button>
-      </div>
-      <div id="exportStatus" style="margin-top:10px; font-size:12px; font-weight:900; color:rgba(11,18,32,.72); line-height:1.7">
-        جاري التحضير…
-      </div>
-      <div style="margin-top:10px; height:10px; background:rgba(11,18,32,.08); border-radius:999px; overflow:hidden; border:1px solid rgba(11,18,32,.08)">
-        <div id="exportBar" style="height:100%; width:0%; background:linear-gradient(90deg, rgba(37,99,235,.85), rgba(16,185,129,.85)); border-radius:999px"></div>
-      </div>
-      <div style="margin-top:10px; font-size:11px; font-weight:900; color:rgba(11,18,32,.55)">
-        ملاحظة: المزامنة تعتمد على رابط JSON عام (GET). يمكن تشغيل التصدير أونلاين (أفضل) أو أوفلاين (بديل).
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script>
-    // ===== Utilities =====
-    const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
-    const fmtSAR=(n)=>{
-      if(n===null||n===undefined||Number.isNaN(n)) return "—";
-      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0})+" ريال";
-    };
-    const fmtMoney=(n)=>{
-      if(n===null||n===undefined||Number.isNaN(n)) return "—";
-      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0});
-    };
-    const fmtPct=(n)=>{
-      if(n===null||n===undefined||Number.isNaN(n)) return "—";
-      return Number(n).toLocaleString("ar-SA",{maximumFractionDigits:0})+"%";
-    };
-
-    function markDirty(){
-      // Any local edit should bump updated timestamp (used for shared sync)
-      localUpdatedAt = Date.now();
-    }
-    function parseNumber(v){
-      if(v===null||v===undefined) return NaN;
-      if(typeof v==="number") return v;
-      const s=String(v).trim();
-      if(!s) return NaN;
-      const normalized=s.replace(/[٬,]/g,"").replace(/ريال|ر\.س|SAR/gi,"").replace(/\s+/g,"");
-      const n=Number(normalized);
-      return Number.isFinite(n)?n:NaN;
-    }
-    function escapeHtml(s){
-      return String(s??"")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-    function uid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16); }
-    function safeFilename(name){ return (name||"data").toString().replace(/[\\/:*?"<>|]/g,"-").trim(); }
-    function downloadBlob(filename, blob){
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a"); a.href=url; a.download=filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 1500);
-    }
-    function detectDelimiter(line){
-      const comma=(line.match(/,/g)||[]).length;
-      const tab=(line.match(/\t/g)||[]).length;
-      const semi=(line.match(/;/g)||[]).length;
-      if(tab>=comma && tab>=semi && tab>0) return "\t";
-      if(semi>comma) return ";";
-      return ",";
-    }
-    function parseDelimited(text){
-      const lines=(text||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").filter(l=>l.trim()!=="");
-      if(!lines.length) return [];
-      const delim=detectDelimiter(lines[0]);
-      return lines.map(line=> line.split(delim).map(x=>String(x??"").trim()));
-    }
-    function stageColor(i){
-      const palette=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)"];
-      return palette[i % palette.length];
-    }
-
-    // ===== Elements =====
-    const tabView = document.getElementById("tabView");
-    const tabManage = document.getElementById("tabManage");
-    const tabSettings = document.getElementById("tabSettings");
-
-    const viewPane = document.getElementById("viewPane");
-    const managePane = document.getElementById("managePane");
-    const settingsPane = document.getElementById("settingsPane");
-
-    const elSearch = document.getElementById("search");
-    const elCountChip = document.getElementById("countChip");
-    const elList = document.getElementById("cardList");
-
-    const heroTitle = document.getElementById("heroTitle");
-    const heroSub = document.getElementById("heroSub");
-    const bigTiles = document.getElementById("bigTiles");
-    const stageBlock = document.getElementById("stageBlock");
-
-    const vTotal = document.getElementById("vTotal");
-    const sStudents = document.getElementById("sStudents");
-
-    const vCovered = document.getElementById("vCovered");
-    const sCoveredNote = document.getElementById("sCoveredNote");
-
-    const vGoal = document.getElementById("vGoal");
-    const sGoalNote = document.getElementById("sGoalNote");
-
-    const bigBar = document.getElementById("bigBar");
-    const bigLegend = document.getElementById("bigLegend");
-    const sAfterPlan = document.getElementById("sAfterPlan");
-
-    const stageGrid = document.getElementById("stageGrid");
-
-    // Manage
-    const paste = document.getElementById("paste");
-    const rowsTbody = document.getElementById("rows");
-    const stageList = document.getElementById("stageList");
-
-    // Settings
-    const returnRate = document.getElementById("returnRate");
-    const goalScope = document.getElementById("goalScope");
-    const leftDensity = document.getElementById("leftDensity");
-
-    // Sync (shared data)
-    const remoteGetUrl = document.getElementById("remoteGetUrl");
-    const remoteAutoOn = document.getElementById("remoteAutoOn");
-    const remoteInterval = document.getElementById("remoteInterval");
-    const remotePushUrl = document.getElementById("remotePushUrl");
-    const remoteToken = document.getElementById("remoteToken");
-    const btnFetchRemote = document.getElementById("btnFetchRemote");
-    const btnPublishRemote = document.getElementById("btnPublishRemote");
-    const syncState = document.getElementById("syncState");
-
-    // Buttons
-    document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
-
-    // ===== Export images (selected / ZIP) =====
-    const exportOverlay = document.getElementById("exportOverlay");
-    const exportStatus = document.getElementById("exportStatus");
-    const exportBar = document.getElementById("exportBar");
-    const btnExportClose = document.getElementById("btnExportClose");
-    const btnExportImage = document.getElementById("btnExportImage");
-    const btnExportImagesZip = document.getElementById("btnExportImagesZip");
-
-    function showExport(msg, p){
-      exportStatus.textContent = msg || "…";
-      exportBar.style.width = `${clamp(Number(p||0),0,100)}%`;
-      exportOverlay.style.display = "block";
-    }
-    function hideExport(){ exportOverlay.style.display = "none"; }
-
-    btnExportClose?.addEventListener("click", hideExport);
-
-    async function ensureExportLibs(){
-      // Keep the original html2canvas path if available, but allow an offline fallback.
-      // If html2canvas is missing (no internet / blocked CDN), we will use an offline SVG renderer.
-      return true;
-    }
-
-    function buildInspectorSnapshotNode(){
-      // Snapshot is based on the View inspector only (clean, manager-friendly)
-      const root = document.createElement("div");
-      root.dir = "rtl";
-      root.lang = "ar";
-      root.className = "arabicFixSnapshot";
-      root.style.background = "#fff";
-      root.style.padding = "14px";
-      root.style.width = "1100px";
-      root.style.maxWidth = "1100px";
-      // Strong Arabic-safe font fallback chain (prevents disjoint letters in some render paths)
-      root.style.fontFamily = `"IBM Plex Sans Arabic","Noto Naskh Arabic","Noto Sans Arabic","Geeza Pro","Tahoma","Arial",sans-serif`;
-      root.style.direction = "rtl";
-      root.style.unicodeBidi = "plaintext";
-      root.style.letterSpacing = "normal";
-
-      // Clone just the inspector view (hero + tiles + stages)
-      const view = document.getElementById("viewPane");
-      const clone = view.cloneNode(true);
-
-      // Remove any no-print elements inside snapshot (none expected)
-      clone.querySelectorAll(".no-print, .seg, .actions").forEach(n=>n.remove());
-
-      // Force visibility of tiles if hidden (when no selection)
-      const bt = clone.querySelector("#bigTiles");
-      const sb = clone.querySelector("#stageBlock");
-      if(bt) bt.style.display = "";
-      if(sb) sb.style.display = "";
-
-      // Make it look like a single page (no sticky/scroll)
-      clone.style.display = "";
-      root.appendChild(clone);
-
-      // Apply current styles by cloning the CSS (keeps styling identical in the temp snapshot)
-      const styleEl = document.getElementById("appCSS");
-      if(styleEl){
-        const style = document.createElement("style");
-        style.textContent = styleEl.textContent || "";
-        root.prepend(style);
-      }
-
-      // Extra CSS fixes for Arabic shaping/ligatures in export capture
-      const fix = document.createElement("style");
-      fix.textContent = `
-        .arabicFixSnapshot, .arabicFixSnapshot *{
-          direction: rtl !important;
-          unicode-bidi: plaintext !important;
-          font-family: "IBM Plex Sans Arabic","Noto Naskh Arabic","Noto Sans Arabic","Geeza Pro","Tahoma","Arial",sans-serif !important;
-          -webkit-text-size-adjust: 100%;
-          font-kerning: normal;
-          text-rendering: geometricPrecision;
-        }
-      `;
-      root.prepend(fix);
-
-      return root;
-    }
-
-    async function renderSnapshotCanvas(){
-      // Create temp container (inside same document so fonts are already available)
-      const temp = document.createElement("div");
-      temp.style.position="fixed";
-      temp.style.inset="0";
-      temp.style.zIndex="9998";
-      temp.style.background="#fff";
-      temp.style.overflow="auto";
-      temp.style.padding="10px";
-      const node = buildInspectorSnapshotNode();
-      temp.appendChild(node);
-      document.body.appendChild(temp);
-
-      try{
-        // Ensure web fonts are ready before capture (prevents Arabic letter disjoint in some cases)
-        if(document.fonts && document.fonts.ready){
-          await document.fonts.ready;
-        }
-        
-
-    // ===== Offline fallback renderer (no external libs) =====
-    function nodeToSvgData(node, width, height){
-      // Wrap HTML in SVG foreignObject (offline rasterization path)
-      const serializer = new XMLSerializer();
-      const xhtml = document.createElement("div");
-      xhtml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-      xhtml.style.width = width + "px";
-      xhtml.style.height = height + "px";
-      xhtml.style.background = "#fff";
-      xhtml.appendChild(node);
-
-      const htmlStr = serializer.serializeToString(xhtml);
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-          <foreignObject x="0" y="0" width="100%" height="100%">
-            ${htmlStr}
-          </foreignObject>
-        </svg>
-      `.trim();
-      return svg;
-    }
-
-    async function renderSnapshotCanvasOffline(){
-      // Create temp container to measure layout precisely
-      const temp = document.createElement("div");
-      temp.style.position = "fixed";
-      temp.style.left = "-10000px";
-      temp.style.top = "0";
-      temp.style.width = "1100px";
-      temp.style.background = "#fff";
-      temp.style.zIndex = "9998";
-      temp.style.pointerEvents = "none";
-
-      const node = buildInspectorSnapshotNode();
-      temp.appendChild(node);
-      document.body.appendChild(temp);
-
-      try{
-        if(document.fonts && document.fonts.ready){
-          await document.fonts.ready;
-        }
-        await new Promise(r=>setTimeout(r, 120));
-        await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
-        const rect = node.getBoundingClientRect();
-        const w = Math.max(1, Math.ceil(rect.width));
-        const h = Math.max(1, Math.ceil(rect.height));
-
-        const svgStr = nodeToSvgData(node, w, h);
-        const blob = new Blob([svgStr], {type:"image/svg+xml;charset=utf-8"});
-        const url = URL.createObjectURL(blob);
-
-        try{
-          const img = new Image();
-          img.decoding = "sync";
-          const loaded = new Promise((resolve, reject)=>{
-            img.onload = resolve;
-            img.onerror = reject;
-          });
-          img.src = url;
-          await loaded;
-
-          const scale = 2;
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.round(w * scale);
-          canvas.height = Math.round(h * scale);
-          const ctx = canvas.getContext("2d");
-          ctx.setTransform(scale,0,0,scale,0,0);
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.fillStyle = "#fff";
-          ctx.fillRect(0,0,w,h);
-          ctx.drawImage(img, 0, 0);
-          return canvas;
-        } finally {
-          URL.revokeObjectURL(url);
-        }
-      } finally {
-        temp.remove();
-      }
-    }
-
-    async function renderSnapshotCanvasSmart(){
-      // Prefer html2canvas if available; otherwise offline fallback
-      if(typeof html2canvas === "function"){
-        return await renderSnapshotCanvas();
-      }
-      return await renderSnapshotCanvasOffline();
-    }
-// Give Safari/iOS a moment to apply shaping after font swap
-        await new Promise(r=>setTimeout(r, 120));
-        await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
-        const opts = {scale: 2, backgroundColor:"#ffffff", useCORS:true, letterRendering:true, foreignObjectRendering:true};
-        try{
-          const canvas = await html2canvas(node, opts);
-          return canvas;
-        }catch(e){
-          // Fallback path (some browsers dislike foreignObjectRendering)
-          const canvas = await html2canvas(node, {...opts, foreignObjectRendering:false});
-          return canvas;
-        }
-      } finally {
-        temp.remove();
-      }
-    }
-
-    async function exportSelectedImage(){
-      if(!selectedId){
-        alert("اختر مجمعًا أولًا.");
-        return;
-      }
-      if(!await ensureExportLibs()) return;
-
-      showExport("جاري تجهيز الصورة…", 12);
-      try{
-        const canvas = await renderSnapshotCanvasSmart();
-        showExport("جاري حفظ الصورة…", 70);
-        const blob = await new Promise(res=>canvas.toBlob(res, "image/png"));
-        const name = safeFilename(cards.find(c=>c.id===selectedId)?.branch_name || "compound");
-        downloadBlob(`بطاقة_${name}.png`, blob);
-        showExport("تم ✅", 100);
-        setTimeout(hideExport, 650);
-      } catch(e){
-        hideExport();
-        alert("تعذر تصدير الصورة.");
-      }
-    }
-
-    async function exportAllImagesZip(){
-      if(!cards.length){
-        alert("لا توجد بطاقات.");
-        return;
-      }
-      if(!await ensureExportLibs()) return;
-      const hasZip = (typeof JSZip === "function");
-
-      showExport("بدء التصدير…", 2);
-      const zip = hasZip ? new JSZip() : null;
-
-      try{
-        for(let i=0;i<cards.length;i++){
-          const c = cards[i];
-          // select and render
-          selectedId = c.id;
-          renderCards();
-
-      // Open a card directly if URL hash includes #card=<id>
-      const hid = getCardHash();
-      if(hid && cards.some(c=>c.id===hid)){
-        selectCard(hid);
-        focusCardInList(hid);
-      }
-          selectCard(c.id);
-          await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
-          showExport(`تصدير: ${c.branch_name} (${i+1}/${cards.length})`, (i/cards.length)*70 + 10);
-
-          const canvas = await renderSnapshotCanvasSmart();
-          const blob = await new Promise(res=>canvas.toBlob(res, "image/png"));
-          const arr = await blob.arrayBuffer();
-          if(zip){
-            zip.file(`البطاقات/بطاقة_${safeFilename(c.branch_name)}.png`, arr);
-          } else {
-            // Offline fallback: download each image separately
-            downloadBlob(`بطاقة_${safeFilename(c.branch_name)}.png`, blob);
-          }
-        }
-
-        if(zip){
-          showExport("تجميع الملف…", 92);
-          const out = await zip.generateAsync({type:"blob"});
-          downloadBlob("البطاقات_صور.zip", out);
-        }
-        showExport("تم ✅", 100);
-        setTimeout(hideExport, 700);
-      } catch(e){
-        hideExport();
-        alert("تعذر تصدير الصور كملف ZIP.");
-      } finally {
-        save();
-      }
-    }
-
-    document.getElementById("btnHow").addEventListener("click", ()=>{
-      alert("الإدخال من تبويب (إدارة): لصق من Google Sheets/Excel ثم (تطبيق اللصق).");
-    });
-    btnExportImage?.addEventListener("click", exportSelectedImage);
-    btnExportImagesZip?.addEventListener("click", exportAllImagesZip);
-
-    document.getElementById("btnFocus").addEventListener("click", ()=>{
-      document.getElementById("panelRight").scrollIntoView({behavior:"smooth", block:"start"});
-    });
-
-    // ===== State =====
-    const LS="compound_kanso_v1";
-    let cards=[];
-    let stages=[];
-    let selectedId=null;
-
-    // Shared sync meta
-    let localUpdatedAt = 0;
-    let syncTimer = null;
-
-    function defaultStages(){
-      return [
-        {id:uid(), name:"المرحلة الأولى", period:"خلال رمضان", target_pct:65},
-        {id:uid(), name:"المرحلة الثانية", period:"بعد رمضان", target_pct:80},
-        {id:uid(), name:"المرحلة الثالثة", period:"نصف السنة", target_pct:90},
-        {id:uid(), name:"المرحلة الرابعة", period:"نهاية السنة", target_pct:100},
-      ];
-    }
-
-    function normalizeCard(obj, id){
-      const total=parseNumber(obj.total_cost);
-      const students=parseNumber(obj.students);
-      let curAmt=parseNumber(obj.covered_current_amount);
-      const curPctIn=parseNumber(obj.covered_current_pct);
-
-      const T = Number.isFinite(total)? total : 0;
-      if(!Number.isFinite(curAmt)){
-        curAmt = (Number.isFinite(curPctIn) && T>0) ? T * clamp(curPctIn,0,100)/100 : 0;
-      }
-      const curPct = (T>0) ? (curAmt/T*100) : 0;
-
-      return {
-        id,
-        branch_name:(obj.branch_name??"").toString().trim(),
-        total_cost:T,
-        students: Number.isFinite(students)? students : 0,
-        covered_current_amount: clamp(curAmt,0,T),
-        covered_current_pct: clamp(curPct,0,100),
-      };
-    }
-
-    function calcPortfolioGoal(total, coveredAmt){
-      const ratePct=parseNumber(returnRate.value);
-      const rate = Number.isFinite(ratePct) ? ratePct/100 : 0;
-      const scope = goalScope.value;
-      const amountToCover = scope==="total" ? Math.max(0,total) : Math.max(0,total - coveredAmt);
-      if(rate<=0) return {goal: NaN, amountToCover, rate};
-      return {goal: amountToCover / rate, amountToCover, rate};
-    }
-    function stageGoal(coverAmount, rate){
-      if(!rate || rate<=0) return NaN;
-      return Math.max(0, coverAmount) / rate;
-    }
-
-    function computeStagePlan(card){
-      const total=card.total_cost||0;
-      const coveredNow=clamp(card.covered_current_amount||0, 0, total);
-      const {rate} = calcPortfolioGoal(total, coveredNow);
-
-      const sorted = stages
-        .map((s,i)=>({ ...s, t: clamp(parseNumber(s.target_pct),0,100)}))
-        .sort((a,b)=>a.t-b.t);
-
-      let current=coveredNow;
-      const plans = sorted.map((s, idx)=>{
-        const desired = total * (s.t/100);
-        const inc = Math.max(0, Math.min(total, desired) - current);
-        current += inc;
-        return {
-          name:(s.name??`مرحلة ${idx+1}`).toString(),
-          period:(s.period??"").toString(),
-          incrementAmount: inc,
-          goal: stageGoal(inc, rate),
-          color: stageColor(idx),
-        };
-      });
-
-      const afterCovered = Math.min(total, current);
-      const remain = Math.max(0, total - afterCovered);
-      return {total, coveredNow, plans, afterCovered, remain, rate};
-    }
-
-    // ===== Persistence =====
-    function save(){
-      // bump updated timestamp on any local change
-      if(!localUpdatedAt) localUpdatedAt = Date.now();
-      const data={
-        meta:{ updated_at: localUpdatedAt, schema: 1 },
-        settings:{
-          returnRate: returnRate.value,
-          goalScope: goalScope.value,
-          leftDensity: leftDensity.value,
-          remoteGetUrl: remoteGetUrl?.value || "",
-          remoteAutoOn: remoteAutoOn?.value || "on",
-          remoteInterval: remoteInterval?.value || "20",
-          remotePushUrl: remotePushUrl?.value || "",
-          remoteToken: remoteToken?.value || ""
-        },
-        cards, stages, selectedId
-      };
-      localStorage.setItem(LS, JSON.stringify(data));
-    }
-    function load(){
-      try{
-        const raw=localStorage.getItem(LS);
-        if(!raw) return false;
-        const d=JSON.parse(raw);
-        if(d?.meta?.updated_at) localUpdatedAt = Number(d.meta.updated_at)||0;
-        if(d?.settings){
-          if(d.settings.returnRate!=null) returnRate.value=d.settings.returnRate;
-          if(d.settings.goalScope!=null) goalScope.value=d.settings.goalScope;
-          if(d.settings.leftDensity!=null) leftDensity.value=d.settings.leftDensity;
-
-          if(remoteGetUrl && d.settings.remoteGetUrl!=null) remoteGetUrl.value=d.settings.remoteGetUrl;
-          if(remoteAutoOn && d.settings.remoteAutoOn!=null) remoteAutoOn.value=d.settings.remoteAutoOn;
-          if(remoteInterval && d.settings.remoteInterval!=null) remoteInterval.value=d.settings.remoteInterval;
-          if(remotePushUrl && d.settings.remotePushUrl!=null) remotePushUrl.value=d.settings.remotePushUrl;
-          if(remoteToken && d.settings.remoteToken!=null) remoteToken.value=d.settings.remoteToken;
-        }
-        if(Array.isArray(d.cards)) cards=d.cards;
-        if(Array.isArray(d.stages)) stages=d.stages;
-        if(d.selectedId) selectedId=d.selectedId;
-        return true;
-      }catch(e){ return false; }
-    }
-
-    // ===== Render cards =====
-    function renderCards(){
-      const q=(elSearch.value||"").trim().toLowerCase();
-      const list=cards.filter(c=>!q || c.branch_name.toLowerCase().includes(q));
-      elList.innerHTML="";
-      list.forEach(c=> elList.appendChild(renderCardMini(c)));
-      elCountChip.textContent = `${list.length} بطاقة`;
-    }
-
-    function renderCardMini(c){
-      const plan=computeStagePlan(c);
-      const total=plan.total;
-      const pct=(amt)=> total>0 ? (amt/total*100) : 0;
-
-      const stageSum=plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
-      const barSegs=[
-        {amount: plan.coveredNow, color:"rgba(247,168,163,1)"},
-        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color})),
-        {amount: plan.remain, color:"#e5e7eb"}
-      ].filter(s=>s.amount>0.0001);
-
-      const dense = (leftDensity.value==="rich");
-
-      const el=document.createElement("div");
-      el.className="card"+(c.id===selectedId?" selected":"");
-      el.setAttribute("role","button");
-      el.setAttribute("tabindex","0");
-      el.addEventListener("click", ()=>selectCard(c.id, true));
-      el.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectCard(c.id, true);} });
-
-      el.innerHTML=`
-        <div class="cardTop">
-          <h3 class="name">${escapeHtml(c.branch_name||"—")}</h3>
-          <div class="kpi">
-            <div class="l">التكلفة</div>
-            <div class="v"><strong>${fmtMoney(total)}</strong></div>
-          </div>
-        </div>
-        <div class="meta">
-          <span class="pill"><span>طلاب</span>${Number(c.students||0).toLocaleString("ar-SA")}</span>
-          <span class="pill"><span>تغطية</span>${fmtPct(c.covered_current_pct)}</span>
-          ${dense ? `<span class="pill"><span>حالي</span>${fmtMoney(plan.coveredNow)}</span>` : ``}
-        </div>
-        <div class="barWrap">
-          <div class="bar">
-            ${barSegs.map(s=>`<div class="segm" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("")}
-          </div>
-          ${dense ? `
-            <div class="legend">
-              <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي</span>
-              <span class="leg"><span class="dot" style="background:#111827"></span>المراحل</span>
-              <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي</span>
-            </div>
-          ` : ``}
-        </div>
-      `;
-      return el;
-    }
-
-    // ===== Inspector =====
-    function selectCard(id, openSheet=false){
-      selectedId=id;
-      renderCards();
-      const c=cards.find(x=>x.id===id);
-      if(!c) return;
-
-      const plan=computeStagePlan(c);
-      const total=plan.total;
-      const stageSum=plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
-
-      heroTitle.textContent = c.branch_name || "—";
-      heroSub.textContent = "ملخص جاهز للعرض: التكلفة، التغطية، المحفظة، ثم المراحل.";
-
-      bigTiles.style.display="";
-      stageBlock.style.display="";
-
-      vTotal.textContent = fmtSAR(total);
-      sStudents.textContent = `عدد الطلاب: ${Number(c.students||0).toLocaleString("ar-SA")}`;
-
-      vCovered.textContent = `${fmtPct(c.covered_current_pct)}  •  ${fmtSAR(plan.coveredNow)}`;
-      sCoveredNote.textContent = `تغطية الجمعية الحالية من التكلفة الإجمالية.`;
-
-      const {goal, amountToCover, rate} = calcPortfolioGoal(total, plan.coveredNow);
-      vGoal.textContent = fmtSAR(goal);
-      const scopeText = (goalScope.value==="total") ? "لتغطية التكلفة الإجمالية" : "لتغطية المتبقي بعد التغطية الحالية";
-      sGoalNote.textContent = `${scopeText} على عائد سنوي ${fmtPct(parseNumber(returnRate.value))} (مبلغ التغطية المطلوب: ${fmtSAR(amountToCover)}).`;
-
-      // Big progress
-      const pct=(amt)=> total>0 ? (amt/total*100) : 0;
-      const barSegs=[
-        {amount: plan.coveredNow, color:"rgba(247,168,163,1)", label:`الحالي: ${fmtSAR(plan.coveredNow)}`},
-        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color, label:`${p.name}: ${fmtSAR(p.incrementAmount)}`})),
-        {amount: plan.remain, color:"#e5e7eb", label:`المتبقي: ${fmtSAR(plan.remain)}`}
-      ].filter(s=>s.amount>0.0001);
-
-      bigBar.innerHTML = barSegs.map(s=>`<div class="segm" style="width:${pct(s.amount)}%; background:${s.color}"></div>`).join("");
-      bigLegend.innerHTML = `
-        <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي: ${fmtSAR(plan.coveredNow)}</span>
-        <span class="leg"><span class="dot" style="background:#111827"></span>المراحل: ${fmtSAR(stageSum)}</span>
-        <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي: ${fmtSAR(plan.remain)}</span>
-      `;
-      const afterPct = total>0 ? (plan.afterCovered/total*100) : 0;
-      sAfterPlan.textContent = `بعد خطة المراحل: تصل التغطية إلى ${fmtPct(afterPct)}.`;
-
-      // Stage tiles (goal prominent)
-      stageGrid.innerHTML = plan.plans
-        .filter(p=>p.incrementAmount>0.0001)
-        .map((p, idx)=>`
-          <div class="stage" style="--stageColor:${p.color}">
-            <div class="row">
-              <b>${escapeHtml(p.name)}</b>
-              <span>${escapeHtml(p.period||"")}</span>
-            </div>
-            <div class="lbl">هدف المرحلة</div>
-            <div class="amt">${fmtMoney(p.goal)}<span class="cur">﷼</span></div>
-          </div>
-        `).join("") || `<div class="note" style="margin:0">لا توجد مراحل فعّالة — عدّل المراحل من تبويب (إدارة).</div>`;
-
-      // Mobile sheet (avoid scrolling to bottom on phones)
-      if(openSheet && isMobile()){
-        renderSheetForCard(c, plan);
-        openDetailSheet();
-        syncSheetNav();
-      }
-
-      save();
-    }
-    // ===== Mobile sheet rendering (better UX for long lists) =====
-    function isMobile(){
-      return window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
-    }
-
-    function openDetailSheet(){
-      const sh = document.getElementById("detailSheet");
-      const bd = document.getElementById("sheetBackdrop");
-      if(!sh || !bd) return;
-      sh.hidden = false; bd.hidden = false;
-      requestAnimationFrame(()=> sh.classList.add("isOpen"));
-      document.documentElement.classList.add("noScroll");
-      document.body.classList.add("noScroll");
-    }
-    function closeDetailSheet(){
-      const sh = document.getElementById("detailSheet");
-      const bd = document.getElementById("sheetBackdrop");
-      if(!sh || !bd) return;
-      sh.classList.remove("isOpen");
-      document.documentElement.classList.remove("noScroll");
-      document.body.classList.remove("noScroll");
-      setTimeout(()=>{ sh.hidden = true; bd.hidden = true; }, 180);
-    }
-
-    function currentFilteredIds(){
-      const q=(elSearch.value||"").trim().toLowerCase();
-      return cards
-        .filter(c=>!q || (c.branch_name||"").toLowerCase().includes(q))
-        .map(c=>c.id);
-    }
-
-    function renderSheetForCard(c, plan){
-      const shName = document.getElementById("sheetName");
-      const shBody = document.getElementById("sheetBody");
-      if(!shBody) return;
-
-      if(shName) shName.textContent = c.branch_name || "—";
-
-      const total = plan.total;
-      const stageSum = plan.plans.reduce((a,p)=>a+p.incrementAmount,0);
-      const afterAmt = plan.coveredNow + stageSum;
-      const afterPct = total>0 ? (afterAmt/total*100) : 0;
-      const coveredPct = total>0 ? (plan.coveredNow/total*100) : 0;
-
-      // Build progress segments (current + stages + remaining)
-      const segs = [
-        {amount: plan.coveredNow, color:"rgba(247,168,163,1)", label:"الحالي"},
-        ...plan.plans.map(p=>({amount:p.incrementAmount, color:p.color, label:p.name})),
-        {amount: plan.remain, color:"#e5e7eb", label:"المتبقي"}
-      ].filter(s=>s.amount>0.0001);
-
-      const segHtml = segs.map(s=>{
-        const w = total>0 ? (s.amount/total*100) : 0;
-        return `<span class="seg" style="width:${w}%; background:${s.color}"></span>`;
-      }).join("");
-
-      const legendSmall = `
-        <div class="legend" style="margin-top:10px">
-          <span class="leg"><span class="dot" style="background:rgba(247,168,163,1)"></span>الحالي</span>
-          <span class="leg"><span class="dot" style="background:#111827"></span>المراحل</span>
-          <span class="leg"><span class="dot" style="background:#e5e7eb"></span>المتبقي</span>
-        </div>
-      `;
-
-      const stagesHtml = (plan.plans||[])
-        .filter(p=>p.incrementAmount>0.0001)
-        .map(p=>`
-          <div class="sheetStage" style="outline:2px solid color-mix(in srgb, ${p.color} 28%, transparent); outline-offset:-2px">
-            <div class="row">
-              <b>${escapeHtml(p.name)}</b>
-              <span style="color: rgba(11,18,32,.55); font-size:12px; font-weight:900">${escapeHtml(p.period||"")}</span>
-            </div>
-            <div class="lbl">هدف المرحلة</div>
-            <div class="amt">${fmtMoney(p.goal)}<span class="cur">﷼</span></div>
-          </div>
-        `).join("") || `<div class="note" style="margin:0">لا توجد مراحل فعّالة — عدّل المراحل من تبويب (إدارة).</div>`;
-
-      shBody.innerHTML = `
-        <div class="sheetCard">
-          <div class="pad">
-            <div class="sheetGrid">
-              <div class="tile">
-                <div class="t">التكلفة الإجمالية</div>
-                <div class="v">${fmtMoney(total)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
-                <div class="s">${fmtNumber(c.students)} طالب/طالبة</div>
-              </div>
-              <div class="tile">
-                <div class="t">التغطية الحالية</div>
-                <div class="v">${fmtMoney(plan.coveredNow)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
-                <div class="s">${fmtPct(coveredPct)} من الإجمالي</div>
-              </div>
-              <div class="tile">
-                <div class="t">هدف المحفظة الاستثمارية</div>
-                <div class="v">${fmtMoney(plan.goal)} <span style="font-size:12px; opacity:.7; font-weight:900">﷼</span></div>
-                <div class="s">مركزي (نسبة التغطية + العائد)</div>
-              </div>
-              <div class="tile">
-                <div class="t">الوضع الآن وخطة المراحل</div>
-                <div class="barWrap" style="margin-top:10px">
-                  <div class="bar">${segHtml}</div>
-                  ${legendSmall}
-                </div>
-                <div class="s" style="margin-top:10px">بعد المراحل: ${fmtMoney(afterAmt)} ﷼ • ${fmtPct(afterPct)}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="sheetCard">
-          <div class="pad">
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px">
-              <div style="font-weight:1000; color: rgba(11,18,32,.82)">خطة المراحل</div>
-              <div class="chip" style="padding:7px 10px">${(plan.plans||[]).filter(p=>p.incrementAmount>0.0001).length} مراحل</div>
-            </div>
-            <div class="sheetStages">${stagesHtml}</div>
-          </div>
-        </div>
-      `;
-    }
-
-    function syncSheetNav(){
-      const ids = currentFilteredIds();
-      const i = ids.indexOf(selectedId);
-      const prev = document.getElementById("sheetPrev");
-      const next = document.getElementById("sheetNext");
-      if(prev) prev.disabled = (i<=0);
-      if(next) next.disabled = (i<0 || i>=ids.length-1);
-    }
-
-    function sheetGo(delta){
-      const ids = currentFilteredIds();
-      const i = ids.indexOf(selectedId);
-      if(i<0) return;
-      const j = i + delta;
-      if(j<0 || j>=ids.length) return;
-      selectCard(ids[j], true);
-    }
-
-
-    // ===== Manage table =====
-    function renderRows(){
-      rowsTbody.innerHTML="";
-      cards.forEach((c, idx)=>{
-        const tr=document.createElement("tr");
-        tr.innerHTML=`
-          <td><input class="cell" data-i="${idx}" data-k="branch_name" value="${escapeHtml(c.branch_name)}" placeholder="اسم المجمع"/></td>
-          <td><input class="cell" data-i="${idx}" data-k="total_cost" value="${c.total_cost||""}" placeholder="مثال: 123000"/></td>
-          <td><input class="cell" data-i="${idx}" data-k="students" value="${c.students||""}" placeholder="مثال: 420"/></td>
-          <td><input class="cell" data-i="${idx}" data-k="covered_current_pct" value="${Number.isFinite(c.covered_current_pct)? Math.round(c.covered_current_pct):""}" placeholder="مثال: 37"/></td>
-          <td><input class="cell" data-i="${idx}" data-k="covered_current_amount" value="${c.covered_current_amount||""}" placeholder="مثال: 115000"/></td>
-          <td><button class="btn small danger no-print" data-del="${idx}">حذف</button></td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-
-      rowsTbody.querySelectorAll("input.cell").forEach(inp=>{
-        inp.addEventListener("input", ()=>{
-          const i=Number(inp.getAttribute("data-i"));
-          const k=inp.getAttribute("data-k");
-          const obj={...cards[i]};
-          obj[k]=inp.value;
-          cards[i]=normalizeCard(obj, cards[i].id);
-          markDirty(); save(); renderCards();
-          if(selectedId===cards[i].id) selectCard(selectedId);
-        });
-      });
-
-      rowsTbody.querySelectorAll("[data-del]").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const i=Number(btn.getAttribute("data-del"));
-          const removed=cards[i]?.id;
-          cards.splice(i,1);
-          if(selectedId===removed) selectedId=null;
-          renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
-        });
-      });
-    }
-
-    function applyPaste(){
-      const rows=parseDelimited(paste.value);
-      if(!rows.length){ alert("الصق بيانات أولاً."); return; }
-      rows.forEach(r=>{
-        const obj={
-          branch_name:r[0]??"",
-          total_cost:r[1]??"",
-          students:r[2]??"",
-          covered_current_pct:r[3]??"",
-          covered_current_amount:r[4]??"",
-        };
-        const norm=normalizeCard(obj, uid());
-        if(norm.branch_name) cards.push(norm);
-      });
-      paste.value="";
-      renderRows(); renderCards();
-      if(!selectedId && cards.length) selectCard(cards[0].id);
-      save();
-    }
-
-    // ===== Stages builder =====
-    function renderStages(){
-      stageList.innerHTML="";
-      stages.forEach((st, idx)=>{
-        const color=stageColor(idx);
-        const box=document.createElement("div");
-        box.className="stageItem";
-        box.innerHTML=`
-          <div class="stageTop">
-            <span class="badge"><span class="swatch" style="background:${color}"></span>#${idx+1}</span>
-            <button class="btn small danger no-print" data-remove="${st.id}">حذف</button>
-          </div>
-          <div class="stageForm">
-            <div class="field" style="margin:0">
-              <label>اسم المرحلة</label>
-              <input data-id="${st.id}" data-k="name" value="${escapeHtml(st.name)}"/>
-            </div>
-            <div class="field" style="margin:0">
-              <label>الفترة</label>
-              <input data-id="${st.id}" data-k="period" value="${escapeHtml(st.period)}"/>
-            </div>
-            <div class="field" style="margin:0">
-              <label>نسبة التغطية التراكمية (%)</label>
-              <input type="number" min="0" max="100" step="0.1" data-id="${st.id}" data-k="target_pct" value="${escapeHtml(st.target_pct)}"/>
-            </div>
-          </div>
-        `;
-        stageList.appendChild(box);
-      });
-
-      stageList.querySelectorAll("[data-remove]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const id=b.getAttribute("data-remove");
-          stages = stages.filter(x=>x.id!==id);
-          renderStages(); markDirty(); save(); rerenderAll();
-        });
-      });
-      stageList.querySelectorAll("input[data-id]").forEach(inp=>{
-        inp.addEventListener("input", ()=>{
-          const id=inp.getAttribute("data-id");
-          const k=inp.getAttribute("data-k");
-          const st=stages.find(x=>x.id===id);
-          if(!st) return;
-          st[k]=inp.value;
-          markDirty(); save(); rerenderAll();
-        });
-      });
-    }
-
-    function updateInspectorEmpty(){
-      if(selectedId && cards.some(c=>c.id===selectedId)) return;
-      heroTitle.textContent="اختر مجمعًا";
-      heroSub.textContent="اضغط على بطاقة من اليسار لعرض التفاصيل هنا.";
-      bigTiles.style.display="none";
-      stageBlock.style.display="none";
-    }
-
-    // ===== Mode switching =====
-    function setMode(mode){
-      const isView = mode==="view";
-      const isManage = mode==="manage";
-      const isSettings = mode==="settings";
-
-      tabView.classList.toggle("active", isView);
-      tabManage.classList.toggle("active", isManage);
-      tabSettings.classList.toggle("active", isSettings);
-
-      tabView.setAttribute("aria-selected", isView ? "true" : "false");
-      tabManage.setAttribute("aria-selected", isManage ? "true" : "false");
-      tabSettings.setAttribute("aria-selected", isSettings ? "true" : "false");
-
-      viewPane.style.display = isView ? "" : "none";
-      managePane.style.display = isManage ? "" : "none";
-      settingsPane.style.display = isSettings ? "" : "none";
-
-      save();
-    }
-
-    function rerenderAll(){
-      renderCards();
-      renderRows();
-      if(selectedId) selectCard(selectedId);
-      else updateInspectorEmpty();
-    }
-
-    // ===== Import/Export JSON =====
-    const jsonFile = document.getElementById("jsonFile");
-    document.getElementById("btnExportJSON").addEventListener("click", ()=>{
-      const data={
-        settings:{
-          returnRate:returnRate.value,
-          goalScope:goalScope.value,
-          leftDensity:leftDensity.value
-        },
-        stages, cards
-      };
-      downloadBlob("compounds_data.json", new Blob([JSON.stringify(data,null,2)], {type:"application/json"}));
-    });
-    document.getElementById("btnImportJSON").addEventListener("click", ()=>jsonFile.click());
-    jsonFile.addEventListener("change", async ()=>{
-      const f=jsonFile.files?.[0];
-      if(!f) return;
-      try{
-        const txt=await f.text();
-        const d=JSON.parse(txt);
-        if(d?.settings){
-          if(d.settings.returnRate!=null) returnRate.value=d.settings.returnRate;
-          if(d.settings.goalScope!=null) goalScope.value=d.settings.goalScope;
-          if(d.settings.leftDensity!=null) leftDensity.value=d.settings.leftDensity;
-        }
-        if(Array.isArray(d.stages)) stages=d.stages;
-        if(Array.isArray(d.cards)) cards=d.cards;
-        // normalize
-        cards = cards.map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
-        if(!Array.isArray(stages) || !stages.length) stages=defaultStages();
-        selectedId = cards[0]?.id || null;
-
-        renderStages(); rerenderAll(); save();
-      }catch(e){
-        alert("ملف JSON غير صالح.");
-      }finally{
-        jsonFile.value="";
-      }
-    });
-
-    // ===== Wire buttons =====
-    document.getElementById("btnApplyPaste").addEventListener("click", applyPaste);
-    document.getElementById("btnAddRow").addEventListener("click", ()=>{
-      cards.push(normalizeCard({branch_name:"", total_cost:"", students:"", covered_current_pct:"", covered_current_amount:""}, uid()));
-      renderRows(); renderCards(); markDirty(); save();
-    });
-    document.getElementById("btnClear").addEventListener("click", ()=>{
-      if(confirm("مسح كل البيانات؟")){
-        cards=[]; selectedId=null;
-        renderRows(); renderCards(); updateInspectorEmpty(); markDirty(); save();
-      }
-    });
-
-    document.getElementById("btnAddStage").addEventListener("click", ()=>{
-      const last = stages.length ? parseNumber(stages[stages.length-1].target_pct) : 0;
-      const next = Number.isFinite(last) ? Math.min(100, Math.max(0, last + 5)) : 10;
-      stages.push({id:uid(), name:`مرحلة ${stages.length+1}`, period:"", target_pct:next});
-      renderStages(); markDirty(); save(); rerenderAll();
-    });
-    document.getElementById("btnResetStages").addEventListener("click", ()=>{
-      stages=defaultStages();
-      renderStages(); markDirty(); save(); rerenderAll();
-    });
-
-    // Settings events
-    returnRate.addEventListener("input", ()=>{ markDirty(); save(); rerenderAll(); });
-    goalScope.addEventListener("change", ()=>{ markDirty(); save(); rerenderAll(); });
-    leftDensity.addEventListener("change", ()=>{ markDirty(); save(); renderCards(); });
-
-    // Sync UI events
-    btnFetchRemote?.addEventListener("click", ()=>fetchRemoteOnce(false));
-    btnPublishRemote?.addEventListener("click", publishRemote);
-
-    remoteGetUrl?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
-    remoteAutoOn?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
-    remoteInterval?.addEventListener("change", ()=>{ markDirty(); save(); startSyncTimer(); });
-    remotePushUrl?.addEventListener("change", ()=>{ markDirty(); save(); });
-    remoteToken?.addEventListener("change", ()=>{ markDirty(); save(); });
-
-    // Sheet events
-    const sheetBackdrop = document.getElementById("sheetBackdrop");
-    const detailSheet = document.getElementById("detailSheet");
-    const sheetClose = document.getElementById("sheetClose");
-    const sheetPrev = document.getElementById("sheetPrev");
-    const sheetNext = document.getElementById("sheetNext");
-    sheetBackdrop?.addEventListener("click", closeDetailSheet);
-    sheetClose?.addEventListener("click", closeDetailSheet);
-    sheetPrev?.addEventListener("click", ()=>sheetGo(-1));
-    sheetNext?.addEventListener("click", ()=>sheetGo(1));
-
-    // ESC closes
-    window.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && detailSheet && !detailSheet.hidden) closeDetailSheet(); });
-
-    // When search changes, keep nav state accurate
-    elSearch?.addEventListener("input", ()=>{ if(detailSheet && !detailSheet.hidden) syncSheetNav(); });
-
-
-    document.getElementById("btnExportCSS").addEventListener("click", ()=>{
-      const css=document.getElementById("appCSS")?.innerHTML || "";
-      downloadBlob("compound_board.css", new Blob([css], {type:"text/css;charset=utf-8"}));
-    });
-
-    document.getElementById("btnResetAll").addEventListener("click", ()=>{
-      if(!confirm("إرجاع كل شيء للإعدادات الافتراضية؟")) return;
-      localStorage.removeItem(LS);
-      location.reload();
-    });
-
-    // Tabs
-    tabView.addEventListener("click", ()=>setMode("view"));
-    tabManage.addEventListener("click", ()=>setMode("manage"));
-    tabSettings.addEventListener("click", ()=>setMode("settings"));
-
-    // Search
-    elSearch.addEventListener("input", renderCards);
-
-    // Sample data
-    document.getElementById("btnAddSample").addEventListener("click", ()=>{
-      cards=[
-        normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
-        normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
-        normalizeCard({branch_name:"مجمع حفصة بنت عمر", total_cost:"180000", students:"520", covered_current_pct:"22"}, "seed3"),
-        normalizeCard({branch_name:"مجمع عثمان بن عفان", total_cost:"265000", students:"730", covered_current_amount:"92000"}, "seed4"),
-      ];
-      if(!stages.length) stages=defaultStages();
-      selectedId=cards[0].id;
-      renderStages(); rerenderAll(); save();
-      setMode("view");
-    });
-
-    
-    // ===== Shared sync (polling) =====
-    function setSyncBadge(text, ok){
-      if(!syncState) return;
-      syncState.textContent = text;
-      syncState.style.borderColor = ok ? "rgba(16,185,129,.35)" : "rgba(245,158,11,.35)";
-      syncState.style.color = "rgba(11,18,32,.78)";
-      syncState.style.background = ok ? "rgba(16,185,129,.10)" : "rgba(245,158,11,.10)";
-    }
-
-    async function fetchRemoteOnce(silent=false){
-      const url = (remoteGetUrl?.value || "").trim();
-      if(!url){
-        if(!silent) alert("ضع رابط JSON (GET) في الإعدادات أولًا.");
-        setSyncBadge("غير متصل", false);
-        return false;
-      }
-      try{
-        setSyncBadge("يتحقق…", true);
-        const u = new URL(url, location.href);
-        u.searchParams.set("_ts", Date.now().toString()); // cache-bust
-        const res = await fetch(u.toString(), {cache:"no-store"});
-        if(!res.ok) throw new Error("HTTP "+res.status);
-        const data = await res.json();
-
-        const remoteUpdated = Number(data?.meta?.updated_at || 0) || 0;
-        if(remoteUpdated && remoteUpdated <= (localUpdatedAt||0)){
-          setSyncBadge("محدّث", true);
-          return true;
-        }
-
-        // Apply remote data
-        if(data?.settings){
-          if(data.settings.returnRate!=null) returnRate.value = data.settings.returnRate;
-          if(data.settings.goalScope!=null) goalScope.value = data.settings.goalScope;
-          if(data.settings.leftDensity!=null) leftDensity.value = data.settings.leftDensity;
-        }
-        if(Array.isArray(data?.stages)) stages = data.stages;
-        if(Array.isArray(data?.cards)) cards = data.cards;
-
-        cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
-
-      // Ensure sync endpoints and pull latest immediately (so new visitors see last published data)
-      ensureRemoteUrls();
-      try{ await fetchRemoteOnce(true); }catch(e){}
-      startPresence();
-      startAlwaysPull();
-        if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
-
-        localUpdatedAt = remoteUpdated || Date.now();
-        selectedId = (selectedId && cards.some(c=>c.id===selectedId)) ? selectedId : (cards[0]?.id || null);
-        if(!selectedId) setCardHash(null);
-
-        renderStages();
-        renderRows();
-        renderCards();
-        if(selectedId) selectCard(selectedId);
-        else updateInspectorEmpty();
-
-        save();
-        setSyncBadge("تم التحديث", true);
-        return true;
-      }catch(e){
-        setSyncBadge("تعذر الجلب", false);
-        if(!silent) alert("تعذر جلب البيانات من الرابط.\nتأكد من الرابط و CORS.");
-        return false;
-      }
-    }
-
-    function startSyncTimer(){
-      stopSyncTimer();
-      const on = (remoteAutoOn?.value || "on") === "on";
-      const url = (remoteGetUrl?.value || "").trim();
-      if(!on || !url){
-        setSyncBadge("غير متصل", false);
-        return;
-      }
-      const sec = clamp(parseNumber(remoteInterval?.value || 20) || 20, 5, 300);
-      setSyncBadge(`مزامنة كل ${sec}ث`, true);
-      syncTimer = setInterval(()=>fetchRemoteOnce(true), sec*1000);
-      fetchRemoteOnce(true);
-    }
-
-    function stopSyncTimer(){
-      if(syncTimer){ clearInterval(syncTimer); syncTimer=null; }
-    }
-
-    async function publishRemote(){
-      const push = (remotePushUrl?.value || "").trim();
-      if(!push){
-        // fallback: export JSON for manual upload
-        const data={
-          meta:{ updated_at: Date.now(), schema: 1 },
-          settings:{
-            returnRate:returnRate.value,
-            goalScope:goalScope.value,
-            leftDensity:leftDensity.value
-          },
-          stages, cards
-        };
-        downloadBlob("compounds_data.json", new Blob([JSON.stringify(data,null,2)], {type:"application/json"}));
-        alert("ما فيه رابط حفظ (POST).\nتم تنزيل ملف JSON — ارفعه على السيرفر بنفس رابط GET ليصل للجميع.");
-        return;
-      }
-
-      try{
-        setSyncBadge("ينشر…", true);
-        const payload={
-          meta:{ updated_at: Date.now(), schema: 1 },
-          settings:{
-            returnRate:returnRate.value,
-            goalScope:goalScope.value,
-            leftDensity:leftDensity.value
-          },
-          stages, cards
-        };
-
-        const headers = {"Content-Type":"application/json"};
-        const token = (remoteToken?.value || "").trim();
-        if(token) headers["Authorization"] = "Bearer " + token;
-
-        const res = await fetch(push, {method:"POST", headers, body: JSON.stringify(payload)});
-        if(!res.ok) throw new Error("HTTP "+res.status);
-
-        localUpdatedAt = payload.meta.updated_at;
-        save();
-        setSyncBadge("تم النشر", true);
-        fetchRemoteOnce(true);
-        alert("تم نشر التعديل ✅\n(إذا كان رابط GET يشير لنفس المصدر، سيصل للجميع تلقائيًا).");
-      }catch(e){
-        setSyncBadge("تعذر النشر", false);
-        alert("تعذر النشر عبر رابط الحفظ.\nتأكد من الرابط و CORS وطريقة التوثيق.");
-      }
-    }
-
-
-    
-    // ===== Mobile nav wiring (no feature changes) =====
-    (function(){
-      const nav = document.querySelector(".mNav");
-      if(!nav) return;
-      nav.addEventListener("click", (e)=>{
-        const btn = e.target.closest(".mNavBtn");
-        if(!btn) return;
-        const tgt = btn.getAttribute("data-target");
-        const act = btn.getAttribute("data-action");
-        if(tgt){
-          const el = document.getElementById(tgt);
-          if(el) el.click();
-        }else if(act==="print"){
-          document.getElementById("btnPrint")?.click();
-        }else if(act==="images"){
-          // Prefer ZIP export of images when available; fallback to single images export
-          document.getElementById("btnExportZip")?.click() || document.getElementById("btnExportImages")?.click();
-        }
-      });
-    })();
-
-
-    
-    // ===== Direct-to-card deep link + focus (mobile friendly) =====
-    function setCardHash(id){
-      try{
-        const url = new URL(location.href);
-        if(id) url.hash = "card=" + encodeURIComponent(id);
-        else url.hash = "";
-        history.replaceState(null, "", url.toString());
-      }catch(e){}
-    }
-    function getCardHash(){
-      try{
-        const h = (location.hash || "").replace(/^#/, "");
-        if(!h) return null;
-        const m = h.match(/(?:^|&)card=([^&]+)/);
-        return m ? decodeURIComponent(m[1]) : null;
-      }catch(e){ return null; }
-    }
-    function focusCardInList(id){
-      const el = document.querySelector(`[data-card-id="${CSS.escape(id)}"]`);
-      if(el){
-        el.scrollIntoView({behavior:"smooth", block:"center", inline:"nearest"});
-        el.classList.add("pulseFocus");
-        setTimeout(()=>el.classList.remove("pulseFocus"), 900);
-      }
-    }
-
-
-    
-    // ===== Card overlay zoom (mobile). Presentation only, preserves all existing features. =====
-    const cardOverlay = document.getElementById("cardOverlay");
-    const cardOverlayBackdrop = document.getElementById("cardOverlayBackdrop");
-    const cardOverlayShell = document.getElementById("cardOverlayShell");
-    const cardOverlayBody = document.getElementById("cardOverlayBody");
-    const cardOverlayClose = document.getElementById("cardOverlayClose");
-    const cardOverlayPrev = document.getElementById("cardOverlayPrev");
-    const cardOverlayNext = document.getElementById("cardOverlayNext");
-
-    let overlayOpenId = null;
-
-    function isMobile(){
-      return window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
-    }
-
-    function lockScroll(lock){
-      document.documentElement.style.overflow = lock ? "hidden" : "";
-      document.body.style.overflow = lock ? "hidden" : "";
-    }
-
-    function renderOverlayContent(){
-      const vp = document.getElementById("viewPane");
-      if(!vp) return;
-      const clone = vp.cloneNode(true);
-      // Remove controls in the clone to keep it clean
-      clone.querySelectorAll(".no-print, .actions, .seg").forEach(n=>n.remove());
-      cardOverlayBody.innerHTML = "";
-      const fade = document.createElement("div");
-      fade.className = "flipFadeIn";
-      fade.appendChild(clone);
-      cardOverlayBody.appendChild(fade);
-      requestAnimationFrame(()=>fade.classList.add("on"));
-    }
-
-    function currentIndex(){
-      return cards.findIndex(c=>c.id===overlayOpenId);
-    }
-    function gotoIndex(idx){
-      if(idx<0 || idx>=cards.length) return;
-      const id = cards[idx].id;
-      overlayOpenId = id;
-      selectCard(id);
-      setCardHash(id);
-      focusCardInList(id);
-      renderOverlayContent();
-    }
-
-    function openCardOverlay(fromEl, id){
-      if(!isMobile()) return;
-      overlayOpenId = id;
-
-      const r = fromEl.getBoundingClientRect();
-
-      // Create a lightweight FLIP clone from the tapped card
-      const cloneWrap = document.createElement("div");
-      cloneWrap.className = "flipClone";
-      cloneWrap.style.left = r.left + "px";
-      cloneWrap.style.top = r.top + "px";
-      cloneWrap.style.width = r.width + "px";
-      cloneWrap.style.height = r.height + "px";
-
-      const inner = fromEl.cloneNode(true);
-      inner.classList.remove("pulseFocus");
-      cloneWrap.appendChild(inner);
-      document.body.appendChild(cloneWrap);
-
-      // Open overlay (content prepared from existing viewPane to preserve logic)
-      cardOverlay.classList.add("isOpen");
-      cardOverlay.setAttribute("aria-hidden","false");
-      lockScroll(true);
-      renderOverlayContent();
-
-      // Animate clone into overlay bounds
-      const target = cardOverlayShell.getBoundingClientRect();
-
-      requestAnimationFrame(()=>{
-        cloneWrap.style.transition = "left .34s cubic-bezier(.2,.9,.2,1), top .34s cubic-bezier(.2,.9,.2,1), width .34s cubic-bezier(.2,.9,.2,1), height .34s cubic-bezier(.2,.9,.2,1), border-radius .34s cubic-bezier(.2,.9,.2,1), opacity .18s ease";
-        cloneWrap.style.left = target.left + "px";
-        cloneWrap.style.top = target.top + "px";
-        cloneWrap.style.width = target.width + "px";
-        cloneWrap.style.height = target.height + "px";
-        cloneWrap.style.borderRadius = "22px";
-        inner.style.transition = "opacity .18s ease";
-        inner.style.opacity = "0";
-      });
-
-      setTimeout(()=>{ cloneWrap.remove(); }, 380);
-    }
-
-    function closeCardOverlay(){
-      if(!cardOverlay.classList.contains("isOpen")) return;
-      cardOverlay.classList.remove("isOpen");
-      cardOverlay.setAttribute("aria-hidden","true");
-      lockScroll(false);
-      overlayOpenId = null;
-    }
-
-    cardOverlayBackdrop?.addEventListener("click", closeCardOverlay);
-    cardOverlayClose?.addEventListener("click", closeCardOverlay);
-    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeCardOverlay(); });
-
-    cardOverlayPrev?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>0) gotoIndex(i-1); });
-    cardOverlayNext?.addEventListener("click", ()=>{ const i=currentIndex(); if(i>=0 && i<cards.length-1) gotoIndex(i+1); });
-
-
-    
-    // ===== PWA: Service Worker (offline shell) =====
-    (function(){
-      try{
-        if("serviceWorker" in navigator){
-          window.addEventListener("load", ()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-        }
-      }catch(e){}
-    })();
-
-
-    
-    // ===== Admin lock logic (keeps all features, hides advanced controls until code) =====
-    const ADMIN_KEY = "compound_admin_unlocked_v1";
-    const adminLockModal = document.getElementById("adminLockModal");
-    const adminLockBackdrop = document.getElementById("adminLockBackdrop");
-    const adminPass = document.getElementById("adminPass");
-    const adminUnlockBtn = document.getElementById("adminUnlockBtn");
-    const adminLockBtn = document.getElementById("adminLockBtn");
-    const adminLockState = document.getElementById("adminLockState");
-
-    function isUnlocked(){
-      try{ return localStorage.getItem(ADMIN_KEY)==="1"; }catch(e){ return false; }
-    }
-    function applyLockState(){
-      const unlocked = isUnlocked();
-      document.body.classList.toggle("adminLocked", !unlocked);
-      if(adminLockState) adminLockState.textContent = unlocked ? "مفعل" : "مخفي";
-    }
-    function openAdminModal(){
-      if(!adminLockModal) return;
-      adminLockModal.classList.add("isOpen");
-      adminLockModal.setAttribute("aria-hidden","false");
-      try{ adminPass.value=""; adminPass.focus(); }catch(e){}
-    }
-    function closeAdminModal(){
-      if(!adminLockModal) return;
-      adminLockModal.classList.remove("isOpen");
-      adminLockModal.setAttribute("aria-hidden","true");
-    }
-    function unlockWith(code){
-      if(String(code||"").trim()==="111"){
-        try{ localStorage.setItem(ADMIN_KEY,"1"); }catch(e){}
-        applyLockState();
-        closeAdminModal();
-        return true;
-      }
-      return false;
-    }
-    function lockNow(){
-      try{ localStorage.removeItem(ADMIN_KEY); }catch(e){}
-      applyLockState();
-      closeAdminModal();
-    }
-
-    adminUnlockBtn?.addEventListener("click", ()=>{ if(!unlockWith(adminPass?.value)) alert("رمز غير صحيح"); });
-    adminPass?.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ if(!unlockWith(adminPass?.value)) alert("رمز غير صحيح"); } });
-    adminLockBtn?.addEventListener("click", lockNow);
-    adminLockBackdrop?.addEventListener("click", closeAdminModal);
-    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeAdminModal(); });
-
-    // Gesture: long-press or triple-tap on header brand to open modal
-    (function(){
-      const brand = document.querySelector(".brand");
-      if(!brand) return;
-      let tapCount=0, tapTimer=null;
-      let pressTimer=null;
-
-      brand.addEventListener("touchstart", ()=>{
-        pressTimer = setTimeout(openAdminModal, 650);
-      }, {passive:true});
-      brand.addEventListener("touchend", ()=>{
-        if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
-      });
-
-      brand.addEventListener("click", ()=>{
-        tapCount++;
-        if(tapTimer) clearTimeout(tapTimer);
-        tapTimer = setTimeout(()=>{ tapCount=0; }, 650);
-        if(tapCount>=3){
-          tapCount=0;
-          openAdminModal();
-        }
-      });
-    })();
-
-    // Apply initial lock state
-    applyLockState();
-
-
-    
-    // Swipe down to close (mobile)
-    (function(){
-      const shell = cardOverlayShell;
-      if(!shell) return;
-      let sy=0, cy=0, dragging=false;
-      shell.addEventListener("touchstart", (e)=>{
-        if(!cardOverlay.classList.contains("isOpen")) return;
-        const t = e.touches[0];
-        sy = t.clientY; cy = sy; dragging=true;
-      }, {passive:true});
-      shell.addEventListener("touchmove", (e)=>{
-        if(!dragging) return;
-        const t = e.touches[0];
-        cy = t.clientY;
-        const dy = Math.max(0, cy - sy);
-        shell.style.transform = `translateY(${dy}px) scale(${1 - Math.min(dy/1200, .02)})`;
-        shell.style.transition = "none";
-      }, {passive:true});
-      shell.addEventListener("touchend", ()=>{
-        if(!dragging) return;
-        dragging=false;
-        const dy = Math.max(0, cy - sy);
-        shell.style.transition = "";
-        shell.style.transform = "";
-        if(dy > 120) closeCardOverlay();
-      });
-    })();
-
-
-    
-    // ===== Auto-configure remote sync endpoints (no UI required) =====
-    function ensureRemoteUrls(){
-      try{
-        const origin = location.origin;
-        if(remoteGetUrl && !String(remoteGetUrl.value||"").trim()){
-          remoteGetUrl.value = origin + "/.netlify/functions/compounds-get";
-        }
-        if(remotePushUrl && !String(remotePushUrl.value||"").trim()){
-          remotePushUrl.value = origin + "/.netlify/functions/compounds-save";
-        }
-        // auto on by default
-        if(remoteAutoOn && !String(remoteAutoOn.value||"").trim()){
-          remoteAutoOn.value = "on";
-        }
-      }catch(e){}
-    }
-
-
-    
-    // Refresh on app resume (PWA/iOS)
-    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); } });
-    window.addEventListener('focus', ()=>{ ensureRemoteUrls(); fetchRemoteOnce(true).catch(()=>{}); });
-
-
-    // ===== Presence + autosync v2 (no settings; everyone pulls, admins auto-push) =====
-    const presenceCountEl = document.getElementById("onlineCount");
-
-    // Stable anonymous session id for presence
-    const SID_KEY = "compound_presence_sid_v1";
-    function getSid(){
-      try{
-        let sid = localStorage.getItem(SID_KEY);
-        if(!sid){
-          sid = (crypto?.randomUUID?.() || ("sid_" + Math.random().toString(16).slice(2) + Date.now()));
-          localStorage.setItem(SID_KEY, sid);
-        }
-        return sid;
-      }catch(e){
-        return "sid_" + Math.random().toString(16).slice(2) + Date.now();
-      }
-    }
-
-    function getPresenceBase(){
-      try{
-        return location.origin + "/.netlify/functions";
-      }catch(e){ return "/.netlify/functions"; }
-    }
-
-    async function presencePing(){
-      const url = getPresenceBase() + "/presence-ping";
-      try{
-        await fetch(url, {
-          method:"POST",
-          headers: {"Content-Type":"application/json"},
-          cache:"no-store",
-          body: JSON.stringify({ sid: getSid(), t: Date.now() })
-        });
-      }catch(e){}
-    }
-
-    async function presenceCount(){
-      const url = getPresenceBase() + "/presence-count";
-      try{
-        const res = await fetch(url, { cache:"no-store" });
-        if(!res.ok) throw new Error("bad");
-        const j = await res.json();
-        if(presenceCountEl) presenceCountEl.textContent = (j?.count ?? "—");
-      }catch(e){
-        if(presenceCountEl) presenceCountEl.textContent = "—";
-      }
-    }
-
-    function startPresence(){
-      presencePing(); presenceCount();
-      setInterval(presencePing, 20000);
-      setInterval(presenceCount, 25000);
-      document.addEventListener("visibilitychange", ()=>{
-        if(!document.hidden){ presencePing(); presenceCount(); }
-      });
-      window.addEventListener("focus", ()=>{ presencePing(); presenceCount(); });
-    }
-
-    // Autosync:
-    // - Everyone pulls frequently.
-    // - Only unlocked admins (code 111) auto-push on changes (debounced).
-    let autoPushTimer = null;
-    function scheduleAutoPush(){
-      try{
-        if(typeof isUnlocked === "function" && !isUnlocked()) return; // only admins publish
-        if(autoPushTimer) clearTimeout(autoPushTimer);
-        autoPushTimer = setTimeout(()=>{
-          try{
-            ensureRemoteUrls?.();
-            // publishRemote is the existing "نشر للجميع" action; we call it silently
-            publishRemote?.();
-          }catch(e){}
-        }, 650);
-      }catch(e){}
-    }
-
-    // Hook into existing save() to also schedule push
-    const __origSave = (typeof save === "function") ? save : null;
-    if(__origSave){
-      window.save = function(){
-        const r = __origSave.apply(this, arguments);
-        scheduleAutoPush();
-        return r;
-      };
-    }
-
-    // Faster pull interval for everyone (freshness)
-    function startAlwaysPull(){
-      try{
-        ensureRemoteUrls?.();
-        fetchRemoteOnce?.(true).catch(()=>{});
-      }catch(e){}
-      setInterval(()=>{
-        try{
-          ensureRemoteUrls?.();
-          fetchRemoteOnce?.(true).catch(()=>{});
-        }catch(e){}
-      }, 6000); // every 6s
-    }
-
-
-    // ===== Init =====
-    (async function init(){
-      const ok=load();
-      if(!ok){
-        stages=defaultStages();
-        cards=[
-          normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
-          normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
-        ];
-        selectedId=cards[0].id;
-      }
-      if(!Array.isArray(stages) || !stages.length) stages=defaultStages();
-      cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
-
-      renderStages();
-      renderRows();
-      renderCards();
-      if(selectedId && cards.some(c=>c.id===selectedId)) selectCard(selectedId);
-      else if(cards[0]) selectCard(cards[0].id);
-      else updateInspectorEmpty();
-
-      setMode("view");
-      startSyncTimer();
-      save();
-    })();
-  </script>
-
-  <!-- Mobile detail sheet (prevents jumping/scrolling to bottom on long lists) -->
-  <div class="sheetBackdrop no-print" id="sheetBackdrop" hidden></div>
-  <section class="sheet no-print" id="detailSheet" hidden aria-label="تفاصيل المجمع">
-    <div class="sheetHandle" id="sheetHandle" aria-hidden="true"></div>
-    <div class="sheetHead">
-      <div class="sheetTitle">
-        <div class="sheetKicker">تفاصيل</div>
-        <div class="sheetName" id="sheetName">—</div>
-      </div>
-      <div class="sheetNav">
-        <button class="btn small" id="sheetPrev" title="السابق">‹</button>
-        <button class="btn small" id="sheetNext" title="التالي">›</button>
-        <button class="btn small" id="sheetClose" title="إغلاق">✕</button>
-      </div>
-    </div>
-    <div class="sheetBody" id="sheetBody"></div>
+  <!-- BOARD -->
+  <section class="view active" id="view_board">
+    <div class="grid" id="cardGrid"></div>
   </section>
 
+  <!-- LIST -->
+  <section class="view" id="view_list">
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width:160px">الاسم</th>
+            <th style="min-width:110px">المجمع</th>
+            <th style="min-width:90px">الدور</th>
+            <th style="min-width:110px">التكلفة</th>
+            <th style="min-width:110px">المغطّى</th>
+            <th style="min-width:90px">الطلاب</th>
+            <th style="min-width:120px">هدف المحفظة</th>
+            <th style="min-width:110px">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MANAGE (admin) -->
+  <section class="view adminOnly" id="view_manage">
+    <div class="tableWrap" style="padding: 12px;">
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width: 220px;">
+          <div class="k" style="margin-bottom:6px;">استيراد CSV</div>
+          <div class="rowBtns">
+            <input type="file" id="csvFile" accept=".csv,text/csv" class="btn" style="padding:10px 12px; border-radius:999px; width: 210px;" />
+            <button class="btn" id="btnCsvPaste">لصق CSV</button>
+          </div>
+          <div class="k" style="margin-top:8px;">يتم التعرف على الأعمدة تلقائيًا (ومعها اختيار يدوي عند الحاجة).</div>
+        </div>
+
+        <div style="flex:1; min-width: 220px;">
+          <div class="k" style="margin-bottom:6px;">إضافة بطاقة</div>
+          <div class="rowBtns">
+            <button class="btn primary" id="btnAddCard">إضافة</button>
+            <button class="btn" id="btnExportJson">تصدير JSON (نسخة احتياطية)</button>
+            <button class="btn" id="btnImportJson">استيراد JSON</button>
+            <input type="file" id="jsonFile" accept="application/json" style="display:none" />
+          </div>
+        </div>
+      </div>
+
+      <div class="warn" id="dirtyWarn" style="display:none;">
+        لديك تغييرات غير منشورة. اضغط <b>نشر</b> ليشاهد الجميع النسخة الجديدة.
+      </div>
+
+      <div id="importPreview" style="margin-top:12px; display:none;"></div>
+    </div>
+
+    <div class="tableWrap" style="margin-top:12px; padding:12px;">
+      <div class="row" style="gap: 10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width: 240px;">
+          <div class="k" style="margin-bottom:6px;">المراحل (مركزية)</div>
+          <div class="k">هذه الخيارات تظهر فقط بعد إدخال الرمز 111.</div>
+        </div>
+        <div class="rowBtns">
+          <button class="btn adminOnly" id="btnAddStage">إضافة مرحلة</button>
+        </div>
+      </div>
+      <div id="stageEditor" class="adminOnly" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS (admin) -->
+  <section class="view adminOnly" id="view_settings">
+    <div class="tableWrap" style="padding: 12px;">
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width: 260px;">
+          <div class="k" style="margin-bottom:6px;">إعدادات محورية</div>
+          <div class="k">يمكنك ضبط هدف المحفظة كنسبة من التكلفة.</div>
+        </div>
+      </div>
+
+      <div class="row" style="gap:10px; margin-top:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px;">
+          <div class="k">نسبة هدف المحفظة من التكلفة (مثال 1 = 100%)</div>
+          <input class="edit" id="setGoalRatio" type="number" step="0.01" placeholder="مثال: 1" />
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <div class="k">نسبة التغطية (إذا تبي تثبيتها مركزيًا) (0..1)</div>
+          <input class="edit" id="setCoverageRatio" type="number" step="0.01" placeholder="فارغ = حسب البيانات" />
+        </div>
+      </div>
+
+      <div class="rowBtns" style="margin-top:10px;">
+        <button class="btn primary adminOnly" id="btnSaveSettings">حفظ الإعدادات</button>
+        <button class="btn adminOnly" id="btnLock">إخفاء الخيارات</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Page -->
+  <section id="detailPage" class="detailPage" aria-hidden="true">
+    <div class="detailTop">
+      <button class="btn small" id="detailBack">رجوع</button>
+      <div class="detailTitle" id="detailTitle">التفاصيل</div>
+      <button class="btn small primary adminOnly" id="detailPublish">نشر</button>
+    </div>
+
+    <div class="detailTabs" id="detailTabs">
+      <button class="detailTab active" data-tab="summary">ملخص</button>
+      <button class="detailTab" data-tab="stages">المراحل</button>
+      <button class="detailTab" data-tab="full">كامل</button>
+    </div>
+
+    <div class="detailKPIWrap" id="detailKPIWrap"></div>
+
+    <div class="detailBody" id="detailBody">
+      <div class="detailPanel active" id="detailPanelSummary"></div>
+      <div class="detailPanel" id="detailPanelStages"></div>
+      <div class="detailPanel" id="detailPanelFull"></div>
+      <div class="hint">اسحب للأسفل للإغلاق • أو اسحب من الطرف الأيسر للرجوع</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Mobile nav -->
+<nav class="mNav noPrint">
+  <div class="seg" id="mSeg">
+    <button data-view="board" class="active">لوحة</button>
+    <button data-view="list">قائمة</button>
+    <button data-view="manage" class="adminOnly">إدارة</button>
+    <button data-view="settings" class="adminOnly">إعدادات</button>
+  </div>
+</nav>
+
+<!-- Admin unlock modal -->
+<div class="modal noPrint" id="adminModal" aria-hidden="true">
+  <div class="backdrop" id="adminBackdrop"></div>
+  <div class="sheet">
+    <div class="handle" aria-hidden="true"></div>
+    <div class="title">رمز الدخول</div>
+    <div class="subt">أدخل الرمز لإظهار خيارات الإدارة والإعدادات.</div>
+    <div class="row2">
+      <input id="adminPass" inputmode="numeric" autocomplete="one-time-code" placeholder="•••" maxlength="6" />
+      <button class="btn primary" id="adminUnlock">دخول</button>
+    </div>
+    <div class="rowBtns" style="margin-top:10px; justify-content:space-between;">
+      <button class="btn" id="adminHide">إخفاء الخيارات</button>
+      <span class="chip"><span class="k">الحالة</span><span class="v" id="adminState">مخفي</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- Conflict modal -->
+<div class="modal noPrint" id="conflictModal" aria-hidden="true">
+  <div class="backdrop" id="conflictBackdrop"></div>
+  <div class="sheet">
+    <div class="handle" aria-hidden="true"></div>
+    <div class="title">تعارض في النسخ</div>
+    <div class="subt">تم العثور على نسخة أحدث على الخادم، بينما لديك تغييرات محلية. اختر التصرف:</div>
+    <div class="warn" id="conflictInfo">—</div>
+    <div class="rowBtns" style="margin-top:10px;">
+      <button class="btn" id="btnKeepRemote">اعتماد نسخة الخادم</button>
+      <button class="btn primary adminOnly" id="btnKeepLocal">الاحتفاظ بتعديلاتي (ثم نشر)</button>
+      <button class="btn" id="btnExportLocal">تصدير تعديلاتي JSON</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================
+   Jony Ive-style rebuild (v10)
+   - Keeps previous capabilities:
+     PWA, Presence, Admin lock (111), Manual Refresh, Publish, Stages central,
+     Board/List, Detail page tabs + gestures, Filters, Deep links.
+   - Better data handling:
+     Schema+Validation, Dirty state, Conflict-aware sync (base_rev), Draft-first UX.
+============================= */
+
+(function(){
+  // ===== PWA: Service Worker (offline shell) =====
+  try{
+    if("serviceWorker" in navigator){
+      window.addEventListener("load", ()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+    }
+  }catch(e){}
+
+  // ===== Utilities =====
+  const $ = (s, p=document)=>p.querySelector(s);
+  const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
+  const now = ()=>Date.now();
+
+  function escapeHtml(s){
+    return String(s??"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  }
+  function fmtInt(n){
+    const x = Number(n||0);
+    if(!isFinite(x)) return "0";
+    try{ return new Intl.NumberFormat("ar-SA").format(Math.round(x)); }catch(e){ return String(Math.round(x)); }
+  }
+  function fmtMoney(n){ return fmtInt(n); }
+  function pct01(x){
+    const n = Number(x);
+    if(!isFinite(n)) return "—";
+    const p = n*100;
+    return (p<10 ? p.toFixed(1) : p.toFixed(0)) + "%";
+  }
+  function uid(prefix="id"){
+    try{ return prefix+"_"+crypto.randomUUID(); }catch(e){ return prefix+"_"+Math.random().toString(16).slice(2)+now(); }
+  }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+  // ===== Remote endpoints (no UI) =====
+  function remoteBase(){ return location.origin + "/.netlify/functions"; }
+  function getUrl(){ return remoteBase() + "/compounds-get"; }
+  function saveUrl(){ return remoteBase() + "/compounds-save"; }
+
+  // ===== State + Persistence =====
+  const LS_KEY = "compound_v10_local_state";
+  const ADMIN_KEY = "compound_admin_unlocked_v1";
+  const SID_KEY = "compound_presence_sid_v1";
+
+  let state = defaultState();
+  let remoteSnapshot = null;   // last fetched from server
+  let dirty = false;           // local changes not published
+  let selectedId = null;
+
+  function defaultState(){
+    return {
+      meta: { schema: 2, updated_at: 0, rev: "init" },
+      settings: {
+        goal_ratio: 1,        // portfolio goal as ratio of total
+        coverage_ratio: null  // if set, overrides card.covered/total display
+      },
+      stages: [
+        { id: uid("st"), name: "المرحلة الأولى", target_ratio: 0.25, color: "#3B82F6" },
+        { id: uid("st"), name: "المرحلة الثانية", target_ratio: 0.25, color: "#22C55E" },
+        { id: uid("st"), name: "المرحلة الثالثة", target_ratio: 0.25, color: "#F59E0B" },
+        { id: uid("st"), name: "المرحلة الرابعة", target_ratio: 0.25, color: "#A855F7" }
+      ],
+      cards: []
+    };
+  }
+
+  function migrate(raw){
+    // Accept prior schema 1 or missing
+    const s = raw && typeof raw==="object" ? raw : {};
+    const schema = Number(s?.meta?.schema || 1);
+
+    if(schema === 1){
+      // Convert old stages: might have {target} amounts. We'll keep by mapping to ratio if total exists is per-card. Here use ratios if present; else equal.
+      const settings = s.settings || {};
+      const stages = Array.isArray(s.stages) ? s.stages.map((st,i)=>({
+        id: st.id || uid("st"),
+        name: st.name || ("مرحلة " + (i+1)),
+        target_ratio: (typeof st.target_ratio==="number") ? st.target_ratio : null,
+        target: (typeof st.target==="number") ? st.target : null,
+        color: st.color || null
+      })) : [];
+
+      const cards = Array.isArray(s.cards) ? s.cards.map(c=>({
+        id: String(c.id || uid("c")),
+        name: String(c.name||""),
+        total: Number(c.total||0)||0,
+        covered: Number(c.covered||0)||0,
+        students: Number(c.students||0)||0,
+        compoundCategory: String(c.compoundCategory||c.compound||""),
+        dawr: String(c.dawr||""),
+        // legacy extras if exist
+        admin: Number(c.admin||c.adminCost||0)||0,
+        halaqat: Number(c.halaqat||0)||0,
+        programs: Number(c.programs||0)||0,
+      })) : [];
+
+      return {
+        meta: { schema: 2, updated_at: Number(s?.meta?.updated_at||0)||0, rev: String(s?.meta?.rev||"migrated") },
+        settings: {
+          goal_ratio: Number(settings.goal_ratio ?? settings.goalRatio ?? 1) || 1,
+          coverage_ratio: (settings.coverage_ratio==null || settings.coverage_ratio==="") ? null : Number(settings.coverage_ratio)
+        },
+        stages: normalizeStagesV2(stages),
+        cards: normalizeCardsV2(cards)
+      };
+    }
+
+    // schema 2
+    return {
+      meta: { schema: 2, updated_at: Number(s?.meta?.updated_at||0)||0, rev: String(s?.meta?.rev||"unknown") },
+      settings: {
+        goal_ratio: Number(s?.settings?.goal_ratio ?? 1) || 1,
+        coverage_ratio: (s?.settings?.coverage_ratio==null || s?.settings?.coverage_ratio==="") ? null : Number(s?.settings?.coverage_ratio)
+      },
+      stages: normalizeStagesV2(s?.stages || []),
+      cards: normalizeCardsV2(s?.cards || [])
+    };
+  }
+
+  function normalizeStagesV2(stages){
+    const arr = Array.isArray(stages) ? stages : [];
+    const cleaned = arr.map((st,i)=>({
+      id: String(st.id || uid("st")),
+      name: String(st.name || ("مرحلة " + (i+1))),
+      // Store either ratio OR absolute amount; prefer ratio to stay consistent for all cards
+      target_ratio: (st.target_ratio==null || st.target_ratio==="") ? null : clamp(Number(st.target_ratio)||0, 0, 1.5),
+      target: (st.target==null || st.target==="") ? null : Math.max(0, Number(st.target)||0),
+      color: String(st.color || ["#3B82F6","#22C55E","#F59E0B","#A855F7","#EF4444","#14B8A6","#6366F1"][i%7])
+    }));
+    // If no stages, provide 4 equal stages
+    if(!cleaned.length){
+      return [
+        { id: uid("st"), name:"المرحلة الأولى", target_ratio:0.25, target:null, color:"#3B82F6" },
+        { id: uid("st"), name:"المرحلة الثانية", target_ratio:0.25, target:null, color:"#22C55E" },
+        { id: uid("st"), name:"المرحلة الثالثة", target_ratio:0.25, target:null, color:"#F59E0B" },
+        { id: uid("st"), name:"المرحلة الرابعة", target_ratio:0.25, target:null, color:"#A855F7" }
+      ];
+    }
+    // If all target_ratio null, auto set equal ratios
+    const hasAnyRatio = cleaned.some(x=>x.target_ratio!=null);
+    if(!hasAnyRatio){
+      const r = 1/cleaned.length;
+      cleaned.forEach(x=>x.target_ratio = r);
+    }else{
+      cleaned.forEach(x=>{ if(x.target_ratio==null) x.target_ratio = 0; });
+    }
+    return cleaned;
+  }
+
+  function normalizeCardsV2(cards){
+    const arr = Array.isArray(cards) ? cards : [];
+    return arr.map((c)=>({
+      id: String(c.id || uid("c")),
+      name: String(c.name || ""),
+      total: Math.max(0, Number(c.total)||0),
+      covered: Math.max(0, Number(c.covered)||0),
+      students: Math.max(0, Number(c.students)||0),
+      compoundCategory: String(c.compoundCategory || ""),
+      dawr: String(c.dawr || ""),
+      admin: Math.max(0, Number(c.admin)||0),
+      halaqat: Math.max(0, Number(c.halaqat)||0),
+      programs: Math.max(0, Number(c.programs)||0),
+    }));
+  }
+
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      return migrate(JSON.parse(raw));
+    }catch(e){ return null; }
+  }
+  function saveLocal(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+    }catch(e){}
+  }
+
+  function markDirty(on=true){
+    dirty = !!on;
+    $("#dirtyWarn") && ($("#dirtyWarn").style.display = dirty ? "block" : "none");
+    $("#subtitle").textContent = dirty ? "لديك تغييرات غير منشورة" : "عرض سريع • تفاصيل واضحة";
+  }
+
+  function setLastSync(ts){
+    const el = $("#lastSync");
+    if(!el) return;
+    if(!ts){ el.textContent = "—"; return; }
+    const d = new Date(ts);
+    try{
+      el.textContent = d.toLocaleString("ar-SA", { hour:"2-digit", minute:"2-digit", day:"2-digit", month:"2-digit" });
+    }catch(e){
+      el.textContent = d.toISOString().slice(0,16).replace("T"," ");
+    }
+  }
+
+  // ===== Presence =====
+  function getSid(){
+    try{
+      let sid = localStorage.getItem(SID_KEY);
+      if(!sid){
+        sid = (crypto?.randomUUID?.() || ("sid_" + Math.random().toString(16).slice(2) + now()));
+        localStorage.setItem(SID_KEY, sid);
+      }
+      return sid;
+    }catch(e){ return "sid_" + Math.random().toString(16).slice(2) + now(); }
+  }
+  async function presencePing(){
+    try{
+      await fetch(remoteBase()+"/presence-ping", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        cache:"no-store",
+        body: JSON.stringify({ sid: getSid(), t: now() })
+      });
+    }catch(e){}
+  }
+  async function presenceCount(){
+    try{
+      const res = await fetch(remoteBase()+"/presence-count", { cache:"no-store" });
+      const j = await res.json();
+      $("#onlineCount").textContent = (j?.count ?? "—");
+    }catch(e){ $("#onlineCount").textContent = "—"; }
+  }
+  function startPresence(){
+    presencePing(); presenceCount();
+    setInterval(presencePing, 20000);
+    setInterval(presenceCount, 25000);
+    document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ presencePing(); presenceCount(); }});
+    window.addEventListener("focus", ()=>{ presencePing(); presenceCount(); });
+  }
+
+  // ===== Admin lock (111) =====
+  function isUnlocked(){
+    try{ return localStorage.getItem(ADMIN_KEY)==="1"; }catch(e){ return false; }
+  }
+  function applyLockState(){
+    const unlocked = isUnlocked();
+    document.body.classList.toggle("adminLocked", !unlocked);
+    $("#adminState").textContent = unlocked ? "مفعل" : "مخفي";
+    // Keep active view valid
+    if(!unlocked){
+      const v = currentView();
+      if(v==="manage" || v==="settings") switchView("board");
+    }
+  }
+  function openAdminModal(){
+    $("#adminModal").classList.add("open");
+    $("#adminModal").setAttribute("aria-hidden","false");
+    try{ $("#adminPass").value=""; $("#adminPass").focus(); }catch(e){}
+  }
+  function closeAdminModal(){
+    $("#adminModal").classList.remove("open");
+    $("#adminModal").setAttribute("aria-hidden","true");
+  }
+  function unlockWith(code){
+    if(String(code||"").trim()==="111"){
+      try{ localStorage.setItem(ADMIN_KEY,"1"); }catch(e){}
+      applyLockState();
+      closeAdminModal();
+      toast("تم تفعيل الخيارات");
+      return true;
+    }
+    toast("رمز غير صحيح");
+    return false;
+  }
+  function lockNow(){
+    try{ localStorage.removeItem(ADMIN_KEY); }catch(e){}
+    applyLockState();
+    closeAdminModal();
+    toast("تم إخفاء الخيارات");
+  }
+
+  // Gesture: triple-tap or long press brand
+  (function(){
+    const brand = $("#brand");
+    if(!brand) return;
+    let tap=0, tmr=null, press=null;
+    brand.addEventListener("touchstart", ()=>{ press=setTimeout(openAdminModal, 650); }, {passive:true});
+    brand.addEventListener("touchend", ()=>{ if(press){clearTimeout(press); press=null;} }, {passive:true});
+    brand.addEventListener("click", ()=>{
+      tap++;
+      if(tmr) clearTimeout(tmr);
+      tmr=setTimeout(()=>tap=0, 650);
+      if(tap>=3){ tap=0; openAdminModal(); }
+    });
+  })();
+
+  $("#adminBackdrop").addEventListener("click", closeAdminModal);
+  $("#adminUnlock").addEventListener("click", ()=>unlockWith($("#adminPass").value));
+  $("#adminPass").addEventListener("keydown", (e)=>{ if(e.key==="Enter") unlockWith($("#adminPass").value); });
+  $("#adminHide").addEventListener("click", lockNow);
+
+  // ===== Toast (tiny, minimal) =====
+  let toastT = null;
+  function toast(msg){
+    let el = $("#toast");
+    if(!el){
+      el = document.createElement("div");
+      el.id="toast";
+      el.style.position="fixed";
+      el.style.left="50%";
+      el.style.bottom="calc(92px + var(--safeBot))";
+      el.style.transform="translateX(-50%)";
+      el.style.padding="10px 12px";
+      el.style.borderRadius="999px";
+      el.style.background="rgba(11,18,32,.92)";
+      el.style.color="rgba(255,255,255,.96)";
+      el.style.fontWeight="1000";
+      el.style.fontSize="12px";
+      el.style.boxShadow="0 18px 60px rgba(16,24,40,.22)";
+      el.style.zIndex="200";
+      el.style.opacity="0";
+      el.style.transition="opacity .14s ease, transform .14s ease";
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.opacity="1";
+    el.style.transform="translateX(-50%) translateY(0)";
+    if(toastT) clearTimeout(toastT);
+    toastT = setTimeout(()=>{
+      el.style.opacity="0";
+      el.style.transform="translateX(-50%) translateY(6px)";
+    }, 1200);
+  }
+
+  // ===== Conflict modal =====
+  function openConflict(info){
+    $("#conflictInfo").innerHTML = info;
+    $("#conflictModal").classList.add("open");
+    $("#conflictModal").setAttribute("aria-hidden","false");
+  }
+  function closeConflict(){
+    $("#conflictModal").classList.remove("open");
+    $("#conflictModal").setAttribute("aria-hidden","true");
+  }
+  $("#conflictBackdrop").addEventListener("click", closeConflict);
+
+  // ===== Sync (manual) with conflict-aware save =====
+  async function fetchRemote(){
+    const res = await fetch(getUrl(), { cache:"no-store" });
+    if(!res.ok) throw new Error("fetch failed");
+    const data = migrate(await res.json());
+    // ensure server may not have rev
+    if(!data.meta.rev) data.meta.rev = "srv_" + now();
+    remoteSnapshot = data;
+    return data;
+  }
+
+  async function pullLatest(){
+    const btn = $("#btnRefresh");
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = "…";
+    try{
+      const remote = await fetchRemote();
+      // If local dirty and remote differs, raise conflict (do not overwrite silently)
+      const remoteRev = remote?.meta?.rev;
+      const localBase = state?.meta?.base_rev || state?.meta?.rev;
+      const localDirty = dirty;
+      const remoteNewer = (remoteRev && remoteRev !== (remoteSnapshot?.meta?.rev || remoteRev)) ? true : true; // always treat as fresh fetch
+
+      if(localDirty && remoteRev && remoteRev !== localBase){
+        // Show conflict
+        openConflict(`نسخة الخادم أحدث من نسختك المحلية.<br><br><b>الخادم:</b> ${escapeHtml(remoteRev)}<br><b>محلي (أساس):</b> ${escapeHtml(localBase)}<br><br>اختر اعتماد الخادم أو الاحتفاظ بتعديلاتك.`);
+        // Stash remote for buttons
+        window.__remoteForConflict = remote;
+      }else{
+        // Accept remote as new local (clean)
+        state = remote;
+        state.meta.base_rev = remote.meta.rev;
+        markDirty(false);
+        saveLocal();
+        renderAll();
+        setLastSync(remote.meta.updated_at || now());
+        toast("تم التحديث");
+      }
+    }catch(e){
+      toast("تعذر التحديث");
+    }finally{
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  }
+
+  async function publish(){
+    if(!isUnlocked()){
+      toast("الخيارات مخفية");
+      return;
+    }
+    const btn = $("#btnPublish");
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = "…";
+    try{
+      // Prepare payload with base_rev
+      const payload = structuredClone(state);
+      payload.meta = payload.meta || {};
+      payload.meta.schema = 2;
+      payload.meta.base_rev = payload.meta.base_rev || (remoteSnapshot?.meta?.rev || payload.meta.rev);
+      payload.meta.updated_at = now();
+      // local rev will be replaced by server; still send a draft rev
+      payload.meta.rev = "draft_" + now();
+
+      const res = await fetch(saveUrl(), {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        cache:"no-store",
+        body: JSON.stringify(payload)
+      });
+
+      if(res.status === 409){
+        const j = await res.json().catch(()=>null);
+        const srv = j?.current ? migrate(j.current) : null;
+        window.__remoteForConflict = srv || null;
+        openConflict(`تعذر النشر لأن هناك نسخة أحدث على الخادم.<br><br>اضغط <b>اعتماد نسخة الخادم</b> أولاً ثم أعد تطبيق تغييراتك، أو <b>الاحتفاظ بتعديلاتي</b> لإعادة النشر بعد الحل.`);
+        return;
+      }
+
+      if(!res.ok) throw new Error("save failed");
+      const j = await res.json().catch(()=>({}));
+      // Update local meta with server rev
+      const newRev = j?.rev || ("srv_" + now());
+      state.meta.rev = newRev;
+      state.meta.base_rev = newRev;
+      state.meta.updated_at = j?.updated_at || now();
+      markDirty(false);
+      saveLocal();
+      setLastSync(state.meta.updated_at);
+      toast("تم النشر");
+    }catch(e){
+      toast("تعذر النشر");
+    }finally{
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  }
+
+  $("#btnRefresh").addEventListener("click", pullLatest);
+  $("#btnPublish").addEventListener("click", publish);
+
+  // Conflict actions
+  $("#btnKeepRemote").addEventListener("click", ()=>{
+    const srv = window.__remoteForConflict;
+    if(srv){
+      state = srv;
+      state.meta.base_rev = srv.meta.rev;
+      markDirty(false);
+      saveLocal();
+      renderAll();
+      setLastSync(srv.meta.updated_at || now());
+      toast("تم اعتماد الخادم");
+    }
+    closeConflict();
+  });
+  $("#btnKeepLocal").addEventListener("click", async ()=>{
+    closeConflict();
+    toast("سيتم النشر…");
+    await publish();
+  });
+  $("#btnExportLocal").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup_local.json";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  });
+
+  // ===== View switching =====
+  function currentView(){
+    const active = $("#viewSeg button.active");
+    return active?.getAttribute("data-view") || "board";
+  }
+  function switchView(view){
+    $$("#viewSeg button").forEach(b=>b.classList.toggle("active", b.getAttribute("data-view")===view));
+    $$("#mSeg button").forEach(b=>b.classList.toggle("active", b.getAttribute("data-view")===view));
+    $$(".view").forEach(v=>v.classList.remove("active"));
+    const sec = $("#view_"+view);
+    if(sec) sec.classList.add("active");
+  }
+  $("#viewSeg").addEventListener("click", (e)=>{
+    const b = e.target.closest("button[data-view]");
+    if(!b) return;
+    const v = b.getAttribute("data-view");
+    if(b.classList.contains("adminOnly") && !isUnlocked()) { toast("الخيارات مخفية"); return; }
+    switchView(v);
+  });
+  $("#mSeg").addEventListener("click", (e)=>{
+    const b = e.target.closest("button[data-view]");
+    if(!b) return;
+    const v = b.getAttribute("data-view");
+    if(b.classList.contains("adminOnly") && !isUnlocked()) { toast("الخيارات مخفية"); return; }
+    switchView(v);
+  });
+
+  // ===== Filtering + Sorting =====
+  function uniqNonEmpty(arr){
+    return Array.from(new Set(arr.map(s=>String(s||"").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ar"));
+  }
+  function refreshFilters(){
+    const c = $("#filterCompound"), d = $("#filterDawr");
+    const keepC = c.value, keepD = d.value;
+    const compounds = uniqNonEmpty(state.cards.map(x=>x.compoundCategory));
+    const dawrs = uniqNonEmpty(state.cards.map(x=>x.dawr));
+    c.innerHTML = '<option value="">كل المجمعات</option>' + compounds.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+    d.innerHTML = '<option value="">كل الدور</option>' + dawrs.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+    c.value = compounds.includes(keepC) ? keepC : "";
+    d.value = dawrs.includes(keepD) ? keepD : "";
+  }
+  function applyFilters(list){
+    const q = ($("#q").value || "").trim();
+    const qc = ($("#filterCompound").value || "").trim();
+    const qd = ($("#filterDawr").value || "").trim();
+    return list.filter(c=>{
+      if(q && !c.name.includes(q)) return false;
+      if(qc && c.compoundCategory !== qc) return false;
+      if(qd && c.dawr !== qd) return false;
+      return true;
+    });
+  }
+  function sortList(list){
+    const s = $("#sortBy").value;
+    const arr = list.slice();
+    const gap = (c)=>Math.max(0, (c.total||0) - (c.covered||0));
+    if(s==="gap") arr.sort((a,b)=>gap(b)-gap(a));
+    else if(s==="total") arr.sort((a,b)=>(b.total||0)-(a.total||0));
+    else if(s==="students") arr.sort((a,b)=>(b.students||0)-(a.students||0));
+    else arr.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
+    return arr;
+  }
+
+  $("#q").addEventListener("input", ()=>renderAll());
+  $("#filterCompound").addEventListener("change", ()=>renderAll());
+  $("#filterDawr").addEventListener("change", ()=>renderAll());
+  $("#sortBy").addEventListener("change", ()=>renderAll());
+
+  // ===== Board render =====
+  function goalForCard(card){
+    const ratio = Number(state.settings.goal_ratio||1) || 1;
+    return Math.round((Number(card.total||0)||0) * ratio);
+  }
+  function coverageRatioForCard(card){
+    const fixed = state.settings.coverage_ratio;
+    if(fixed==null || fixed==="") return null;
+    const n = Number(fixed);
+    return isFinite(n) ? clamp(n,0,1.5) : null;
+  }
+  function cardCoverage(card){
+    const total = Number(card.total||0)||0;
+    const covered = Number(card.covered||0)||0;
+    const fixed = coverageRatioForCard(card);
+    if(total<=0) return 0;
+    if(fixed!=null) return clamp(fixed,0,1.5);
+    return clamp(covered/total,0,1.5);
+  }
+
+  function cardHtml(card){
+    const total = Number(card.total||0)||0;
+    const covered = Number(card.covered||0)||0;
+    const cov = cardCoverage(card);
+    const goal = goalForCard(card);
+    const gap = Math.max(0, goal - covered);
+    const pctText = pct01(Math.min(1, cov));
+    const w = clamp(cov,0,1) * 100;
+
+    return `
+      <article class="card" data-id="${escapeHtml(card.id)}">
+        <div class="cardIn">
+          <div class="row">
+            <div style="min-width:0;">
+              <div class="name">${escapeHtml(card.name||"")}</div>
+              <div class="meta">
+                ${card.compoundCategory ? `<span class="pill"><span class="k">المجمع</span><b>${escapeHtml(card.compoundCategory)}</b></span>` : ""}
+                ${card.dawr ? `<span class="pill"><span class="k">الدور</span><b>${escapeHtml(card.dawr)}</b></span>` : ""}
+                <span class="pill"><span class="k">الطلاب</span><b>${fmtInt(card.students||0)}</b></span>
+              </div>
+            </div>
+            <div style="text-align:left;">
+              <div class="k">التكلفة</div>
+              <div class="big"><span>${fmtMoney(total)}</span><span class="sar">﷼</span></div>
+            </div>
+          </div>
+
+          <div class="bar" aria-label="نسبة التغطية"><div class="fill" style="width:${w.toFixed(1)}%"></div></div>
+          <div class="smallRow">
+            <span>المغطّى: ${fmtMoney(covered)} ﷼</span>
+            <span>التغطية: ${pctText}</span>
+          </div>
+
+          <div class="smallRow" style="margin-top:6px;">
+            <span>هدف المحفظة: ${fmtMoney(goal)} ﷼</span>
+            <span>الفجوة: ${fmtMoney(gap)} ﷼</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderBoard(){
+    const grid = $("#cardGrid");
+    const list = sortList(applyFilters(state.cards));
+    if(!list.length){
+      grid.innerHTML = `<div class="tableWrap" style="padding: 14px;">لا توجد بطاقات بعد.</div>`;
+      return;
+    }
+    grid.innerHTML = list.map(cardHtml).join("");
+  }
+
+  // ===== List render (inline editing) =====
+  function renderList(){
+    const body = $("#tableBody");
+    const list = sortList(applyFilters(state.cards));
+
+    body.innerHTML = list.map(c=>{
+      const goal = goalForCard(c);
+      return `
+        <tr data-id="${escapeHtml(c.id)}">
+          <td><input class="edit" data-k="name" value="${escapeHtml(c.name)}"></td>
+          <td><input class="edit" data-k="compoundCategory" value="${escapeHtml(c.compoundCategory)}"></td>
+          <td><input class="edit" data-k="dawr" value="${escapeHtml(c.dawr)}"></td>
+          <td><input class="edit" data-k="total" type="number" step="1" value="${escapeHtml(c.total)}"></td>
+          <td><input class="edit" data-k="covered" type="number" step="1" value="${escapeHtml(c.covered)}"></td>
+          <td><input class="edit" data-k="students" type="number" step="1" value="${escapeHtml(c.students)}"></td>
+          <td style="white-space:nowrap;">${fmtMoney(goal)} <span class="sar">﷼</span></td>
+          <td>
+            <div class="rowBtns">
+              <button class="btn small" data-act="open">تفاصيل</button>
+              <button class="btn small" data-act="del">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    // Bind inline edits
+    body.querySelectorAll("input.edit").forEach(inp=>{
+      inp.addEventListener("change", ()=>{
+        const tr = inp.closest("tr");
+        const id = tr.getAttribute("data-id");
+        const k = inp.getAttribute("data-k");
+        const card = state.cards.find(x=>x.id===id);
+        if(!card) return;
+        let v = inp.value;
+        if(["total","covered","students"].includes(k)) v = Math.max(0, Number(v||0)||0);
+        card[k] = v;
+        state.cards = normalizeCardsV2(state.cards);
+        state.meta.updated_at = now();
+        saveLocal();
+        markDirty(true);
+        refreshFilters();
+        renderAll(); // updates board + computed columns
+      });
+    });
+
+    body.querySelectorAll("button[data-act]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const tr = btn.closest("tr");
+        const id = tr.getAttribute("data-id");
+        if(btn.getAttribute("data-act")==="open"){
+          navigateDetail(id);
+        }else{
+          // delete
+          if(!confirm("حذف البطاقة؟")) return;
+          state.cards = state.cards.filter(x=>x.id!==id);
+          state.meta.updated_at = now();
+          saveLocal();
+          markDirty(true);
+          refreshFilters();
+          renderAll();
+        }
+      });
+    });
+  }
+
+  // ===== Detail page =====
+  const detailPage = $("#detailPage");
+  const detailTitle = $("#detailTitle");
+  const detailKPIWrap = $("#detailKPIWrap");
+  const detailPanelSummary = $("#detailPanelSummary");
+  const detailPanelStages = $("#detailPanelStages");
+  const detailPanelFull = $("#detailPanelFull");
+
+  function setDetailTab(tab){
+    $$("#detailTabs .detailTab").forEach(b=>b.classList.toggle("active", b.getAttribute("data-tab")===tab));
+    const map = { summary: detailPanelSummary, stages: detailPanelStages, full: detailPanelFull };
+    Object.entries(map).forEach(([k,el])=>el.classList.toggle("active", k===tab));
+  }
+  $("#detailTabs").addEventListener("click", (e)=>{
+    const b = e.target.closest(".detailTab");
+    if(!b) return;
+    setDetailTab(b.getAttribute("data-tab"));
+  });
+
+  function renderDetail(card){
+    if(!card) return;
+    detailTitle.textContent = card.name || "التفاصيل";
+
+    const total = Number(card.total||0)||0;
+    const covered = Number(card.covered||0)||0;
+    const cov = cardCoverage(card);
+    const goal = goalForCard(card);
+
+    detailKPIWrap.innerHTML = `
+      <div class="detailKPIGrid">
+        <div class="detailKPI">
+          <div class="kk">التكلفة الإجمالية</div>
+          <div class="vv"><span>${fmtMoney(total)}</span><span class="sar">﷼</span></div>
+          <div class="sub">عدد الطلاب: ${fmtInt(card.students||0)}</div>
+        </div>
+        <div class="detailKPI">
+          <div class="kk">المغطّى الحالي</div>
+          <div class="vv"><span>${fmtMoney(covered)}</span><span class="sar">﷼</span></div>
+          <div class="sub">نسبة التغطية: ${pct01(Math.min(1, cov))}</div>
+        </div>
+        <div class="detailKPI">
+          <div class="kk">هدف المحفظة</div>
+          <div class="vv"><span>${fmtMoney(goal)}</span><span class="sar">﷼</span></div>
+          <div class="sub">النسبة: ${fmtInt((state.settings.goal_ratio||1)*100)}%</div>
+        </div>
+        <div class="detailKPI">
+          <div class="kk">المجمع / الدور</div>
+          <div class="vv" style="font-size:14px;">
+            <span>${escapeHtml(card.compoundCategory||"—")}</span>
+            <span style="font-size:12px; color: rgba(11,18,32,.55); font-weight:900;">${escapeHtml(card.dawr||"")}</span>
+          </div>
+          <div class="sub">اضغط تحديث لجلب آخر نسخة عند الحاجة</div>
+        </div>
+      </div>
+    `;
+
+    // Summary: a focused card
+    detailPanelSummary.innerHTML = `
+      <div class="stageRow">
+        <div class="stageRowTop">
+          <div class="stageName">الملخص</div>
+          <div class="stageTarget">${fmtMoney(Math.max(0, goal - covered))}<span class="sar">﷼</span></div>
+        </div>
+        <div class="stageMeta">
+          <span>الفجوة إلى هدف المحفظة</span>
+          <span>تحديث: يدوي</span>
+        </div>
+        <div class="stageBar"><div class="stageFill" style="background: linear-gradient(90deg, rgba(59,130,246,.92), rgba(16,185,129,.80)); width:${clamp(cov,0,1)*100}%"></div></div>
+        <div class="stageMeta">
+          <span>التغطية الحالية</span>
+          <span>${pct01(Math.min(1,cov))}</span>
+        </div>
+      </div>
+    `;
+
+    // Stages: ratio-based targets mapped to total cost (or absolute if stage.target)
+    const list = (state.stages||[]).map((st,i)=>{
+      const amt = (st.target!=null) ? Number(st.target||0)||0 : Math.round((Number(st.target_ratio||0)||0) * total);
+      const ratio = total>0 ? amt/total : 0;
+      return { name: st.name, amt, ratio: clamp(ratio,0,1.5), color: st.color };
+    });
+
+    detailPanelStages.innerHTML = `
+      <div class="stageList">
+        ${list.map(x=>`
+          <div class="stageRow">
+            <div class="stageRowTop">
+              <div class="stageName"><span style="display:inline-block;width:10px;height:10px;border-radius:999px;background:${x.color};margin-inline-end:8px;"></span>${escapeHtml(x.name)}</div>
+              <div class="stageTarget">${fmtMoney(x.amt)}<span class="sar">﷼</span></div>
+            </div>
+            <div class="stageBar"><div class="stageFill" style="background:${x.color}; width:${(x.ratio*100).toFixed(1)}%"></div></div>
+            <div class="stageMeta">
+              <span>نسبة من التكلفة: ${pct01(x.ratio)}</span>
+              <span>التغطية الحالية: ${pct01(Math.min(1,cov))}</span>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    // Full: editable mini-form (admin only) + read-only details
+    detailPanelFull.innerHTML = `
+      <div class="stageRow">
+        <div class="stageName">البيانات</div>
+        <div class="stageMeta"><span>هنا عرض كامل</span><span>—</span></div>
+      </div>
+
+      <div class="stageRow adminOnly">
+        <div class="stageRowTop">
+          <div class="stageName">تعديل سريع</div>
+          <div class="stageMeta"><span>سيؤثر على الجميع بعد النشر</span><span></span></div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+          <div><div class="k">الاسم</div><input class="edit" id="d_name" value="${escapeHtml(card.name)}"></div>
+          <div><div class="k">المجمع</div><input class="edit" id="d_comp" value="${escapeHtml(card.compoundCategory)}"></div>
+          <div><div class="k">الدور</div><input class="edit" id="d_dawr" value="${escapeHtml(card.dawr)}"></div>
+          <div><div class="k">الطلاب</div><input class="edit" id="d_students" type="number" value="${escapeHtml(card.students)}"></div>
+          <div><div class="k">التكلفة</div><input class="edit" id="d_total" type="number" value="${escapeHtml(card.total)}"></div>
+          <div><div class="k">المغطّى</div><input class="edit" id="d_covered" type="number" value="${escapeHtml(card.covered)}"></div>
+        </div>
+        <div class="rowBtns" style="margin-top:10px;">
+          <button class="btn primary adminOnly" id="d_save">حفظ</button>
+        </div>
+      </div>
+    `;
+
+    // Bind detail save
+    const btn = $("#d_save");
+    if(btn){
+      btn.addEventListener("click", ()=>{
+        if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+        card.name = $("#d_name").value;
+        card.compoundCategory = $("#d_comp").value;
+        card.dawr = $("#d_dawr").value;
+        card.students = Math.max(0, Number($("#d_students").value||0)||0);
+        card.total = Math.max(0, Number($("#d_total").value||0)||0);
+        card.covered = Math.max(0, Number($("#d_covered").value||0)||0);
+        state.cards = normalizeCardsV2(state.cards);
+        state.meta.updated_at = now();
+        saveLocal();
+        markDirty(true);
+        refreshFilters();
+        renderAll();
+        toast("تم الحفظ");
+      });
+    }
+
+    setDetailTab("summary");
+  }
+
+  function openDetail(id){
+    selectedId = id;
+    const card = state.cards.find(x=>x.id===id);
+    if(!card) return;
+    renderDetail(card);
+    detailPage.classList.add("isOpen");
+    detailPage.setAttribute("aria-hidden","false");
+    // Update hash
+    try{
+      const url = new URL(location.href);
+      url.hash = "page=detail&card=" + encodeURIComponent(id);
+      history.replaceState(null,"",url.toString());
+    }catch(e){}
+  }
+  function closeDetail(){
+    detailPage.classList.remove("isOpen");
+    detailPage.setAttribute("aria-hidden","true");
+    try{
+      const url = new URL(location.href);
+      url.hash = "";
+      history.replaceState(null,"",url.toString());
+    }catch(e){}
+  }
+  $("#detailBack").addEventListener("click", closeDetail);
+  $("#detailPublish").addEventListener("click", publish);
+
+  // gestures
+  (function(){
+    let sx=0, sy=0, cx=0, cy=0, dragging=false, edge=false;
+    detailPage.addEventListener("touchstart", (e)=>{
+      if(!detailPage.classList.contains("isOpen")) return;
+      const t = e.touches[0];
+      sx=cx=t.clientX; sy=cy=t.clientY;
+      edge = sx < 18;
+      dragging = true;
+    }, {passive:true});
+    detailPage.addEventListener("touchmove", (e)=>{
+      if(!dragging) return;
+      const t = e.touches[0];
+      cx=t.clientX; cy=t.clientY;
+    }, {passive:true});
+    detailPage.addEventListener("touchend", ()=>{
+      if(!dragging) return;
+      dragging=false;
+      const dx=cx-sx, dy=cy-sy;
+      if(edge && dx>80 && Math.abs(dy)<60){ closeDetail(); return; }
+      if(dy>140 && Math.abs(dx)<90){ closeDetail(); }
+    });
+  })();
+
+  function navigateDetail(id){ openDetail(id); }
+
+  // Board click => detail
+  $("#cardGrid").addEventListener("click", (e)=>{
+    const el = e.target.closest(".card");
+    if(!el) return;
+    const id = el.getAttribute("data-id");
+    navigateDetail(id);
+  });
+
+  // ===== Manage: add card, JSON backup, CSV import =====
+  $("#btnAddCard").addEventListener("click", ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+    const c = { id: uid("c"), name: "بدون اسم", total:0, covered:0, students:0, compoundCategory:"", dawr:"", admin:0, halaqat:0, programs:0 };
+    state.cards.unshift(c);
+    state.meta.updated_at = now();
+    saveLocal();
+    markDirty(true);
+    refreshFilters();
+    renderAll();
+    toast("تمت الإضافة");
+  });
+
+  $("#btnExportJson").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "backup.json";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  });
+  $("#btnImportJson").addEventListener("click", ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+    $("#jsonFile").click();
+  });
+  $("#jsonFile").addEventListener("change", async ()=>{
+    const f = $("#jsonFile").files?.[0];
+    if(!f) return;
+    const txt = await f.text();
+    try{
+      const obj = migrate(JSON.parse(txt));
+      state = obj;
+      state.meta.updated_at = now();
+      saveLocal();
+      markDirty(true);
+      refreshFilters();
+      renderAll();
+      toast("تم الاستيراد");
+    }catch(e){
+      toast("ملف غير صالح");
+    }finally{
+      $("#jsonFile").value="";
+    }
+  });
+
+  // CSV parse (simple robust)
+  function parseCSV(text){
+    const rows = [];
+    let row = [], cur="", inQ=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i], nxt=text[i+1];
+      if(ch === '"' ){
+        if(inQ && nxt === '"'){ cur+='"'; i++; }
+        else inQ = !inQ;
+      } else if(ch === ',' && !inQ){
+        row.push(cur); cur="";
+      } else if((ch === '\n' || ch === '\r') && !inQ){
+        if(ch === '\r' && nxt === '\n') i++;
+        row.push(cur); cur="";
+        if(row.some(x=>String(x).trim()!=="")) rows.push(row);
+        row=[];
+      } else {
+        cur+=ch;
+      }
+    }
+    row.push(cur);
+    if(row.some(x=>String(x).trim()!=="")) rows.push(row);
+    return rows;
+  }
+
+  function guessMap(headers){
+    const h = headers.map(x=>String(x||"").trim().toLowerCase());
+    const find = (keys)=>h.findIndex(v=>keys.some(k=>v.includes(k)));
+    return {
+      name: find(["اسم","name"]),
+      total: find(["تكلفة","اجمالي","total","cost"]),
+      covered: find(["مغط","covered","current"]),
+      students: find(["طلاب","students"]),
+      compoundCategory: find(["مجمع","compound"]),
+      dawr: find(["دور","الدور","hall","dawr"]),
+    };
+  }
+
+  function renderImportPreview(headers, dataRows){
+    const map = guessMap(headers);
+    const box = $("#importPreview");
+    box.style.display = "block";
+
+    const headOpts = headers.map((x,i)=>`<option value="${i}">${escapeHtml(x||("عمود "+(i+1)))}</option>`).join("");
+
+    const sel = (key, label, idx)=>`
+      <div style="flex:1; min-width: 180px;">
+        <div class="k">${escapeHtml(label)}</div>
+        <select class="select" data-map="${key}" style="width:100%;">
+          <option value="-1">—</option>
+          ${headOpts}
+        </select>
+      </div>
+    `;
+
+    box.innerHTML = `
+      <div class="tableWrap" style="padding:12px;">
+        <div class="row" style="gap:10px; flex-wrap:wrap;">
+          ${sel("name","الاسم", map.name)}
+          ${sel("compoundCategory","المجمع", map.compoundCategory)}
+          ${sel("dawr","الدور", map.dawr)}
+          ${sel("total","التكلفة", map.total)}
+          ${sel("covered","المغطّى", map.covered)}
+          ${sel("students","الطلاب", map.students)}
+        </div>
+
+        <div class="rowBtns" style="margin-top:10px;">
+          <button class="btn primary adminOnly" id="btnApplyImport">تطبيق الاستيراد</button>
+          <button class="btn" id="btnCancelImport">إلغاء</button>
+        </div>
+
+        <div class="k" style="margin-top:10px;">معاينة أول 5 صفوف:</div>
+        <div style="overflow:auto; border-radius:16px; border:1px solid rgba(11,18,32,.08); background: rgba(255,255,255,.74);">
+          <table style="min-width: 720px">
+            <thead><tr>${headers.map(x=>`<th>${escapeHtml(x||"")}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${dataRows.slice(0,5).map(r=>`<tr>${headers.map((_,i)=>`<td>${escapeHtml(r[i]||"")}</td>`).join("")}</tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    // Set defaults
+    $$('#importPreview select[data-map]').forEach(s=>{
+      const key = s.getAttribute("data-map");
+      const idx = map[key];
+      if(idx>=0) s.value = String(idx);
+      else s.value = "-1";
+    });
+
+    $("#btnCancelImport").addEventListener("click", ()=>{ box.style.display="none"; box.innerHTML=""; });
+
+    $("#btnApplyImport").addEventListener("click", ()=>{
+      if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+      const chosen = {};
+      $$('#importPreview select[data-map]').forEach(s=>{
+        chosen[s.getAttribute("data-map")] = Number(s.value);
+      });
+
+      const newCards = [];
+      for(const r of dataRows){
+        const name = chosen.name>=0 ? String(r[chosen.name]||"").trim() : "";
+        if(!name) continue;
+        const c = {
+          id: uid("c"),
+          name,
+          compoundCategory: chosen.compoundCategory>=0 ? String(r[chosen.compoundCategory]||"").trim() : "",
+          dawr: chosen.dawr>=0 ? String(r[chosen.dawr]||"").trim() : "",
+          total: chosen.total>=0 ? Math.max(0, Number(String(r[chosen.total]||"").replace(/[^\d.]/g,""))||0) : 0,
+          covered: chosen.covered>=0 ? Math.max(0, Number(String(r[chosen.covered]||"").replace(/[^\d.]/g,""))||0) : 0,
+          students: chosen.students>=0 ? Math.max(0, Number(String(r[chosen.students]||"").replace(/[^\d.]/g,""))||0) : 0,
+          admin:0, halaqat:0, programs:0
+        };
+        newCards.push(c);
+      }
+
+      // Merge strategy: by name+compoundCategory (if found, update; else add)
+      for(const c of newCards){
+        const existing = state.cards.find(x=>x.name===c.name && (x.compoundCategory||"")===(c.compoundCategory||""));
+        if(existing){
+          existing.total = c.total;
+          existing.covered = c.covered;
+          existing.students = c.students;
+          existing.dawr = c.dawr || existing.dawr;
+        }else{
+          state.cards.push(c);
+        }
+      }
+
+      state.cards = normalizeCardsV2(state.cards);
+      state.meta.updated_at = now();
+      saveLocal();
+      markDirty(true);
+      refreshFilters();
+      renderAll();
+      box.style.display="none"; box.innerHTML="";
+      toast("تم الاستيراد");
+    });
+  }
+
+  async function handleCsvText(text){
+    const rows = parseCSV(text);
+    if(rows.length < 2){ toast("CSV غير كافٍ"); return; }
+    const headers = rows[0];
+    const dataRows = rows.slice(1);
+    renderImportPreview(headers, dataRows);
+  }
+
+  $("#csvFile").addEventListener("change", async ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); $("#csvFile").value=""; return; }
+    const f = $("#csvFile").files?.[0];
+    if(!f) return;
+    const txt = await f.text();
+    await handleCsvText(txt);
+    $("#csvFile").value="";
+  });
+
+  $("#btnCsvPaste").addEventListener("click", async ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+    const txt = prompt("الصق CSV هنا:");
+    if(!txt) return;
+    await handleCsvText(txt);
+  });
+
+  // ===== Stage editor (admin) =====
+  function renderStageEditor(){
+    const el = $("#stageEditor");
+    if(!el) return;
+    if(!isUnlocked()){ el.innerHTML = ""; return; }
+
+    el.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${(state.stages||[]).map((st,i)=>`
+          <div class="stageRow" data-id="${escapeHtml(st.id)}" style="box-shadow:none;">
+            <div class="stageRowTop">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="display:inline-block;width:12px;height:12px;border-radius:999px;background:${escapeHtml(st.color)};"></span>
+                <input class="edit" data-k="name" value="${escapeHtml(st.name)}" style="max-width:220px;">
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div>
+                  <div class="k">نسبة من التكلفة</div>
+                  <input class="edit" data-k="target_ratio" type="number" step="0.01" value="${escapeHtml(st.target_ratio)}" style="width:120px;">
+                </div>
+                <div>
+                  <div class="k">لون</div>
+                  <input class="edit" data-k="color" type="color" value="${escapeHtml(st.color)}" style="width:58px; height:40px; padding:0; border-radius:12px;">
+                </div>
+                <button class="btn small" data-act="del">حذف</button>
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    el.querySelectorAll("input.edit").forEach(inp=>{
+      inp.addEventListener("change", ()=>{
+        const row = inp.closest("[data-id]");
+        const id = row.getAttribute("data-id");
+        const st = state.stages.find(x=>x.id===id);
+        if(!st) return;
+        const k = inp.getAttribute("data-k");
+        let v = inp.value;
+        if(k==="target_ratio"){
+          v = clamp(Number(v||0)||0, 0, 1.5);
+        }
+        st[k] = v;
+        state.stages = normalizeStagesV2(state.stages);
+        state.meta.updated_at = now();
+        saveLocal();
+        markDirty(true);
+        renderAll();
+      });
+    });
+
+    el.querySelectorAll("button[data-act='del']").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const row = btn.closest("[data-id]");
+        const id = row.getAttribute("data-id");
+        if(!confirm("حذف المرحلة؟")) return;
+        state.stages = state.stages.filter(x=>x.id!==id);
+        state.stages = normalizeStagesV2(state.stages);
+        state.meta.updated_at = now();
+        saveLocal();
+        markDirty(true);
+        renderAll();
+      });
+    });
+  }
+  $("#btnAddStage").addEventListener("click", ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+    state.stages.push({ id: uid("st"), name: "مرحلة جديدة", target_ratio: 0.1, target:null, color: "#6366F1" });
+    state.stages = normalizeStagesV2(state.stages);
+    state.meta.updated_at = now();
+    saveLocal();
+    markDirty(true);
+    renderAll();
+  });
+
+  // ===== Settings (admin) =====
+  $("#btnSaveSettings").addEventListener("click", ()=>{
+    if(!isUnlocked()){ toast("الخيارات مخفية"); return; }
+    const r = Number($("#setGoalRatio").value || 1);
+    let c = $("#setCoverageRatio").value;
+    c = (c==="" || c==null) ? null : Number(c);
+    state.settings.goal_ratio = (isFinite(r) && r>0) ? r : 1;
+    state.settings.coverage_ratio = (c==null || !isFinite(c)) ? null : clamp(c,0,1.5);
+    state.meta.updated_at = now();
+    saveLocal();
+    markDirty(true);
+    renderAll();
+    toast("تم الحفظ");
+  });
+  $("#btnLock").addEventListener("click", lockNow);
+
+  // ===== Detail open by hash route =====
+  function handleRoute(){
+    const h = (location.hash||"").replace(/^#/,"");
+    const mPage = h.match(/(?:^|&)page=([^&]+)/);
+    const page = mPage ? decodeURIComponent(mPage[1]) : "";
+    const mCard = h.match(/(?:^|&)card=([^&]+)/);
+    const id = mCard ? decodeURIComponent(mCard[1]) : null;
+
+    if(page==="detail" && id && state.cards.some(c=>c.id===id)){
+      openDetail(id);
+    }else{
+      // keep closed
+    }
+  }
+  window.addEventListener("hashchange", ()=>{ try{ handleRoute(); }catch(e){} });
+
+  // ===== Render =====
+  function renderAll(){
+    refreshFilters();
+    renderBoard();
+    renderList();
+    renderStageEditor();
+
+    // settings fields
+    if($("#setGoalRatio")) $("#setGoalRatio").value = String(state.settings.goal_ratio ?? 1);
+    if($("#setCoverageRatio")) $("#setCoverageRatio").value = (state.settings.coverage_ratio==null ? "" : String(state.settings.coverage_ratio));
+
+    // update last sync display from state meta
+    setLastSync(state.meta.updated_at || 0);
+  }
+
+  // ===== Init =====
+  (async function init(){
+    // load local first for speed
+    const local = loadLocal();
+    if(local){
+      state = local;
+      // consider local dirty if base_rev differs
+      markDirty(!!local.__dirty || false);
+    }
+
+    applyLockState();
+    startPresence();
+
+    // Pull latest ONCE on first load (so new visitor sees latest) but keep manual thereafter
+    try{
+      const remote = await fetchRemote();
+      // If local is empty or not dirty, accept remote
+      const localHasData = (state.cards||[]).length > 0 || (state.meta.updated_at||0) > 0;
+      if(!localHasData){
+        state = remote;
+        state.meta.base_rev = remote.meta.rev;
+        markDirty(false);
+      }else{
+        // keep local as working copy; only auto-accept if local not dirty and remote is newer
+        const localTs = Number(state.meta.updated_at||0)||0;
+        const remoteTs = Number(remote.meta.updated_at||0)||0;
+        if(!dirty && remoteTs > localTs){
+          state = remote;
+          state.meta.base_rev = remote.meta.rev;
+          markDirty(false);
+        }else{
+          // just keep remoteSnapshot for conflict detection
+          state.meta.base_rev = state.meta.base_rev || remote.meta.rev || state.meta.rev;
+        }
+      }
+      saveLocal();
+    }catch(e){
+      // offline ok
+    }
+
+    renderAll();
+    handleRoute();
+  })();
+
+})();
+</script>
 </body>
 </html>

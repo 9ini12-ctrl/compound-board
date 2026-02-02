@@ -5,7 +5,6 @@ export default async () => {
   const now = Date.now();
   const TTL = 120000; // 2 minutes
   let count = 0;
-  // list keys under prefix
   const list = await store.list({ prefix: "s/" });
   for (const it of (list?.blobs || [])) {
     const metaT = Number(it?.metadata?.t || 0);
