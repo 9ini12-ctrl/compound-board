@@ -1,18 +1,11 @@
-تشغيل على Netlify (جاهز):
+رفع بدون تعقيد (Netlify + GitHub):
 
-1) ارفع هذا المجلد على GitHub ثم اربطه في Netlify (Recommended).
-   - أو ارفعه كـ ZIP من Netlify UI إن كان حسابك يدعم Functions من الواجهة.
+1) فك الضغط.
+2) GitHub > Add file > Upload files
+3) ادخل للمجلد بعد فك الضغط ثم حدِّد كل ما بداخله (index.html + netlify.toml + package.json + مجلد netlify)
+4) اسحب الملفات المحددة إلى GitHub (لا تسحب "المجلد" نفسه حتى لا يصير داخل مجلد).
+5) Netlify: Trigger deploy (Clear cache and deploy).
 
-2) بعد النشر افتح الموقع.
-
-3) من الإعدادات > مزامنة جماعية:
-   - سيتم تعبئة الروابط تلقائيًا:
-     GET: /.netlify/functions/compounds-get
-     POST: /.netlify/functions/compounds-save
-
-4) عدّل البيانات من Manage ثم اضغط "نشر التعديل للجميع".
-
-5) المستخدمون الآخرون سيتم تحديثهم تلقائيًا حسب مؤقت التحديث.
-
-ملاحظة:
-- لو كنت تستخدم Drag&Drop بدون Repo: غالبًا Functions لن تعمل. الأفضل GitHub.
+اختبار:
+افتح: /.netlify/functions/compounds-get
+لازم يرجّع JSON (مو 404).

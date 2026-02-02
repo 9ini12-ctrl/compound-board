@@ -489,7 +489,96 @@
       .card{box-shadow:none}
       .inspector{position:static}
     }
-  </style>
+  
+
+    /* Mobile polish (phone-first). Keeps all features; only adjusts layout/typography for small screens. */
+    @media (max-width: 640px){
+      .wrap{padding: 10px 10px 90px;} /* extra bottom space for mobile nav */
+      .top{position:sticky; top:0; z-index:60; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);}
+      .topInner{flex-direction:column; align-items:stretch; gap:10px;}
+      .brand{gap:10px}
+      .brand h1{font-size:16px}
+      .brand p{font-size:12px; line-height:1.25}
+      .seg{width:100%; overflow:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start}
+      .seg button{flex:0 0 auto; min-width: 92px; padding:10px 12px; font-size:13px}
+      .actions{width:100%; flex-wrap:wrap}
+      .actions .btn{flex: 1 1 calc(50% - 8px); justify-content:center; padding:10px 12px; border-radius: 16px}
+      .actions .btn.small{flex: 1 1 calc(50% - 8px)}
+      .panel{border-radius: 18px}
+      .panelHead{padding: 12px; gap:10px}
+      .searchRow{min-width:100%}
+      .search{font-size:16px} /* prevent iOS zoom */
+      .chip{padding:8px 10px; font-size:12px}
+
+      /* Cards */
+      .list{padding: 10px; gap: 10px}
+      .card{border-radius: 18px; padding: 12px}
+      .cardTop{flex-direction:column; align-items:stretch; gap:8px}
+      .name{font-size:17px}
+      .kpi{min-width:0; text-align:right}
+      .kpi .v{font-size:15px}
+      .kpi .v strong{font-size:18px}
+      .meta{gap:6px}
+      .pill{font-size:12px; padding:8px 10px}
+
+      /* Progress + stages */
+      .progressRow{gap:10px}
+      .progressBar{height: 12px}
+      .stageStrip{gap:8px; flex-wrap:wrap}
+      .stagePill{flex: 1 1 calc(50% - 8px); min-width: 0}
+      .stagePill .t{font-size:12px}
+      .stagePill .v{font-size:14px}
+
+      /* Manage / settings forms */
+      .form{grid-template-columns: 1fr !important}
+      .field{grid-column:1/-1 !important}
+      input, select, textarea{font-size:16px} /* tap-friendly, no zoom */
+      .tableWrap{border-radius: 16px}
+      table{min-width: 860px} /* still scrollable; slightly lighter */
+
+      /* Reduce motion on phones for comfort */
+      .card:hover{transform:none}
+    }
+
+    /* Mobile bottom nav */
+    .mNav{display:none}
+    @media (max-width: 640px){
+      .mNav{
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        z-index: 80;
+        display:flex;
+        gap: 10px;
+        align-items:center;
+        justify-content:space-between;
+        padding: 10px 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.86);
+        border: 1px solid rgba(11,18,32,.10);
+        box-shadow: 0 20px 60px rgba(16,24,40,.18);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+      .mNavBtn{
+        appearance:none; border:0; background:transparent;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        gap:6px;
+        min-width: 54px;
+        padding: 8px 6px;
+        border-radius: 16px;
+        color: rgba(11,18,32,.80);
+        font-weight:1000;
+        cursor:pointer;
+        transition: .12s ease;
+      }
+      .mNavBtn:active{transform: scale(.98)}
+      .mI{font-size:18px; line-height:1}
+      .mT{font-size:11px; line-height:1}
+      .mSep{width:1px; height:34px; background: rgba(11,18,32,.10); border-radius: 999px}
+    }
+</style>
 </head>
 <body>
   <header class="top">
@@ -516,6 +605,27 @@
       </div>
     </div>
   </header>
+
+  <!-- Mobile bottom navigation (keeps all existing controls; adds easier access on phones) -->
+  <nav class="mNav no-print" aria-label="تنقل الهاتف">
+    <button class="mNavBtn" data-target="tabView" aria-label="عرض">
+      <span class="mI">👁️</span><span class="mT">عرض</span>
+    </button>
+    <button class="mNavBtn" data-target="tabManage" aria-label="إدارة">
+      <span class="mI">🛠️</span><span class="mT">إدارة</span>
+    </button>
+    <button class="mNavBtn" data-target="tabSettings" aria-label="إعدادات">
+      <span class="mI">⚙️</span><span class="mT">إعدادات</span>
+    </button>
+    <span class="mSep" aria-hidden="true"></span>
+    <button class="mNavBtn" data-action="print" aria-label="طباعة / PDF">
+      <span class="mI">🖨️</span><span class="mT">PDF</span>
+    </button>
+    <button class="mNavBtn" data-action="images" aria-label="تصدير صور">
+      <span class="mI">🖼️</span><span class="mT">صور</span>
+    </button>
+  </nav>
+
 
   <main class="wrap">
     <section class="layout">
@@ -1789,6 +1899,29 @@
         alert("تعذر النشر عبر رابط الحفظ.\nتأكد من الرابط و CORS وطريقة التوثيق.");
       }
     }
+
+
+    
+    // ===== Mobile nav wiring (no feature changes) =====
+    (function(){
+      const nav = document.querySelector(".mNav");
+      if(!nav) return;
+      nav.addEventListener("click", (e)=>{
+        const btn = e.target.closest(".mNavBtn");
+        if(!btn) return;
+        const tgt = btn.getAttribute("data-target");
+        const act = btn.getAttribute("data-action");
+        if(tgt){
+          const el = document.getElementById(tgt);
+          if(el) el.click();
+        }else if(act==="print"){
+          document.getElementById("btnPrint")?.click();
+        }else if(act==="images"){
+          // Prefer ZIP export of images when available; fallback to single images export
+          document.getElementById("btnExportZip")?.click() || document.getElementById("btnExportImages")?.click();
+        }
+      });
+    })();
 
 
     // ===== Init =====
