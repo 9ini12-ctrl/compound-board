@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "updated_at": 1770190149297,
+    "schema": 1
+  },
+  "settings": {
+    "returnRate": "9",
+    "goalScope": "remaining",
+    "leftDensity": "calm"
+  },
+  "stages": [
+    {
+      "id": "c4d46a48de82819c1d437a04",
+      "name": "المرحلة الأولى",
+      "period": "خلال رمضان",
+      "target_pct": 65
+    },
+    {
+      "id": "9c714750d657e819c1d437a04",
+      "name": "المرحلة الثانية",
+      "period": "بعد رمضان",
+      "target_pct": 80
+    },
+    {
+      "id": "a5e96be5544dc819c1d437a04",
+      "name": "المرحلة الثالثة",
+      "period": "نصف السنة",
+      "target_pct": 90
+    },
+    {
+      "id": "b70be1ad4674419c1d437a04",
+      "name": "المرحلة الرابعة",
+      "period": "نهاية السنة",
+      "target_pct": 100
+    }
+  ],
+  "cards": [
+    {
+      "id": "ea0eedaf4968f819c1d442fda",
+      "branch_name": "مجمع أبي بن كعب",
+      "total_cost": 146780,
+      "students": 95,
+      "covered_current_amount": 62700,
+      "covered_current_pct": 42.716991415724216
+    },
+    {
+      "id": "f53da43ee5c0f819c1d442fda",
+      "branch_name": "مجمع سعيد بن زيد",
+      "total_cost": 118240,
+      "students": 78,
+      "covered_current_amount": 50050,
+      "covered_current_pct": 42.32916102841678
+    },
+    {
+      "id": "ada7aec5169d119c1d442fda",
+      "branch_name": "مجمع أسامة بن زيد",
+      "total_cost": 233640,
+      "students": 163,
+      "covered_current_amount": 99000,
+      "covered_current_pct": 42.3728813559322
+    },
+    {
+      "id": "0923f01d6c733819c1d442fda",
+      "branch_name": "مجمع عمر بن الخطاب",
+      "total_cost": 253980,
+      "students": 180,
+      "covered_current_amount": 116050,
+      "covered_current_pct": 45.692574218442395
+    },
+    {
+      "id": "d4eeb6ea9aaa3819c1d442fda",
+      "branch_name": "مجمع جامع المصيريعي",
+      "total_cost": 166140,
+      "students": 123,
+      "covered_current_amount": 68750,
+      "covered_current_pct": 41.38076321174913
+    },
+    {
+      "id": "d90ecc198741a19c1d442fda",
+      "branch_name": "مجمع مصعب بن عمير",
+      "total_cost": 281960,
+      "students": 214,
+      "covered_current_amount": 117150,
+      "covered_current_pct": 41.54844658816854
+    },
+    {
+      "id": "b5636561846bb819c1d442fda",
+      "branch_name": "مجمع عتبة بن غزوان",
+      "total_cost": 344760,
+      "students": 263,
+      "covered_current_amount": 143000,
+      "covered_current_pct": 41.47812971342383
+    },
+    {
+      "id": "bc524b400b88919c1d442fda",
+      "branch_name": "مجمع سعد بن معاذ",
+      "total_cost": 103820,
+      "students": 81,
+      "covered_current_amount": 41800,
+      "covered_current_pct": 40.261991909073394
+    },
+    {
+      "id": "3c693e871468519c1d442fda",
+      "branch_name": "مجمع الزبير بن العوام",
+      "total_cost": 146980,
+      "students": 120,
+      "covered_current_amount": 64900,
+      "covered_current_pct": 44.15566743774663
+    },
+    {
+      "id": "de68c335239fb819c1d442fda",
+      "branch_name": "مجمع عثمان بن عفان",
+      "total_cost": 412120,
+      "students": 350,
+      "covered_current_amount": 166650,
+      "covered_current_pct": 40.437251286033195
+    },
+    {
+      "id": "4eb0811e61aac819c1d442fda",
+      "branch_name": "مجمع عبدالله بن عباس",
+      "total_cost": 58920,
+      "students": 52,
+      "covered_current_amount": 22000,
+      "covered_current_pct": 37.3387644263408
+    },
+    {
+      "id": "cf2a29464489119c1d442fda",
+      "branch_name": "مجمع زيد بن ثابت",
+      "total_cost": 353520,
+      "students": 348,
+      "covered_current_amount": 135300,
+      "covered_current_pct": 38.27223353699932
+    },
+    {
+      "id": "126e311c1e8ef19c1d442fda",
+      "branch_name": "مجمع الحلقات المنفردة",
+      "total_cost": 90680,
+      "students": 96,
+      "covered_current_amount": 33000,
+      "covered_current_pct": 36.39170710189678
+    },
+    {
+      "id": "7d101dc3d7ab1819c1d442fda",
+      "branch_name": "مجمع عبدالله بن مسعود",
+      "total_cost": 88520,
+      "students": 97,
+      "covered_current_amount": 31350,
+      "covered_current_pct": 35.41572525982829
+    },
+    {
+      "id": "416a5fa56e90919c1d442fda",
+      "branch_name": "مجمع الحلقات الإلكترونية",
+      "total_cost": 284720,
+      "students": 370,
+      "covered_current_amount": 95700,
+      "covered_current_pct": 33.6119696543973
+    },
+    {
+      "id": "deb8d3cd40e8919c1d442fda",
+      "branch_name": "مجمع الحلق الاجتماعية",
+      "total_cost": 95320,
+      "students": 194,
+      "covered_current_amount": 20900,
+      "covered_current_pct": 21.926143516575745
+    }
+  ]
+}
