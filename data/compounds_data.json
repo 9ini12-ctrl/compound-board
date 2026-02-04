@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "updated_at": 1769990000000,
+    "schema": 1
+  },
+  "settings": {
+    "returnRate": "9",
+    "goalScope": "remaining",
+    "leftDensity": "calm"
+  },
+  "stages": [
+    {
+      "id": "stg_1",
+      "name": "المرحلة الأولى",
+      "period": "خلال رمضان",
+      "target_pct": 65
+    },
+    {
+      "id": "stg_2",
+      "name": "المرحلة الثانية",
+      "period": "بعد رمضان",
+      "target_pct": 80
+    },
+    {
+      "id": "stg_3",
+      "name": "المرحلة الثالثة",
+      "period": "نصف السنة",
+      "target_pct": 90
+    },
+    {
+      "id": "stg_4",
+      "name": "المرحلة الرابعة",
+      "period": "نهاية السنة",
+      "target_pct": 100
+    }
+  ],
+  "cards": [
+    {
+      "id": "seed1",
+      "branch_name": "مجمع زيد بن ثابت",
+      "total_cost": 123234,
+      "students": 420,
+      "covered_current_amount": 45600
+    },
+    {
+      "id": "seed2",
+      "branch_name": "مجمع الإمام عاصم",
+      "total_cost": 310000,
+      "students": 980,
+      "covered_current_amount": 115000
+    }
+  ],
+  "selectedId": "seed1"
+}
