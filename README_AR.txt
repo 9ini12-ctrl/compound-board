@@ -7,11 +7,5 @@
 5) Netlify: Trigger deploy (Clear cache and deploy).
 
 اختبار:
-
-افتح بعد الرفع:
-/data/compounds_data.json
+افتح: /.netlify/functions/compounds-get
 لازم يرجّع JSON (مو 404).
-
-ملاحظة مهمة:
-- التطبيق الآن يعتمد افتراضيًا على هذا الملف كمصدر بيانات مركزي للجميع.
-- لتحديث البيانات للجميع: حدّث ملف JSON على السيرفر (أو داخل GitHub ثم Deploy).

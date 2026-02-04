@@ -2034,7 +2034,12 @@
 
     // Sample data
     document.getElementById("btnAddSample").addEventListener("click", ()=>{
-      cards=[];
+      cards=[
+        normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
+        normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
+        normalizeCard({branch_name:"مجمع حفصة بنت عمر", total_cost:"180000", students:"520", covered_current_pct:"22"}, "seed3"),
+        normalizeCard({branch_name:"مجمع عثمان بن عفان", total_cost:"265000", students:"730", covered_current_amount:"92000"}, "seed4"),
+      ];
       if(!stages.length) stages=defaultStages();
       selectedId=cards[0].id;
       renderStages(); rerenderAll(); save();
@@ -2223,24 +2228,30 @@
 
 
     // ===== Init =====
-    (function init(){
-      const ok=load();
-      if(!ok){
-        stages=defaultStages();
-        cards=[];
-        selectedId=cards[0].id;
-      }
+    (async function init(){
+      const ok = load();
 
-      // Default: use a centralized JSON file hosted with the site (can be replaced from Settings).
-      // This makes the "server JSON" the primary source for everyone, while localStorage remains a cache/fallback.
+      // Force centralized JSON by default (no more seed examples)
+      // If user has no remote URL saved, set it automatically.
       try{
         if(remoteGetUrl && !(remoteGetUrl.value||"").trim()){
-          const isFile = (location.protocol === 'file:' || location.origin === 'null');
-          remoteGetUrl.value = isFile ? `./data/compounds_data.json` : `${location.origin}/data/compounds_data.json`;
+          const isFile = location.protocol === "file:";
+          const def = isFile ? "./data/compounds_data.json" : (location.origin + "/data/compounds_data.json");
+          remoteGetUrl.value = def;
         }
-      }catch(e){}
+        if(remoteAutoOn) remoteAutoOn.value = "on";
+        if(remoteInterval && !(remoteInterval.value||"").trim()) remoteInterval.value = "20";
+      }catch(_){}
 
-      if(!Array.isArray(stages) || !stages.length) stages=defaultStages();
+      // Always start with minimal local state; remote will override on success
+      if(!ok){
+        stages = defaultStages();
+        cards = [];
+        selectedId = null;
+      }
+
+      // Normalize local (if any) before first render
+      if(!Array.isArray(stages) || !stages.length) stages = defaultStages();
       cards = (cards||[]).map(c=>normalizeCard(c, c.id||uid())).filter(c=>c.branch_name);
 
       renderStages();
@@ -2251,8 +2262,17 @@
       else updateInspectorEmpty();
 
       setMode("view");
-      startSyncTimer();
       save();
+
+      // Fetch remote immediately (then keep polling)
+      const fetched = await fetchRemoteOnce(true);
+      startSyncTimer();
+
+      // If remote fetch succeeded, UI already re-rendered inside fetchRemoteOnce
+      // If it failed and we have no cards, show a helpful badge.
+      if(!fetched && (!cards || !cards.length)){
+        setSyncBadge("ضع رابط JSON (GET) في الإعدادات", false);
+      }
     })();
   </script>
 
