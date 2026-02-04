@@ -2243,7 +2243,8 @@
       // This makes the "server JSON" the primary source for everyone, while localStorage remains a cache/fallback.
       try{
         if(remoteGetUrl && !(remoteGetUrl.value||"").trim()){
-          remoteGetUrl.value = `${location.origin}/data/compounds_data.json`;
+          const isFile = (location.protocol === 'file:' || location.origin === 'null');
+          remoteGetUrl.value = isFile ? `./data/compounds_data.json` : `${location.origin}/data/compounds_data.json`;
         }
       }catch(e){}
 
