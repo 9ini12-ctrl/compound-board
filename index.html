@@ -2034,12 +2034,7 @@
 
     // Sample data
     document.getElementById("btnAddSample").addEventListener("click", ()=>{
-      cards=[
-        normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
-        normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
-        normalizeCard({branch_name:"مجمع حفصة بنت عمر", total_cost:"180000", students:"520", covered_current_pct:"22"}, "seed3"),
-        normalizeCard({branch_name:"مجمع عثمان بن عفان", total_cost:"265000", students:"730", covered_current_amount:"92000"}, "seed4"),
-      ];
+      cards=[];
       if(!stages.length) stages=defaultStages();
       selectedId=cards[0].id;
       renderStages(); rerenderAll(); save();
@@ -2232,10 +2227,7 @@
       const ok=load();
       if(!ok){
         stages=defaultStages();
-        cards=[
-          normalizeCard({branch_name:"مجمع زيد بن ثابت", total_cost:"123234", students:"420", covered_current_pct:"37"}, "seed1"),
-          normalizeCard({branch_name:"مجمع الإمام عاصم", total_cost:"310000", students:"980", covered_current_amount:"115000"}, "seed2"),
-        ];
+        cards=[];
         selectedId=cards[0].id;
       }
 
