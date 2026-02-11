@@ -1,8 +1,4 @@
 {
-  "meta": {
-    "updated_at": 1770190149297,
-    "schema": 1
-  },
   "settings": {
     "returnRate": "9",
     "goalScope": "remaining",
@@ -162,6 +158,222 @@
       "students": 194,
       "covered_current_amount": 20900,
       "covered_current_pct": 21.926143516575745
+    },
+    {
+      "id": "8bb68dae46b319c4ecc111d",
+      "branch_name": "الحركان الصباحية",
+      "total_cost": 252164,
+      "students": 137,
+      "covered_current_amount": 119232,
+      "covered_current_pct": 47.283513903650004
+    },
+    {
+      "id": "a0d466876879d19c4ecc111d",
+      "branch_name": "العضيب الصباحية",
+      "total_cost": 168412,
+      "students": 103,
+      "covered_current_amount": 79056,
+      "covered_current_pct": 46.94202313374344
+    },
+    {
+      "id": "812e24a81fac319c4ecc111d",
+      "branch_name": "الفهد الصباحية",
+      "total_cost": 110444,
+      "students": 59,
+      "covered_current_amount": 52272,
+      "covered_current_pct": 47.32896309441889
+    },
+    {
+      "id": "31a72f5d2d1d1819c4ecc111d",
+      "branch_name": "نورة الشبل الصباحية",
+      "total_cost": 96652,
+      "students": 55,
+      "covered_current_amount": 45576,
+      "covered_current_pct": 47.15474071928155
+    },
+    {
+      "id": "f7753e8a0734e819c4ecc111d",
+      "branch_name": "البديعة الصباحية",
+      "total_cost": 66868,
+      "students": 25,
+      "covered_current_amount": 32184,
+      "covered_current_pct": 48.13064545073877
+    },
+    {
+      "id": "70c77269f1fb7819c4ecc111d",
+      "branch_name": "تراتيل الصباحية",
+      "total_cost": 331724,
+      "students": 263,
+      "covered_current_amount": 152712,
+      "covered_current_pct": 46.0358611375722
+    },
+    {
+      "id": "10f29711c16cb19c4ecc111d",
+      "branch_name": "الملك خالد الصباحية",
+      "total_cost": 97352,
+      "students": 62,
+      "covered_current_amount": 45576,
+      "covered_current_pct": 46.81567918481387
+    },
+    {
+      "id": "1587af55b9b2919c4ecc111d",
+      "branch_name": "الحركان المسائية",
+      "total_cost": 390392,
+      "students": 314,
+      "covered_current_amount": 179496,
+      "covered_current_pct": 45.978401196745835
+    },
+    {
+      "id": "ca93a4abfcf5f819c4ecc111d",
+      "branch_name": "العضيب المسائية",
+      "total_cost": 183204,
+      "students": 117,
+      "covered_current_amount": 85752,
+      "covered_current_pct": 46.80683827864021
+    },
+    {
+      "id": "84250f963216e819c4ecc111d",
+      "branch_name": "تراتيل المسائية",
+      "total_cost": 334724,
+      "students": 293,
+      "covered_current_amount": 152712,
+      "covered_current_pct": 45.62325976028011
+    },
+    {
+      "id": "f4f4af99ce4fc19c4ecc111d",
+      "branch_name": "الفهد المسائية",
+      "total_cost": 170212,
+      "students": 121,
+      "covered_current_amount": 79056,
+      "covered_current_pct": 46.44560900524052
+    },
+    {
+      "id": "b857b1b10fee4819c4ecc111d",
+      "branch_name": "دار المطار المسائية (حصة السليم)",
+      "total_cost": 244772,
+      "students": 197,
+      "covered_current_amount": 112536,
+      "covered_current_pct": 45.97584691059435
+    },
+    {
+      "id": "ed7fd2cbc4b4f819c4ecc111d",
+      "branch_name": "مشرفة المسائية",
+      "total_cost": 139228,
+      "students": 79,
+      "covered_current_amount": 65664,
+      "covered_current_pct": 47.162926997443044
+    },
+    {
+      "id": "52b1aa3aea84819c4ecc111d",
+      "branch_name": "غراس المسائية",
+      "total_cost": 152620,
+      "students": 79,
+      "covered_current_amount": 72360,
+      "covered_current_pct": 47.411872624819814
+    },
+    {
+      "id": "3dd1a831be86619c4ecc111d",
+      "branch_name": "التلقين المسائية",
+      "total_cost": 165212,
+      "students": 71,
+      "covered_current_amount": 79056,
+      "covered_current_pct": 47.8512456722272
+    },
+    {
+      "id": "746b18f5d1d38819c4ecc111d",
+      "branch_name": "الفيحاء المسائية",
+      "total_cost": 126536,
+      "students": 86,
+      "covered_current_amount": 58968,
+      "covered_current_pct": 46.601757602579504
+    },
+    {
+      "id": "68b311cbb5144819c4ecc111d",
+      "branch_name": "الودي المسائية",
+      "total_cost": 96052,
+      "students": 49,
+      "covered_current_amount": 45576,
+      "covered_current_pct": 47.44929829675593
+    },
+    {
+      "id": "4ee656a9bba01819c4ecc111d",
+      "branch_name": "البديعة المسائية",
+      "total_cost": 199896,
+      "students": 150,
+      "covered_current_amount": 92448,
+      "covered_current_pct": 46.248048985472444
+    },
+    {
+      "id": "9fe5eb50b2b7b19c4ecc111d",
+      "branch_name": "الملك خالد المسائية",
+      "total_cost": 303540,
+      "students": 249,
+      "covered_current_amount": 139320,
+      "covered_current_pct": 45.898398893061874
+    },
+    {
+      "id": "6717d5d36fef919c4ecc111d",
+      "branch_name": "البويطن المسائية",
+      "total_cost": 95252,
+      "students": 41,
+      "covered_current_amount": 45576,
+      "covered_current_pct": 47.847814219124004
+    },
+    {
+      "id": "7ffdc47187133819c4ecc111d",
+      "branch_name": "نورة الشبل المسائية",
+      "total_cost": 195296,
+      "students": 104,
+      "covered_current_amount": 92448,
+      "covered_current_pct": 47.337375061445194
+    },
+    {
+      "id": "24a617e87fc9c19c4ecc111d",
+      "branch_name": "ابن عيد المسائية",
+      "total_cost": 138828,
+      "students": 75,
+      "covered_current_amount": 65664,
+      "covered_current_pct": 47.298815800847095
+    },
+    {
+      "id": "aca1501015ca2819c4ecc111d",
+      "branch_name": "الحميضي المسائية",
+      "total_cost": 142528,
+      "students": 112,
+      "covered_current_amount": 65664,
+      "covered_current_pct": 46.07094746295465
+    },
+    {
+      "id": "e8de123ec4d3e19c4ecc111d",
+      "branch_name": "موضي الخنيني",
+      "total_cost": 215888,
+      "students": 176,
+      "covered_current_amount": 99144,
+      "covered_current_pct": 45.92381234714296
+    },
+    {
+      "id": "b5ec0f09207bd19c4ecc111d",
+      "branch_name": "حصة بنت عبدالله البسام",
+      "total_cost": 98452,
+      "students": 73,
+      "covered_current_amount": 45576,
+      "covered_current_pct": 46.29260959655467
+    },
+    {
+      "id": "2dd10fbd69ccd819c4ecc111d",
+      "branch_name": "جامع التميمي",
+      "total_cost": 110544,
+      "students": 60,
+      "covered_current_amount": 52272,
+      "covered_current_pct": 47.286148501953974
+    },
+    {
+      "id": "20d9e52de742a819c4ecc111d",
+      "branch_name": "المقرأة الإلكترونية",
+      "total_cost": 569812,
+      "students": 769,
+      "covered_current_amount": 246456,
+      "covered_current_pct": 43.252160361663144
     }
   ]
 }
